@@ -26,5 +26,7 @@
     
     
     <string name="send_successed">发送成功!</string>
+    
+    <string name="recover_system_font_txt">恢复系统默认字体</string>
 
 </resources>

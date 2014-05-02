@@ -1,24 +1,20 @@
 package com.hly.fontxiu.fontquality;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import com.hly.fontxiu.R;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Button;
+
+import com.hly.fontxiu.R;
+import com.hly.fontxiu.fontmanager.FontResUtil;
+import com.hly.fontxiu.fontmanager.FontResource;
 
 public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 
@@ -58,8 +54,20 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		for (View v : fontsImageView) {
 			v.setOnClickListener(this);
 		}
+		Button btn = (Button)view.findViewById(R.id.btn_recover_system_font);
+		btn.setOnClickListener(mRecoverSystemFontClickListener);
 		return view;
 	}
+	
+	OnClickListener mRecoverSystemFontClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View arg0) {
+			FontResource fontRes = new FontResource("", "", "", null);
+			FontResUtil.updateSysteFontConfiguration(fontRes);
+            FontResUtil.saveSystemFontRes(getActivity(), fontRes);
+		}
+	};
 
 	@Override
 	public void onClick(View arg0) {

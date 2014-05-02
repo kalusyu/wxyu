@@ -117,7 +117,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
             @Override
             public void onGetOnlineConfigFailed(String key) {
                 // 获取在线参数失败，可能原因有：键值未设置或为空、网络异常、服务器异常
-            	mAwardPoints = 200+"";
+            	mAwardPoints = 280+"";
             }
         });
 	}

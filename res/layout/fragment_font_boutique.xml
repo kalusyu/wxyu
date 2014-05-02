@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+	
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -10,6 +10,12 @@
         android:layout_marginRight="5dip"
         android:gravity="center"
         android:orientation="vertical" >
+        
+        <Button android:id="@+id/btn_recover_system_font"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_background"
+            android:text="@string/recover_system_font_txt"/>
 
         <LinearLayout
             android:layout_width="match_parent"
