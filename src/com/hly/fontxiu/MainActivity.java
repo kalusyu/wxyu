@@ -32,6 +32,7 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.hly.fontxiu.feedback.FeedBackActivity;
+import com.hly.fontxiu.fontall.FontAllFragment;
 import com.hly.fontxiu.fontquality.FontBoutiqueFragment;
 import com.hly.fontxiu.points.EarnPointsFragment;
 import com.hly.fontxiu.setting.AboutActivity;
@@ -45,11 +46,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
     public static final String TAG = "MainActivity";
 
-    private static final int PAGE_COUNT = 2;
+    private static final int PAGE_COUNT = 3;
 
     public static final int FONT_QUALITY_LIST = 0;
-    public static final int FONT_EARN_POINTS = 1;
-    public static final int FONT_ALL = 2;
+    public static final int FONT_ALL = 1;
+    public static final int FONT_EARN_POINTS = 2;
 
     private TextView mTabQuality;
     private TextView mTabAllFont;
@@ -66,7 +67,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     String mKey = "mAwardFirstTime";  // key
     String defaultValue = null;    // 默认的 value，当获取不到在线参数时，会返回该值
 
-    private String mAwardPoints;
+    public static String sAwardPoints;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,13 +112,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
             @Override
             public void onGetOnlineConfigSuccessful(String key, String value) {
                 // 获取在线参数成功
-            	mAwardPoints = value;
+            	sAwardPoints = value;
             }
 
             @Override
             public void onGetOnlineConfigFailed(String key) {
                 // 获取在线参数失败，可能原因有：键值未设置或为空、网络异常、服务器异常
-            	mAwardPoints = 280+"";
+            	sAwardPoints = 280+"";
             }
         });
 	}
@@ -137,10 +138,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		if (isWifi || isNetData) {
 			boolean isFirstLoading = sp.getBoolean("isFirstLoading", true);
 			if (isFirstLoading){
-				PointsHelper.awardPoints(this, Integer.parseInt(mAwardPoints));
+				PointsHelper.awardPoints(this, Integer.parseInt(sAwardPoints));
 				sp.edit().putBoolean("isFirstLoading", false).commit();
 				new AlertDialog.Builder(this).setTitle("字体秀秀")
-						.setMessage("恭喜您获得"+Integer.parseInt(mAwardPoints)+"金币奖励")
+						.setMessage("恭喜您获得"+Integer.parseInt(sAwardPoints)+"金币奖励")
 						.setNeutralButton("确定", null).create().show();
 			}
 		}
@@ -269,10 +270,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         mTabQuality.setId(FONT_QUALITY_LIST);
         mTabQuality.setOnClickListener(this);
 
-        // mTabAllFont = (TextView)findViewById(R.id.tab_font_all);
-        // mTabAllFont.setText("全部");
-        // mTabAllFont.setId(FONT_ALL);
-        // mTabAllFont.setOnClickListener(this);
+         mTabAllFont = (TextView)findViewById(R.id.tab_font_all);
+         mTabAllFont.setText("全部");
+         mTabAllFont.setId(FONT_ALL);
+         mTabAllFont.setOnClickListener(this);
 
         mTabEarnPoints = (TextView)findViewById(R.id.tab_earn_points);
         mTabEarnPoints.setText("获取积分");
@@ -281,7 +282,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
         mTabs = new TextView[PAGE_COUNT];
         mTabs[FONT_QUALITY_LIST] = mTabQuality;
-        // mTabs[FONT_ALL] = mTabAllFont;
+         mTabs[FONT_ALL] = mTabAllFont;
         mTabs[FONT_EARN_POINTS] = mTabEarnPoints;
     }
 
@@ -332,7 +333,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
                 case FONT_ALL:
                     // TODO
-                    mListFragment[position] = new Fragment();
+                    mListFragment[position] = new FontAllFragment();
                     break;
                 case FONT_EARN_POINTS:
                     // TODO

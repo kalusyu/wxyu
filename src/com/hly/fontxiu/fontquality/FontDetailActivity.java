@@ -125,7 +125,7 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 											.getViewPager();
 									if (viewPager != null) {
 										FontDetailActivity.this.finish();
-										viewPager.setCurrentItem(1);
+										viewPager.setCurrentItem(2);
 									}
 								}
 							})

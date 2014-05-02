@@ -33,7 +33,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:background="@drawable/btn_background"
-            android:text="精品" />
+            android:text="@string/boutique" />
 
         <TextView
             android:id="@+id/tab_font_all"
@@ -41,9 +41,8 @@
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:visibility="gone"
             android:background="@drawable/btn_background"
-            android:text="全部" />
+            android:text="@string/all" />
 
         <TextView
             android:id="@+id/tab_earn_points"
@@ -52,7 +51,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:background="@drawable/btn_background"
-            android:text="获取积分" />
+            android:text="@string/get_points" />
     </LinearLayout>
 
 </LinearLayout>
