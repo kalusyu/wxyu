@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <RelativeLayout
+        android:id="@+id/OffersMiniBannerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" >
+    </RelativeLayout>
+    
+    
+    <Button android:id="@+id/btn_earn_points"
+        android:layout_width="45dip"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:ems="2"
+        android:background="@drawable/btn_background"
+        android:layout_below="@id/OffersMiniBannerLayout"
+        android:text="获取更多积分"/>
+    
+        <TextView android:id="@+id/txt_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="#f5b10d"
+            android:layout_below="@id/OffersMiniBannerLayout"
+            android:layout_margin="20dip"/>
+    <ScrollView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="50dip"
+        android:layout_below="@id/txt_points"
+        android:paddingLeft="20dip">
+        
+        <TextView android:id="@+id/txt_points_indroduce"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="#ff0000"/>
+    </ScrollView>
+    <RelativeLayout
+        android:id="@+id/offersBannerLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" >
+    </RelativeLayout>
+    
+    
+</RelativeLayout>

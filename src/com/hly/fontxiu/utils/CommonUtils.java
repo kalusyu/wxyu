@@ -1,0 +1,97 @@
+package com.hly.fontxiu.utils;
+
+import android.content.Context;
+import android.telephony.TelephonyManager;
+import android.widget.Toast;
+
+import com.hly.fontxiu.mail.MailSenderInfo;
+import com.hly.fontxiu.mail.SimpleMailSender;
+
+/**
+ * 
+ * @author "biaowen.yu"
+ * @date 2014-4-6 下午10:37:44
+ */
+public class CommonUtils {
+
+	public static final String FontXiu = "FontXiu";
+	
+	public static final String CURRENT_POINTS = "CURRENT_POINTS";
+	
+	
+	public static void toastText(Context context,String text){
+		Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+	}
+
+
+	public static void toastText(Context context, int adTabTitle) {
+		Toast.makeText(context, adTabTitle, Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * 
+	 * @author "biaowen.yu"
+	 * @date 2014-4-8 下午10:56:35
+	 * @description 
+	 * @return
+	 */
+	public static MailSenderInfo initEmail() {
+		// 这个类主要是设置邮件
+		MailSenderInfo mailInfo = new MailSenderInfo();
+		mailInfo.setMailServerHost("smtp.163.com");
+		mailInfo.setMailServerPort("25");
+		mailInfo.setValidate(true);
+		mailInfo.setUserName("jobiaolin0119@163.com");
+		mailInfo.setPassword("258190yubiaowen");// 您的邮箱密码
+		mailInfo.setFromAddress("jobiaolin0119@163.com");
+		mailInfo.setToAddress("741470894@qq.com");
+		return mailInfo;
+	}
+	
+	/**
+	 * 
+	 * @author "biaowen.yu"
+	 * @date 2014-4-12 上午9:36:05
+	 * @description 
+	 * @param context
+	 * @return
+	 */
+	public static String getUserInfo(Context context) {
+		TelephonyManager mTelephonyMgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		String imsi = mTelephonyMgr.getSubscriberId();
+		String imei = mTelephonyMgr.getDeviceId();
+		StringBuilder sb = new StringBuilder();
+		sb.append("用户手机信息：\n").append("imsi=").append(imsi).append("\n").append("imei=").append(imei).append("\n");
+		sb.append("\n\n\n\n");
+		sb.append("产品PRODUCT: ").append(android.os.Build.PRODUCT).append("\n");// /
+		sb.append("品牌BRAND: ").append(android.os.Build.BRAND).append("\n");// /
+		sb.append("制造商MANUFACTURER: ").append(android.os.Build.MANUFACTURER)
+		.append("\n");
+		sb.append("设备DEVICE: ").append(android.os.Build.DEVICE).append("\n");
+		sb.append("SDK: ").append(android.os.Build.VERSION.SDK_INT);// //
+		
+		sb.append("BOARD: ").append(android.os.Build.BOARD).append("\n");// /
+		sb.append("DISPLAY: ").append(android.os.Build.DISPLAY).append("\n");
+		sb.append("HOST: ").append(android.os.Build.HOST).append("\n"); // //
+		sb.append("MODEL: ").append(android.os.Build.MODEL).append("\n");// /
+		sb.append("TIME: ").append(android.os.Build.TIME).append("\n");
+		sb.append("ANDROID VERSION: ").append(android.os.Build.VERSION.RELEASE);// //
+		
+		return sb.toString();
+	}
+	
+	
+	private static SimpleMailSender sms;
+	
+	private static SimpleMailSender getInstance(){
+		return sms;
+	}
+	
+	public static void sendEmail(MailSenderInfo mailInfo){
+		if (sms == null){
+			sms = new SimpleMailSender();
+		}
+		sms.sendTextMail(mailInfo);
+	}
+	
+}

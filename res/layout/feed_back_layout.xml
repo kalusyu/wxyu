@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dip"
+        android:text="@string/feed_back_content_tips" >
+    </TextView>
+
+    <EditText
+        android:id="@+id/edt_feed_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv1"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        android:background="@drawable/textfield_background"
+        android:minLines="5" />
+
+    <TextView
+        android:id="@+id/tv2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_feed_back"
+        android:layout_margin="10dip"
+        android:layout_marginTop="20dip"
+        android:text="@string/feed_back_contacts_tips" >
+    </TextView>
+
+    <EditText
+        android:id="@+id/edt_contacts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv2"
+        android:inputType="text"
+        android:background="@drawable/textfield_background" />
+
+    <Button
+        android:id="@+id/btn_submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/btn_background"
+        android:onClick="submitFeedBack"
+        android:text="提交"
+        android:textColor="#f5b10d" />
+"
+
+</RelativeLayout>

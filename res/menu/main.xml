@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+ <!--    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/> -->
+
+     <item  
+        android:id="@+id/menu_share"  
+        android:icon="@drawable/ic_menu_share"
+        android:showAsAction="always"  
+        android:title="分享"/> 
+        
+     <item 
+         android:id="@+id/menu_feedback"
+         android:showAsAction="always"
+         android:icon="@drawable/feed_back"
+         android:title="反馈"/>
+     
+     <item 
+         android:id="@+id/menu_about"
+         android:showAsAction="never"
+         android:title="关于"/>
+     <item 
+         android:id="@+id/menu_update"
+         android:showAsAction="never"
+         android:title="检测更新"/>
+</menu>
