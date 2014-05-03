@@ -10,6 +10,7 @@
 
     <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" />  
     
 
     <application

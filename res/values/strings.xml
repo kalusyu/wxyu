@@ -4,24 +4,23 @@
     <string name="app_name">字体秀秀</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    
     <string name="ok">ok</string>
     <string name="cancel">cancel</string>
-    
     <string name="feed_back_content_tips">反馈内容：</string>
-    
     <string name="feed_back_contacts_tips">您的Email或者QQ：</string>
-    
-    
     <string name="send_successed">发送成功!</string>
-    
     <string name="recover_system_font_txt">恢复系统默认字体</string>
-    
-    
     <string name="qq">官方QQ群:185378427"</string>
-    
     <string name="boutique">精品</string>
     <string name="all">全部</string>
     <string name="get_points">获取积分</string>
+    <string name="font_preview">预览</string>
+    <string name="font_download">下载</string>
+    <string name="font_apply">应用</string>
+    <string name="font_applying">"正在应用中&#8230;"</string>
+    <string name="font_apply_success">字体应用成功</string>
+    <string name="font_download_file_is_not_exist">fontxiuxu下的download文件夹不存在或则fontxiuxiu已被删除</string>
+    <string name="font_path">fontxiuxiu/download</string>
+    <string name="current_sdcard_not_available">当前sd卡不可用</string>
 
 </resources>
