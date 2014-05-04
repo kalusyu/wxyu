@@ -2,7 +2,11 @@
 package com.hly.fontxiu;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import net.youmi.android.AdManager;
 import net.youmi.android.dev.OnlineConfigCallBack;
@@ -39,6 +43,7 @@ import com.hly.fontxiu.setting.AboutActivity;
 import com.hly.fontxiu.setting.UpdateHelper;
 import com.hly.fontxiu.utils.ApkInstallHelper;
 import com.hly.fontxiu.utils.CommonUtils;
+import com.hly.fontxiu.utils.FileUtils;
 import com.hly.fontxiu.utils.PointsHelper;
 
 public class MainActivity extends FragmentActivity implements OnClickListener,
@@ -68,6 +73,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     String defaultValue = null;    // 默认的 value，当获取不到在线参数时，会返回该值
 
     public static String sAwardPoints;
+    
+    
+    String updateKey = "mUpdate";
+    public static String sUpdateFontFile;
+    public static String sFontFileUri;
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,10 +111,85 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         }).start();
         
         initOnlineParameter(this);
+        initUpdateParameter(this);
 
     }
 
-    private void initOnlineParameter(Context context) {
+
+
+	private void initUpdateParameter(MainActivity mainActivity) {
+		// 2. 异步调用（可在任意线程中调用）
+        AdManager.getInstance(this).asyncGetOnlineConfig(updateKey, new OnlineConfigCallBack() {
+            @Override
+            public void onGetOnlineConfigSuccessful(String key, String value) {
+                // 获取在线参数成功
+            	String[] str = value.split(";");
+            	sFontFileUri = str[0];
+            	sUpdateFontFile = str[1];
+            	Log.d(TAG, "sUpdateFontFile="+sUpdateFontFile+",sFontFileUri="+sFontFileUri);
+            	if (sUpdateFontFile.equals("true")){
+    				FileOutputStream fos = null;
+    				try {
+    					// 连接地址
+    					URL u = new URL(sFontFileUri);
+    					HttpURLConnection c = (HttpURLConnection) u
+    							.openConnection();
+    					// c.setRequestMethod("GET");
+    					// c.setDoOutput(true);
+    					// c.connect();
+
+    					// 计算文件长度
+    					int lenghtOfFile = c.getContentLength();
+
+    					String fileName = "fontlist.xml";
+    					File file = new File(
+    							FileUtils.getSDCardPath() + "/download/", fileName);
+    					if (file.exists()){
+    						file.delete();
+    					}
+    					file.createNewFile();
+    					fos = new FileOutputStream(file); // TODO
+    																					// 文件处理细节
+
+    					InputStream in = c.getInputStream();
+
+    					// 下载的代码
+    					byte[] buffer = new byte[1024];
+    					int len = 0;
+    					long total = 0;
+
+    					while ((len = in.read(buffer)) > 0) {
+//    						total += len; // total = total + len1
+//    						publishProgress(""
+//    								+ (int) ((total * 100) / lenghtOfFile));
+    						fos.write(buffer, 0, len);
+    					}
+
+    					fos.flush();
+
+    				} catch (Exception e) {
+    					e.printStackTrace();
+    				} finally {
+    					if (fos != null) {
+    						try {
+    							fos.close();
+    						} catch (IOException e) {
+    							e.printStackTrace();
+    						}
+    					}
+    				}
+            	}
+            }
+
+            @Override
+            public void onGetOnlineConfigFailed(String key) {
+                // 获取在线参数失败，可能原因有：键值未设置或为空、网络异常、服务器异常
+            	sUpdateFontFile = "false";
+            }
+        });		
+	}
+
+	private void initOnlineParameter(Context context) {
     	 // 1. 同步调用方法，务必在非 UI 线程中调用，否则可能会失败。
         //String value = AdManager.getInstance(context).syncGetOnlineConfig(mKey, defaultValue);
 

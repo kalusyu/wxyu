@@ -13,7 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -23,6 +26,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,22 +54,10 @@ public class FontAllFragment extends ListFragment {
 	private ArrayList<String> mFonts = new ArrayList<String>();
 
 	private List<FontFile> mFontFiles;
-	
-	private WeakReference<ProgressDialog> mProgress;
 
-	Handler mHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			int success = msg.what;
-			if (success == 0) {
-				Toast.makeText(mContext, "下载成功", Toast.LENGTH_SHORT).show();
-			} else if (success == -1) {
-				Toast.makeText(mContext, "下载失败", Toast.LENGTH_SHORT).show();
-			} else if (success == 1) {
-				Toast.makeText(mContext, "文件已存在", Toast.LENGTH_SHORT).show();
-			}
-		}
-	};
+	private WeakReference<ProgressDialog> mProgress;
+	
+	private static final String TAG = "FontAllFragment";
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,13 +77,47 @@ public class FontAllFragment extends ListFragment {
 			mAdapter = new AllListAdapter(mFontFiles.size());
 		}
 		setListAdapter(mAdapter);
+
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+		filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
+		filter.addDataScheme("package");
+		getActivity().registerReceiver(mReceiver, filter);
 	}
 
+	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context arg0, Intent intent) {
+			String pkgName = intent.getDataString();
+			PackageManager pm = mContext.getPackageManager();
+			List<PackageInfo> packegeInfoList = FontResUtil
+					.getFontPackegeInfoList(pm);
+			if (pkgName.contains("android.font")){
+				Log.d(TAG, "font apk had installed ,applying it to system packageName=" + pkgName);
+				int index = pkgName.indexOf(":");
+				String packageName = pkgName.substring(index + 1, pkgName.length());
+				FontLoadTask task = new FontLoadTask(
+						mContext.getPackageManager(), mContext, packegeInfoList);
+				task.execute(packageName);
+			}
+		}
+	};
+
+	public void onDestroy() {
+		super.onDestroy();
+		getActivity().unregisterReceiver(mReceiver);
+	};
+	
 	private void loadInstalledFont() {
 		// TODO
-		for (FontFile fontFile:mFontFiles){
-			boolean isInstalled = SharedPreferencesHelper.isFontInstalled(mContext, fontFile.getFontName());
-			fontFile.setInstalled(isInstalled);
+		Log.d(TAG, "mFontFiles="+mFontFiles);
+		if (mFontFiles != null){
+			for (FontFile fontFile : mFontFiles) {
+				boolean isInstalled = SharedPreferencesHelper.isFontInstalled(
+						mContext, fontFile.getFontName());
+				fontFile.setInstalled(isInstalled);
+			}
 		}
 	}
 
@@ -107,6 +133,7 @@ public class FontAllFragment extends ListFragment {
 			String fontPath = path + File.separatorChar
 					+ context.getResources().getString(R.string.font_path);
 			File file = new File(fontPath);
+			file.mkdirs();
 			if (file.exists()) {
 				for (File child : file.listFiles()) {
 					if (child.getName().equals("fontlist.xml")) {
@@ -137,6 +164,39 @@ public class FontAllFragment extends ListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		Toast.makeText(getActivity(), "p:" + position, 1).show();
+	}
+	
+	class FontLoadTask extends AsyncTask<String, Void, FontResource> {
+
+		Context mContext;
+		List<PackageInfo> mPackegeInfoList;
+		PackageManager mPackageManager;
+
+		public FontLoadTask(PackageManager packageManager, Context context,
+				List<PackageInfo> packegeInfoList) {
+			this.mContext = context;
+			this.mPackegeInfoList = packegeInfoList;
+			this.mPackageManager = packageManager;
+		}
+
+		@Override
+		protected FontResource doInBackground(String... arg0) {
+			List<FontResource> packageFontResList = FontResUtil
+					.assembleFontResourceFromPackage(mPackageManager,
+							arg0[0]);
+			return packageFontResList.get(0);
+		}
+
+		@Override
+		protected void onPostExecute(FontResource result) {
+			FontResource fontRes = result;
+			FontResUtil.updateSysteFontConfiguration(fontRes);
+			FontResUtil.saveSystemFontRes(mContext, fontRes);
+			// SharedPreferencesHelper.addToInstall(mContext,
+			// fontRes.getPackageName());
+			// PointsHelper.spendPoints(mContext, NEED_POINTS);
+			Toast.makeText(mContext, "设置成功", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	class AllListAdapter extends BaseAdapter {
@@ -177,6 +237,14 @@ public class FontAllFragment extends ListFragment {
 			FontFile fontFile = mFontFiles.get(position);
 			holder.mFontName.setText(fontFile.getFontName());
 			holder.mFontSize.setText(fontFile.getFontSize());
+			//TODO
+			if (fontFile.isInstalled()){
+				holder.mDownload.setVisibility(View.GONE);
+				holder.mApply.setVisibility(View.VISIBLE);
+			} else {
+				holder.mDownload.setVisibility(View.VISIBLE);
+				holder.mApply.setVisibility(View.GONE);
+			}
 			FontItemOnClickListener fontListener = new FontItemOnClickListener(
 					holder, position);
 			holder.mPreview.setOnClickListener(fontListener);
@@ -184,7 +252,7 @@ public class FontAllFragment extends ListFragment {
 			holder.mApply.setOnClickListener(fontListener);
 			return view;
 		}
-
+		
 		class FontItemOnClickListener implements OnClickListener {
 
 			private int mPostion;
@@ -194,7 +262,7 @@ public class FontAllFragment extends ListFragment {
 				mPostion = postion;
 				mHolder = holder;
 			}
-			
+
 			@Override
 			public void onClick(final View v) {
 				final FontFile fontFile = mFontFiles.get(mPostion);
@@ -205,14 +273,12 @@ public class FontAllFragment extends ListFragment {
 				case R.id.btn_download:
 					// Toast.makeText(mContext, fontFile.getFontName(),
 					// Toast.LENGTH_SHORT).show();
-					DownloadFileAsync downloadTask = new DownloadFileAsync(mHolder);
+					DownloadFileAsync downloadTask = new DownloadFileAsync(
+							mHolder);
 					downloadTask.execute(fontFile);
 					mHolder.mDownload.setVisibility(View.GONE);
 					break;
 				case R.id.btn_apply:
-					PackageManager pm = mContext.getPackageManager();
-					List<PackageInfo> packegeInfoList = FontResUtil
-							.getFontPackegeInfoList(pm);
 					ApplyFontAsyncTask applyFontTask = new ApplyFontAsyncTask();
 					applyFontTask.execute(fontFile);
 
@@ -223,105 +289,77 @@ public class FontAllFragment extends ListFragment {
 				}
 			}
 		}
+
 		/**
 		 * 
-		 * @author 
-		 *
+		 * @author
+		 * 
 		 */
 		class ApplyFontAsyncTask extends AsyncTask<FontFile, Void, String> {
-			
+
 			private FontFile mFontFile;
-			
+
 			public ApplyFontAsyncTask() {
 			}
 
-	        @Override
-	        protected void onPreExecute() {
-	            super.onPreExecute();
-	            mProgress = new WeakReference<ProgressDialog>(ProgressDialog.show(
-	                    mContext, null,
-	                    getResources().getString(R.string.font_applying),
-	                    true, false));
-	        }
+			@Override
+			protected void onPreExecute() {
+				super.onPreExecute();
+				mProgress = new WeakReference<ProgressDialog>(
+						ProgressDialog
+								.show(mContext,
+										null,
+										getResources().getString(
+												R.string.font_applying), true,
+										false));
+			}
 
-	        @Override
-	        protected String doInBackground(FontFile... fontFile) {
-	        	mFontFile = fontFile[0];
-	        	// get file packageName
-				String file = FileUtils.getSDCardPath() + File.separatorChar + "download"+File.separatorChar + fontFile[0].getFontName()+".apk";
+			@Override
+			protected String doInBackground(FontFile... fontFile) {
+				mFontFile = fontFile[0];
+				// get file packageName
+				String file = FileUtils.getSDCardPath() + File.separatorChar
+						+ "download" + File.separatorChar
+						+ fontFile[0].getFontName() + ".apk";
 				PackageManager pm = mContext.getPackageManager();
-				PackageInfo info = pm.getPackageArchiveInfo(file, PackageManager.GET_ACTIVITIES);  
-				String packageName = info.applicationInfo.packageName; 
-				silentInstall(packageName,file);
-	            return packageName;
-	        }
-	        
-	        public void silentInstall(String packageName, String path) {
+				PackageInfo info = pm.getPackageArchiveInfo(file,
+						PackageManager.GET_ACTIVITIES);
+				String packageName = info.applicationInfo.packageName;
+				silentInstall(packageName, file);
+				return packageName;
+			}
+
+			public void silentInstall(String packageName, String path) {
 				Uri uri = Uri.fromFile(new File(path));
 				PackageManager pm = mContext.getPackageManager();
 				pm.installPackage(uri, null, 0, packageName);
 			}
 
-	        @Override
-	        protected void onPostExecute(String packageName) {
-	            super.onPostExecute(packageName);
-
-	            final ProgressDialog lProgress = mProgress.get();
-	            if (lProgress != null && lProgress.isShowing()
-	                    && !getActivity().isFinishing()) {
-	                lProgress.dismiss();
-	                Toast.makeText(
-	                		mContext,
-	                        getResources().getString(
-	                                R.string.font_apply_success),
-	                        Toast.LENGTH_SHORT).show();
-	            }
-	            SharedPreferencesHelper.addToInstall(mContext, mFontFile.getFontName());
-	            
-	            PackageManager pm = mContext.getPackageManager();
-	    		List<PackageInfo> packegeInfoList = FontResUtil
-	    				.getFontPackegeInfoList(pm);
-	    		FontLoadTask task = new FontLoadTask(mContext.getPackageManager(),
-	    				mContext, packegeInfoList);
-	    		task.execute(packageName);
-	        }
-
-	    }
-		
-		class FontLoadTask extends AsyncTask<String, Void, FontResource>{
-			
-			Context mContext;
-			List<PackageInfo> mPackegeInfoList;
-			PackageManager  mPackageManager;
-
-			public FontLoadTask(PackageManager packageManager,Context context,
-					List<PackageInfo> packegeInfoList) {
-				this.mContext = context;
-				this.mPackegeInfoList = packegeInfoList;
-				this.mPackageManager = packageManager;
-			}
-
 			@Override
-			protected FontResource doInBackground(String... arg0) {
-				List<FontResource> packageFontResList = FontResUtil.assembleFontResourceFromPackage(mPackageManager, arg0[0]);
-				return packageFontResList.get(0);
+			protected void onPostExecute(String packageName) {
+				super.onPostExecute(packageName);
+
+				final ProgressDialog lProgress = mProgress.get();
+				if (lProgress != null && lProgress.isShowing()
+						&& !getActivity().isFinishing()) {
+					lProgress.dismiss();
+					Toast.makeText(
+							mContext,
+							getResources().getString(
+									R.string.font_apply_success),
+							Toast.LENGTH_SHORT).show();
+				}				
+				SharedPreferencesHelper.addToInstall(mContext,
+						mFontFile.getFontName());
 			}
 
-			@Override
-			protected void onPostExecute(FontResource result) {
-				FontResource fontRes = result;
-	            FontResUtil.updateSysteFontConfiguration(fontRes);
-	            FontResUtil.saveSystemFontRes(mContext, fontRes);
-//	            SharedPreferencesHelper.addToInstall(mContext, fontRes.getPackageName());
-//	            PointsHelper.spendPoints(mContext, NEED_POINTS);
-	            Toast.makeText(mContext, "设置成功", Toast.LENGTH_SHORT).show();
-			}
 		}
+
 
 		/**
 		 * 
-		 * @author 
-		 *
+		 * @author
+		 * 
 		 */
 		class DownloadFileAsync extends AsyncTask<FontFile, String, String> {
 
@@ -356,7 +394,8 @@ public class FontAllFragment extends ListFragment {
 
 					String fileName = fontFile[0].getFontName() + ".apk";
 					fos = new FileOutputStream(new File(
-							FileUtils.getSDCardPath() + "/download/", fileName)); // TODO 文件处理细节
+							FileUtils.getSDCardPath() + "/download/", fileName)); // TODO
+																					// 文件处理细节
 
 					InputStream in = c.getInputStream();
 
@@ -399,7 +438,7 @@ public class FontAllFragment extends ListFragment {
 				mHolder.pb.setVisibility(View.GONE);
 				mHolder.mApply.setVisibility(View.VISIBLE);
 			}
-			
+
 		}
 
 		class ViewHolder {

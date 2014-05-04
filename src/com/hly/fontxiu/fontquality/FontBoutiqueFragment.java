@@ -1,16 +1,21 @@
 package com.hly.fontxiu.fontquality;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.hly.fontxiu.R;
 import com.hly.fontxiu.fontmanager.FontResUtil;
@@ -24,6 +29,23 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 	public static final String FONT_FILENAME ="fontFileName";
 
 	private List<View> fontsImageView = new ArrayList<View>();
+	
+	private WeakReference<ProgressDialog> mProgress;
+	
+	@SuppressLint("HandlerLeak")
+	Handler mHandler = new Handler(){
+		public void handleMessage(android.os.Message msg) {
+			super.handleMessage(msg);
+			if (msg.what == 1){
+				final ProgressDialog lProgress = mProgress.get();
+				if (lProgress != null && lProgress.isShowing()
+						&& !getActivity().isFinishing()) {
+					lProgress.dismiss();
+				}
+				Toast.makeText(getActivity(), "恢复成功", Toast.LENGTH_SHORT).show();
+			}
+		};
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -63,9 +85,24 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		
 		@Override
 		public void onClick(View arg0) {
-			FontResource fontRes = new FontResource("", "", "", null);
-			FontResUtil.updateSysteFontConfiguration(fontRes);
-            FontResUtil.saveSystemFontRes(getActivity(), fontRes);
+			
+			mProgress = new WeakReference<ProgressDialog>(
+					ProgressDialog
+							.show(getActivity(),
+									null,
+									getResources().getString(
+											R.string.font_applying), true,
+									false));
+			mHandler.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					FontResource fontRes = new FontResource("", "", "", null);
+					FontResUtil.updateSysteFontConfiguration(fontRes);
+					FontResUtil.saveSystemFontRes(getActivity(), fontRes);
+					mHandler.sendEmptyMessage(1);
+				}
+			});
 		}
 	};
 
