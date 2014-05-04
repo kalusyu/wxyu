@@ -19,7 +19,7 @@
         android:ems="2"
         android:background="@drawable/btn_background"
         android:layout_below="@id/OffersMiniBannerLayout"
-        android:text="获取更多积分"/>
+        android:text="@string/obtain_more_points"/>
     
         <TextView android:id="@+id/txt_points"
             android:layout_width="wrap_content"

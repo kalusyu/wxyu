@@ -46,7 +46,7 @@
         android:layout_alignParentBottom="true"
         android:background="@drawable/btn_background"
         android:onClick="submitFeedBack"
-        android:text="提交"
+        android:text="@string/feed_back_submit"
         android:textColor="#f5b10d" />
 "
 

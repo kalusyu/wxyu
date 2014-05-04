@@ -15,6 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/btn_background"
-        android:text="应用" />
+        android:text="@string/font_apply" />
 
 </LinearLayout>

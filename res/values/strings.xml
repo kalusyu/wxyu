@@ -22,5 +22,9 @@
     <string name="font_download_file_is_not_exist">fontxiuxu下的download文件夹不存在或则fontxiuxiu已被删除</string>
     <string name="font_path">fontxiuxiu/download</string>
     <string name="current_sdcard_not_available">当前sd卡不可用</string>
+    
+    <string name="obtain_more_points">获取更多积分</string>
+	
+	<string name="feed_back_submit">提交</string>
 
 </resources>
