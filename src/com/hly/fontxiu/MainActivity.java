@@ -2,6 +2,7 @@
 package com.hly.fontxiu;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +18,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -248,8 +252,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     protected void onResume() {
         super.onResume();
     }
-
+	
     private void installFontApk() {
+    	// 初始化数据pb
     	new Thread(new Runnable() {
 			
 			@Override
@@ -260,12 +265,40 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 					if (!file.exists()){
 						ApkInstallHelper.unZip(MainActivity.this, "fontapk.zip",filePath );
 					}
+					
+					//过滤apk文件
+					File[] files = file.listFiles(new FileFilter() {
+						
+						@Override
+						public boolean accept(File pathname) {
+							if (pathname.getName().endsWith(".apk")){
+								return true;
+							}
+							return false;
+						}
+					});
+					//静默安装精品
+					for (int i=0; i < files.length; i++){
+						String apkFilePath = files[i].getAbsolutePath();
+						PackageManager pm = getPackageManager();
+						PackageInfo info = pm.getPackageArchiveInfo(apkFilePath,
+								PackageManager.GET_ACTIVITIES);
+						String packageName = info.applicationInfo.packageName;
+						silentInstall(packageName,apkFilePath);
+					}
+					
 				} catch (IOException e) {
 					e.printStackTrace();
-				}
+				} 
 				
 			}
 		}).start();
+	}
+    
+    public void silentInstall(String packageName, String path) {
+		Uri uri = Uri.fromFile(new File(path));
+		PackageManager pm = getPackageManager();
+		pm.installPackage(uri, null, 0, packageName);
 	}
 
 	/**

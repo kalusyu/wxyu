@@ -37,11 +37,10 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		public void handleMessage(android.os.Message msg) {
 			super.handleMessage(msg);
 			if (msg.what == 1){
-				final ProgressDialog lProgress = mProgress.get();
-				if (lProgress != null && lProgress.isShowing()
-						&& !getActivity().isFinishing()) {
-					lProgress.dismiss();
-				}
+//				final ProgressDialog lProgress = mProgress.get();
+//				if (lProgress != null && lProgress.isShowing()) {
+//					lProgress.dismiss();
+//				}
 				Toast.makeText(getActivity(), "恢复成功", Toast.LENGTH_SHORT).show();
 			}
 		};
@@ -86,13 +85,13 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		@Override
 		public void onClick(View arg0) {
 			
-			mProgress = new WeakReference<ProgressDialog>(
-					ProgressDialog
-							.show(getActivity(),
-									null,
-									getResources().getString(
-											R.string.font_applying), true,
-									false));
+//			mProgress = new WeakReference<ProgressDialog>(
+//					ProgressDialog
+//							.show(getActivity(),
+//									null,
+//									getResources().getString(
+//											R.string.font_applying), true,
+//									false));
 			mHandler.post(new Runnable() {
 				
 				@Override
@@ -114,17 +113,17 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		String fontFileName = null;
 		
 		String[] str = new String[] { 
-				"com.hly.android.font.huakang",
-				"com.hly.android.font.wawa",
-				"com.hly.android.font.tianranmeng",
-				"com.hly.android.font.qingniao",
-				"com.hly.android.font.jiandaiyu" };
+				"com.monotype.android.font.wuyunkuaizoukai",
+				"com.monotype.android.font.xiaonaipaozhongwen",
+				"com.monotype.android.font.zhihualuo",
+				"com.monotype.android.font.cuojuehuiyi",
+				"com.monotype.android.font.jiangnandiao" };
 		String[] fileName = new String[]{
-				 "Font_Huakangshaonv.apk",
-				 "Font_Waiwai.apk",
-				 "TianRanMeng.apk",	
-				 "QingNiao.apk",
-				 "MiniJianDaiyu.apk"
+				 "wuyunkuaizoukai.apk",
+				 "xiaonaipaozhongwen.apk",
+				 "zhihualuo.apk",	
+				 "cuojuehuiyi.apk",
+				 "jiangnandiao.apk"
 		};
 		switch (arg0.getId()) {
 
