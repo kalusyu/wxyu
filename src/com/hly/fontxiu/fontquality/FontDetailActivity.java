@@ -34,7 +34,7 @@ import com.hly.fontxiu.utils.SharedPreferencesHelper;
 public class FontDetailActivity extends Activity implements OnClickListener {
 
 	// private ImageView ivFontDetal;
-	private static final int NEED_POINTS = 200;
+	public static final int NEED_POINTS = 200;
 	
 	List<FontResource> mFontRes = new ArrayList<FontResource>();
 	

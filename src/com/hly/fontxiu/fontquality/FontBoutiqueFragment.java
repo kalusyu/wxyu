@@ -58,19 +58,19 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		View view = inflater.inflate(R.layout.fragment_font_boutique, null,
 				false);
 		View v1 = view.findViewById(R.id.iv_font_1);
-		v1.setBackgroundResource(R.drawable.font_small1);
+		v1.setBackgroundResource(R.drawable.jiangnandiao);
 		fontsImageView.add(v1);
 		View v2 = view.findViewById(R.id.iv_font_2);
-		v2.setBackgroundResource(R.drawable.font_small2);
+		v2.setBackgroundResource(R.drawable.cuojuehuiyi);
 		fontsImageView.add(v2);
 		View v3 = view.findViewById(R.id.iv_font_3);
-		v3.setBackgroundResource(R.drawable.font_small3);
+		v3.setBackgroundResource(R.drawable.wuyunkuaizoukai);
 		fontsImageView.add(v3);
 		View v4 = view.findViewById(R.id.iv_font_4);
-		v4.setBackgroundResource(R.drawable.font_small4);
+		v4.setBackgroundResource(R.drawable.xiaonaipao);
 		fontsImageView.add(v4);
 		View v5 = view.findViewById(R.id.iv_font_5);
-		v5.setBackgroundResource(R.drawable.font_small5);
+		v5.setBackgroundResource(R.drawable.zhihualuo);
 		fontsImageView.add(v5);
 		for (View v : fontsImageView) {
 			v.setOnClickListener(this);
@@ -128,32 +128,32 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		switch (arg0.getId()) {
 
 		case R.id.iv_font_1:
-			resoureceId = R.drawable.font_small1;
+			resoureceId = R.drawable.jiangnandiao;
 			fontFilePath = str[4];
 			fontFileName = fileName[4];
 			break;
 		case R.id.iv_font_2:
-			resoureceId = R.drawable.font_small2;
+			resoureceId = R.drawable.cuojuehuiyi;
 			fontFilePath = str[3];
 			fontFileName = fileName[3];
 			break;
 		case R.id.iv_font_3:
-			resoureceId = R.drawable.font_small3;
+			resoureceId = R.drawable.wuyunkuaizoukai;
 			fontFilePath = str[2];
 			fontFileName = fileName[2];
 			break;
 		case R.id.iv_font_4:
-			resoureceId = R.drawable.font_small4;
+			resoureceId = R.drawable.xiaonaipao;
 			fontFilePath = str[1];
 			fontFileName = fileName[1];
 			break;
 		case R.id.iv_font_5:
-			resoureceId = R.drawable.font_small5;
+			resoureceId = R.drawable.zhihualuo;
 			fontFilePath = str[0];
 			fontFileName = fileName[0];
 			break;
 		default:
-			resoureceId = R.drawable.font_small1;
+			resoureceId = R.drawable.jiangnandiao;
 			fontFilePath = str[0];
 			fontFileName = fileName[0];
 			break;

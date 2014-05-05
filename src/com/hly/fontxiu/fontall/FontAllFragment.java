@@ -13,9 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
@@ -27,6 +29,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,11 +42,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hly.fontxiu.MainActivity;
 import com.hly.fontxiu.R;
 import com.hly.fontxiu.bean.FontFile;
 import com.hly.fontxiu.fontmanager.FontResUtil;
 import com.hly.fontxiu.fontmanager.FontResource;
+import com.hly.fontxiu.fontquality.FontDetailActivity;
 import com.hly.fontxiu.utils.FileUtils;
+import com.hly.fontxiu.utils.PointsHelper;
 import com.hly.fontxiu.utils.SharedPreferencesHelper;
 
 public class FontAllFragment extends ListFragment {
@@ -311,8 +317,48 @@ public class FontAllFragment extends ListFragment {
 					mHolder.mDownload.setVisibility(View.GONE);
 					break;
 				case R.id.btn_apply:
-					ApplyFontAsyncTask applyFontTask = new ApplyFontAsyncTask();
-					applyFontTask.execute(fontFile);
+					
+					String file = FileUtils.getSDCardPath()
+							+ File.separatorChar + "download"
+							+ File.separatorChar + fontFile.getFontName()
+							+ ".apk";
+					PackageManager pm = mContext.getPackageManager();
+					PackageInfo info = pm.getPackageArchiveInfo(file,
+							PackageManager.GET_ACTIVITIES);
+					String packageName = info.applicationInfo.packageName;
+					int currentPoints = PointsHelper.getCurrentPoints(getActivity());
+					if (currentPoints < FontDetailActivity.NEED_POINTS && !SharedPreferencesHelper.isFontInstalled(getActivity(), packageName)) {
+						new AlertDialog.Builder(getActivity())
+								.setTitle("提示")
+								.setMessage(
+										"应用此字体需要200积分\n您当前的积分为" + currentPoints + "，是否获取积分")
+								.setPositiveButton("获取积分",
+										new DialogInterface.OnClickListener() {
+
+											@Override
+											public void onClick(DialogInterface arg0,
+													int arg1) {
+												ViewPager viewPager = MainActivity
+														.getViewPager();
+												if (viewPager != null) {
+													viewPager.setCurrentItem(2);
+												}
+											}
+										})
+								.setNegativeButton("取消",
+										new DialogInterface.OnClickListener() {
+
+											@Override
+											public void onClick(DialogInterface arg0,
+													int arg1) {
+
+											}
+										}).show();
+					} else {
+						ApplyFontAsyncTask applyFontTask = new ApplyFontAsyncTask();
+						applyFontTask.execute(fontFile);
+					}
+					
 
 					break;
 
