@@ -13,15 +13,18 @@ import android.widget.Toast;
 /**
  * 这里示例一个调用更新应用接口的工具类，由开发者自定义，继承自 AsyncTask
  */
-public class UpdateHelper extends AsyncTask<Void, Void, AppUpdateInfo> {
+public class UpdateHelper extends AsyncTask<Boolean, Void, AppUpdateInfo> {
 	private Context mContext;
+	
+	private boolean isShowToast;
 
 	public UpdateHelper(Context context) {
 		mContext = context;
 	}
 
 	@Override
-	protected AppUpdateInfo doInBackground(Void... params) {
+	protected AppUpdateInfo doInBackground(Boolean... params) {
+		isShowToast = params[0];
 		try {
 			// 在 doInBackground 中调用 AdManager 的 checkAppUpdate 即可从有米服务器获得应用更新信息。
 			return AdManager.getInstance(mContext).syncCheckAppUpdate();
@@ -39,8 +42,10 @@ public class UpdateHelper extends AsyncTask<Void, Void, AppUpdateInfo> {
 		try {
 			if (result == null || result.getUrl() == null) {
 				// 如果 AppUpdateInfo 为 null 或它的 url 属性为 null，则可以判断为没有新版本。
-				Toast.makeText(mContext, "当前版本已经是最新版", Toast.LENGTH_SHORT)
-						.show();
+				if (isShowToast){
+					Toast.makeText(mContext, "当前版本已经是最新版", Toast.LENGTH_SHORT)
+							.show();
+				}
 				return;
 			}
 

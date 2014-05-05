@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -47,17 +48,43 @@ import com.hly.fontxiu.utils.SharedPreferencesHelper;
 
 public class FontAllFragment extends ListFragment {
 
-	private BaseAdapter mAdapter;
+	private AllListAdapter mAdapter;
 
 	private Context mContext;
 
 	private ArrayList<String> mFonts = new ArrayList<String>();
 
-	private List<FontFile> mFontFiles;
+	private List<FontFile> mFontFiles = new ArrayList<FontFile>();
 
 	private WeakReference<ProgressDialog> mProgress;
 	
 	private static final String TAG = "FontAllFragment";
+	
+	private static final int LOAD_MSG_OK = 1;
+	
+	public static final String GENERATED_FONTFILE_ACTION = "com.hly.fontxiu.FONTFILELIST";
+	
+	private Runnable mLoadFontFileListRunnable = new Runnable() {
+		
+		@Override
+		public void run() {
+			loadFontRes(mContext);
+			loadInstalledFont();
+			mHandler.sendEmptyMessage(LOAD_MSG_OK);
+		}
+	};
+	
+	@SuppressLint("HandlerLeak")
+	private Handler mHandler = new Handler(){
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			if (msg.what == LOAD_MSG_OK){
+				if (mFontFiles != null){
+					mAdapter.notifyDataSetChanged();
+				}
+			}
+		};
+	};
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,15 +100,17 @@ public class FontAllFragment extends ListFragment {
 		mContext = getActivity();
 		loadFontRes(mContext);
 		loadInstalledFont();
-		if (mFontFiles != null) {
-			mAdapter = new AllListAdapter(mFontFiles.size());
-		}
+		mAdapter = new AllListAdapter();
 		setListAdapter(mAdapter);
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_PACKAGE_ADDED);
 		filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
 		filter.addDataScheme("package");
+		getActivity().registerReceiver(mReceiver, filter);
+		
+		filter = new IntentFilter();
+		filter.addAction(GENERATED_FONTFILE_ACTION);
 		getActivity().registerReceiver(mReceiver, filter);
 	}
 
@@ -93,13 +122,18 @@ public class FontAllFragment extends ListFragment {
 			PackageManager pm = mContext.getPackageManager();
 			List<PackageInfo> packegeInfoList = FontResUtil
 					.getFontPackegeInfoList(pm);
-			if (pkgName.contains("android.font")){
+			if (pkgName!= null && pkgName.contains("android.font")){
 				Log.d(TAG, "font apk had installed ,applying it to system packageName=" + pkgName);
 				int index = pkgName.indexOf(":");
 				String packageName = pkgName.substring(index + 1, pkgName.length());
 				FontLoadTask task = new FontLoadTask(
 						mContext.getPackageManager(), mContext, packegeInfoList);
 				task.execute(packageName);
+			}
+			
+			if (intent.getAction().equals(GENERATED_FONTFILE_ACTION)){
+				Log.d(TAG, "intent.getAction()="+intent.getAction());
+				mHandler.post(mLoadFontFileListRunnable);
 			}
 		}
 	};
@@ -200,20 +234,18 @@ public class FontAllFragment extends ListFragment {
 	}
 
 	class AllListAdapter extends BaseAdapter {
-		int mFontCount;
 
-		public AllListAdapter(int fontCount) {
-			mFontCount = fontCount;
+		public AllListAdapter() {
 		}
 
 		@Override
 		public int getCount() {
-			return mFontCount;
+			return mFontFiles.size();
 		}
 
 		@Override
-		public Object getItem(int arg0) {
-			return arg0;
+		public Object getItem(int postion) {
+			return mFontFiles.get(postion);
 		}
 
 		@Override

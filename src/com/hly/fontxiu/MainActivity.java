@@ -113,6 +113,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         initOnlineParameter(this);
         initUpdateParameter(this);
 
+        UpdateHelper task = new UpdateHelper(this);
+        task.execute(false);
     }
 
 
@@ -128,56 +130,65 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
             	sUpdateFontFile = str[1];
             	Log.d(TAG, "sUpdateFontFile="+sUpdateFontFile+",sFontFileUri="+sFontFileUri);
             	if (sUpdateFontFile.equals("true")){
-    				FileOutputStream fos = null;
-    				try {
-    					// 连接地址
-    					URL u = new URL(sFontFileUri);
-    					HttpURLConnection c = (HttpURLConnection) u
-    							.openConnection();
-    					// c.setRequestMethod("GET");
-    					// c.setDoOutput(true);
-    					// c.connect();
+            		new Thread(new Runnable() {
+						
+						@Override
+						public void run() {
+							FileOutputStream fos = null;
+		    				try {
+		    					// 连接地址
+		    					URL u = new URL(sFontFileUri);
+		    					HttpURLConnection c = (HttpURLConnection) u
+		    							.openConnection();
+		    					// c.setRequestMethod("GET");
+		    					// c.setDoOutput(true);
+		    					// c.connect();
 
-    					// 计算文件长度
-    					int lenghtOfFile = c.getContentLength();
+		    					// 计算文件长度
+		    					int lenghtOfFile = c.getContentLength();
 
-    					String fileName = "fontlist.xml";
-    					File file = new File(
-    							FileUtils.getSDCardPath() + "/download/", fileName);
-    					if (file.exists()){
-    						file.delete();
-    					}
-    					file.createNewFile();
-    					fos = new FileOutputStream(file); // TODO
-    																					// 文件处理细节
+		    					String fileName = "fontlist.xml";
+		    					File file = new File(
+		    							FileUtils.getSDCardPath() + "/download/", fileName);
+		    					if (file.exists()){
+		    						file.delete();
+		    					}
+		    					file.createNewFile();
+		    					fos = new FileOutputStream(file); // TODO
+		    																					// 文件处理细节
 
-    					InputStream in = c.getInputStream();
+		    					InputStream in = c.getInputStream();
 
-    					// 下载的代码
-    					byte[] buffer = new byte[1024];
-    					int len = 0;
-    					long total = 0;
+		    					// 下载的代码
+		    					byte[] buffer = new byte[1024];
+		    					int len = 0;
+		    					long total = 0;
 
-    					while ((len = in.read(buffer)) > 0) {
-//    						total += len; // total = total + len1
-//    						publishProgress(""
-//    								+ (int) ((total * 100) / lenghtOfFile));
-    						fos.write(buffer, 0, len);
-    					}
+		    					while ((len = in.read(buffer)) > 0) {
+//		    						total += len; // total = total + len1
+//		    						publishProgress(""
+//		    								+ (int) ((total * 100) / lenghtOfFile));
+		    						fos.write(buffer, 0, len);
+		    					}
 
-    					fos.flush();
+		    					fos.flush();
 
-    				} catch (Exception e) {
-    					e.printStackTrace();
-    				} finally {
-    					if (fos != null) {
-    						try {
-    							fos.close();
-    						} catch (IOException e) {
-    							e.printStackTrace();
-    						}
-    					}
-    				}
+		    				} catch (Exception e) {
+		    					e.printStackTrace();
+		    				} finally {
+		    					if (fos != null) {
+		    						try {
+		    							fos.close();
+		    						} catch (IOException e) {
+		    							e.printStackTrace();
+		    						}
+		    					}
+		    					Intent intent = new Intent();
+		    					intent.setAction(FontAllFragment.GENERATED_FONTFILE_ACTION);
+		    					sendBroadcast(intent);
+		    				}
+						}
+					}).start();
             	}
             }
 
@@ -322,7 +333,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
             break;
         case R.id.menu_update:
             UpdateHelper update = new UpdateHelper(this);
-            update.execute();
+            update.execute(true);
             break;
 
         default:
