@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-	
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -10,12 +10,13 @@
         android:layout_marginRight="5dip"
         android:gravity="center"
         android:orientation="vertical" >
-        
-        <Button android:id="@+id/btn_recover_system_font"
+
+        <Button
+            android:id="@+id/btn_recover_system_font"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/btn_background"
-            android:text="@string/recover_system_font_txt"/>
+            android:text="@string/recover_system_font_txt" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,30 +43,22 @@
         <TextView
             android:id="@+id/iv_font_3"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="280dip"
             android:layout_marginTop="5dip" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/iv_font_4"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
-            android:gravity="center"
-            android:orientation="horizontal" >
+            android:layout_height="280dip"
+            android:layout_marginRight="2dip"
+            android:layout_marginTop="5dip" />
 
-            <TextView
-                android:id="@+id/iv_font_4"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="2dip"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/iv_font_5"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="2dip"
-                android:layout_weight="1" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/iv_font_5"
+            android:layout_width="match_parent"
+            android:layout_height="280dip"
+            android:layout_marginLeft="2dip"
+            android:layout_marginTop="5dip" />
     </LinearLayout>
 
 </ScrollView>

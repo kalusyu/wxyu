@@ -119,6 +119,13 @@ public class FontAllFragment extends ListFragment {
 		filter.addAction(GENERATED_FONTFILE_ACTION);
 		getActivity().registerReceiver(mReceiver, filter);
 	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		getListView().setDivider(getResources().getDrawable(R.drawable.list_divider_light));
+		getListView().setDividerHeight(4);
+	}
 
 	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -232,9 +239,8 @@ public class FontAllFragment extends ListFragment {
 			FontResource fontRes = result;
 			FontResUtil.updateSysteFontConfiguration(fontRes);
 			FontResUtil.saveSystemFontRes(mContext, fontRes);
-			// SharedPreferencesHelper.addToInstall(mContext,
-			// fontRes.getPackageName());
-			// PointsHelper.spendPoints(mContext, NEED_POINTS);
+			SharedPreferencesHelper.addToInstall(mContext,fontRes.getPackageName());
+			PointsHelper.spendPoints(mContext, FontDetailActivity.NEED_POINTS);
 			Toast.makeText(mContext, "设置成功", Toast.LENGTH_SHORT).show();
 		}
 	}

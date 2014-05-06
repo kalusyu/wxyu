@@ -5,5 +5,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     
     <dimen name="boutique_item_paddingBottom">5dip</dimen>
-
+    
+ 	<dimen name="list_button_width">80dip</dimen>
+ 	<dimen name="list_button_height">30dip</dimen>
 </resources>

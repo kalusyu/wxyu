@@ -1,64 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/ll_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/txt_font_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/txt_font_size"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_layout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/list_pressed_light"
         android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:paddingBottom="5dip"
+        android:paddingLeft="5dip"
+        android:paddingRight="5dip"
+        android:paddingTop="5dip" >
 
-        <Button
-            android:id="@+id/btn_preview"
+        <LinearLayout
+            android:id="@+id/ll_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/font_preview" />
+            android:orientation="vertical" >
 
-        <FrameLayout
-            android:id="@+id/framelayout"
+            <TextView
+                android:id="@+id/txt_font_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/txt_font_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_layout2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="5dip" >
 
             <Button
-                android:id="@+id/btn_download"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/font_download" />
+                android:id="@+id/btn_preview"
+                android:layout_width="@dimen/list_button_width"
+                android:layout_height="@dimen/list_button_height"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/btn_background"
+                android:text="@string/font_preview" />
 
-            <Button
-                android:id="@+id/btn_apply"
+            <FrameLayout
+                android:id="@+id/framelayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/font_apply"
-                android:visibility="gone" />
-        </FrameLayout>
-    </LinearLayout>
-    
-    <ProgressBar android:id="@+id/pb_download"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="3dip"
+                android:layout_marginRight="5dip" >
+
+                <Button
+                    android:id="@+id/btn_download"
+                    android:layout_width="@dimen/list_button_width"
+                    android:layout_height="@dimen/list_button_height"
+                    android:background="@drawable/btn_background"
+                    android:text="@string/font_download" />
+
+                <Button
+                    android:id="@+id/btn_apply"
+                    android:layout_width="@dimen/list_button_width"
+                    android:layout_height="@dimen/list_button_height"
+                    android:background="@drawable/btn_background"
+                    android:text="@string/font_apply"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_download"
         style="?android:attr/progressBarStyleHorizontal"
-        android:visibility="gone"></ProgressBar>"
+        android:layout_width="match_parent"
+        android:layout_height="4dip"
+        android:progressDrawable="@drawable/progressbar_color"
+        android:layout_marginBottom="2dip"
+        android:visibility="gone" >
+    </ProgressBar>
 
-</RelativeLayout>
+</LinearLayout>

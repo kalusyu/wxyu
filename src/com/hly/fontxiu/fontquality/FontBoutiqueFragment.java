@@ -41,7 +41,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 //				if (lProgress != null && lProgress.isShowing()) {
 //					lProgress.dismiss();
 //				}
-				Toast.makeText(getActivity(), "恢复成功", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(getActivity(), "恢复成功", Toast.LENGTH_SHORT).show();
 			}
 		};
 	};
@@ -58,7 +58,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		View view = inflater.inflate(R.layout.fragment_font_boutique, null,
 				false);
 		View v1 = view.findViewById(R.id.iv_font_1);
-		v1.setBackgroundResource(R.drawable.jiangnandiao);
+		v1.setBackgroundResource(R.drawable.xiaonaipao);
 		fontsImageView.add(v1);
 		View v2 = view.findViewById(R.id.iv_font_2);
 		v2.setBackgroundResource(R.drawable.cuojuehuiyi);
@@ -67,7 +67,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		v3.setBackgroundResource(R.drawable.wuyunkuaizoukai);
 		fontsImageView.add(v3);
 		View v4 = view.findViewById(R.id.iv_font_4);
-		v4.setBackgroundResource(R.drawable.xiaonaipao);
+		v4.setBackgroundResource(R.drawable.jiangnandiao);
 		fontsImageView.add(v4);
 		View v5 = view.findViewById(R.id.iv_font_5);
 		v5.setBackgroundResource(R.drawable.zhihualuo);
@@ -128,7 +128,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		switch (arg0.getId()) {
 
 		case R.id.iv_font_1:
-			resoureceId = R.drawable.jiangnandiao;
+			resoureceId = R.drawable.xiaonaipao;
 			fontFilePath = str[4];
 			fontFileName = fileName[4];
 			break;
@@ -143,7 +143,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 			fontFileName = fileName[2];
 			break;
 		case R.id.iv_font_4:
-			resoureceId = R.drawable.xiaonaipao;
+			resoureceId = R.drawable.jiangnandiao;
 			fontFilePath = str[1];
 			fontFileName = fileName[1];
 			break;
