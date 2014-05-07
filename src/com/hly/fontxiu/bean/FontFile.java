@@ -40,7 +40,11 @@ public class FontFile {
 	private String fontLocalPath;
 	private String pictureLocalPath;
 	
-	private boolean isInstalled;
+	private boolean isApplied;
+	
+	private boolean isDownloaded;
+	
+	private String packageName;
 	
 	public FontFile() {
 	}
@@ -136,13 +140,31 @@ public class FontFile {
 		this.pictureLocalPath = pictureLocalPath;
 	}
 
-	public boolean isInstalled() {
-		return isInstalled;
+	public boolean isApplied() {
+		return isApplied;
 	}
 
-	public void setInstalled(boolean isAlreadyLocal) {
-		this.isInstalled = isAlreadyLocal;
+	public void setApplied(boolean isApplied) {
+		this.isApplied = isApplied;
 	}
+
+	public boolean isDownloaded() {
+		return isDownloaded;
+	}
+
+	public void setDownloaded(boolean isDownloaded) {
+		this.isDownloaded = isDownloaded;
+	}
+
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+
+	
 	
 	
 	

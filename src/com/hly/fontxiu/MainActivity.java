@@ -152,14 +152,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		    					int lenghtOfFile = c.getContentLength();
 
 		    					String fileName = "fontlist.xml";
-		    					File file = new File(
-		    							FileUtils.getSDCardPath() + "/download/", fileName);
-		    					if (file.exists()){
-		    						file.delete();
-		    					}
-		    					file.createNewFile();
-		    					fos = new FileOutputStream(file); // TODO
-		    																					// 文件处理细节
+		    					fos = openFileOutput(fileName, Context.MODE_PRIVATE);																// 文件处理细节
 
 		    					InputStream in = c.getInputStream();
 

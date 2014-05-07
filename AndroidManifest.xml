@@ -10,8 +10,7 @@
 
     <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.INSTALL_PACKAGES" />  
-    
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" />
 
     <application
         android:allowBackup="true"
@@ -20,26 +19,32 @@
         android:theme="@android:style/Theme.Holo.Light" >
         <activity
             android:name="com.hly.fontxiu.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <activity 
-            android:name="com.hly.fontxiu.fontmanager.FontManagerActivity"></activity>
-        
-        <activity 
-            android:name="com.hly.fontxiu.feedback.FeedBackActivity"></activity>
-        
-        <activity 
-            android:name="com.hly.fontxiu.setting.AboutActivity">
+        <activity
+            android:name="com.hly.fontxiu.fontmanager.FontManagerActivity"
+            android:screenOrientation="portrait" >
         </activity>
-        
-        
-         <!-- SDK 必须配置 -->
+        <activity
+            android:name="com.hly.fontxiu.feedback.FeedBackActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.hly.fontxiu.setting.AboutActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.hly.fontxiu.fontquality.FontDetailActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <!-- SDK 必须配置 -->
         <activity
             android:name="net.youmi.android.AdBrowser"
             android:configChanges="keyboard|keyboardHidden|orientation"
@@ -50,11 +55,10 @@
             android:name="net.youmi.android.AdService"
             android:exported="false" >
         </service>
-        
         <service
-	        android:name="net.youmi.android.ExpService"
-	        android:exported="false" >
-	    </service>
+            android:name="net.youmi.android.ExpService"
+            android:exported="false" >
+        </service>
 
         <receiver
             android:name="net.youmi.android.AdReceiver"
@@ -76,21 +80,16 @@
             android:name="360cn"
             android:value="10190" >
         </meta-data>
-
-        <activity android:name="com.hly.fontxiu.fontquality.FontDetailActivity" >
-        </activity>
     </application>
-    
-    
-        <!-- 有米传媒 Android SDK 所需权限 -->
+
+    <!-- 有米传媒 Android SDK 所需权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-   
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
 
 </manifest>

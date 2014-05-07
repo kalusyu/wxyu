@@ -6,11 +6,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.util.Log;
 
@@ -154,6 +157,25 @@ public class ApkInstallHelper {
 				+ errorMsg);
 		return result;
 	}
+	
+	
+	public static boolean checkProgramInstalled(Context ctx,String packName) {
+		boolean flag = false;
+		PackageManager manager = ctx.getPackageManager();
+		
+		// 根据Intent值查询这样的app
+		 List<PackageInfo> infos = manager.getInstalledPackages(0);
+
+		for (PackageInfo app : infos) {
+			// 该应用的包名和主Activity
+			String pkg = app.packageName;
+			if (pkg.equals(packName)) {
+				flag = true;
+				break;
+			}
+		}
+		return flag;
+	 }
 
 	// com.meitu.android.font.huakangshaonv
 	// com.hly.android.font.wawa

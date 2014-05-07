@@ -110,7 +110,7 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		// final ProgressDialog dialog = ProgressDialog.show(this, "提示",
 		// "正在应用字体...");
 		int currentPoints = PointsHelper.getCurrentPoints(this);
-		if (currentPoints < NEED_POINTS && !SharedPreferencesHelper.isFontInstalled(this, mPackgeName)) {
+		if (currentPoints < NEED_POINTS && !SharedPreferencesHelper.isFontApplied(this, mPackgeName)) {
 			new AlertDialog.Builder(this)
 					.setTitle("提示")
 					.setMessage(
@@ -139,7 +139,7 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 								}
 							}).show();
 		} else {
-			if (!checkPrograme(mPackgeName)){
+			if (!ApkInstallHelper.checkProgramInstalled(this,mPackgeName)){
 				String filePath = Environment.getExternalStorageDirectory()+"/fontxiuxiu";
 				startActivity(ApkInstallHelper.getIntentFromApk(new File(filePath+"/"+mFontFileName)));
 			} else{
@@ -148,23 +148,7 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		}
 	}
 	
-	public boolean checkPrograme(String packName) {
-		boolean flag = false;
-		PackageManager manager = getPackageManager();
-		
-		// 根据Intent值查询这样的app
-		 List<PackageInfo> infos = manager.getInstalledPackages(0);
-
-		for (PackageInfo app : infos) {
-			// 该应用的包名和主Activity
-			String pkg = app.packageName;
-			if (pkg.equals(packName)) {
-				flag = true;
-				break;
-			}
-		}
-		return flag;
-	 }
+	
 
 	
 	class FontLoadTask extends AsyncTask<String, Void, FontResource>{
@@ -191,8 +175,10 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 			FontResource fontRes = result;
             FontResUtil.updateSysteFontConfiguration(fontRes);
             FontResUtil.saveSystemFontRes(mContext, fontRes);
-            SharedPreferencesHelper.addToInstall(mContext, fontRes.getPackageName());
-            PointsHelper.spendPoints(mContext, NEED_POINTS);
+            if (!SharedPreferencesHelper.isFontApplied(mContext, fontRes.getPackageName())){
+	            SharedPreferencesHelper.addToApplied(mContext, fontRes.getPackageName());
+	            PointsHelper.spendPoints(mContext, NEED_POINTS);
+            }
             Toast.makeText(mContext, "设置成功", Toast.LENGTH_SHORT).show();
             finish();
 		}

@@ -150,4 +150,14 @@ public class FileUtils {
 
 		return mList;
 	}
+	
+	/**
+	 * 
+	 * @param url
+	 * @param downloadPath
+	 * @param isShowProgressBar
+	 */
+	public static void downloadFile(String url,String downloadPath,boolean isShowProgressBar){
+		//TODO
+	}
 }

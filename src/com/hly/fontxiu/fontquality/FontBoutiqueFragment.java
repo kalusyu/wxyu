@@ -113,11 +113,13 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		String fontFileName = null;
 		
 		String[] str = new String[] { 
-				"com.monotype.android.font.wuyunkuaizoukai",
 				"com.monotype.android.font.xiaonaipaozhongwen",
-				"com.monotype.android.font.zhihualuo",
 				"com.monotype.android.font.cuojuehuiyi",
-				"com.monotype.android.font.jiangnandiao" };
+				"com.monotype.android.font.wuyunkuaizoukai",
+				"com.monotype.android.font.jiangnandiao",
+				"com.monotype.android.font.zhihualuo"
+				
+				 };
 		String[] fileName = new String[]{
 				 "wuyunkuaizoukai.apk",
 				 "xiaonaipaozhongwen.apk",

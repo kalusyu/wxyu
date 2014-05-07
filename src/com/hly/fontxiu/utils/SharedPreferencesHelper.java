@@ -8,7 +8,7 @@ public final class SharedPreferencesHelper {
 
     public static final String SHARED_PREFERENCES_NAME = "FontSharedPreferences";
 
-    public static void addToInstall(Context context, String fontName) {
+    public static void addToApplied(Context context, String fontName) {
         if(null == context){
             return;
         }
@@ -19,7 +19,7 @@ public final class SharedPreferencesHelper {
         ed.commit();
     }
 
-    public static boolean isFontInstalled(Context context, String fontName) {
+    public static boolean isFontApplied(Context context, String fontName) {
         if(null == context){
             return false;
         }
