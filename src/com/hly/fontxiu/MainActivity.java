@@ -98,6 +98,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
         sViewPager.setCurrentItem(0);
         updateTab(0);
+        initOnlineParameter(this);
+        initUpdateParameter(this);
         
         new Thread(new Runnable() {
 
@@ -114,8 +116,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
             }
         }).start();
         
-        initOnlineParameter(this);
-        initUpdateParameter(this);
 
         UpdateHelper task = new UpdateHelper(this);
         task.execute(false);
@@ -133,7 +133,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
             	sFontFileUri = str[0];
             	sUpdateFontFile = str[1];
             	Log.d(TAG, "sUpdateFontFile="+sUpdateFontFile+",sFontFileUri="+sFontFileUri);
-            	if (sUpdateFontFile.equals("true")){
+            	File f = getFilesDir();
+            	final String fontFileName = "fontlist.xml";
+            	File fontlist = new File(f.getAbsolutePath(),fontFileName);
+            	if (!fontlist.exists() || sUpdateFontFile.equals("true")){
             		new Thread(new Runnable() {
 						
 						@Override
@@ -151,9 +154,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		    					// 计算文件长度
 		    					int lenghtOfFile = c.getContentLength();
 
-		    					String fileName = "fontlist.xml";
-		    					fos = openFileOutput(fileName, Context.MODE_PRIVATE);																// 文件处理细节
-
+		    					String fileName = fontFileName;
+		    					fos = openFileOutput(fileName, Context.MODE_PRIVATE);// 文件处理细节
+		    					
+		    					
 		    					InputStream in = c.getInputStream();
 
 		    					// 下载的代码

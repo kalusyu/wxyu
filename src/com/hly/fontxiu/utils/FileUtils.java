@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,12 +11,16 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.os.Environment;
+import android.util.Log;
 import android.util.Xml;
 
 import com.hly.fontxiu.bean.FontFile;
+import com.hly.fontxiu.task.AsynImageLoader;
 
 public class FileUtils {
 
+	public static final String TAG = "FileUtils";
+	
 	private static String mPath = Environment.getExternalStorageDirectory()
 			+ "/fontxiuxiu";;
 
@@ -105,6 +108,9 @@ public class FileUtils {
 				case XmlPullParser.START_TAG:
 					if (parser.getName().equals("fontType")) {
 						fontFile = new FontFile();
+					} else if (parser.getName().equals("fontDisplayName")) {
+						eventType = parser.next();
+						fontFile.setFontDisplayName(parser.getText());
 					} else if (parser.getName().equals("fontName")) {
 						eventType = parser.next();
 						fontFile.setFontName(parser.getText());
@@ -160,4 +166,33 @@ public class FileUtils {
 	public static void downloadFile(String url,String downloadPath,boolean isShowProgressBar){
 		//TODO
 	}
+	
+	
+	public static File getCacheFile(String imageUri){  
+        File cacheFile = null;  
+        try {  
+            if (Environment.getExternalStorageState().equals(  
+                    Environment.MEDIA_MOUNTED)) {  
+                File sdCardDir = Environment.getExternalStorageDirectory();  
+                String fileName = getFileName(imageUri);  
+                File dir = new File(sdCardDir.getCanonicalPath()  
+                        + AsynImageLoader.CACHE_DIR);  
+                if (!dir.exists()) {  
+                    dir.mkdirs();  
+                }  
+                cacheFile = new File(dir, fileName);  
+                Log.i(TAG, "exists:" + cacheFile.exists() + ",dir:" + dir + ",file:" + fileName);  
+            }    
+        } catch (IOException e) {  
+            e.printStackTrace();  
+            Log.e(TAG, "getCacheFileError:" + e.getMessage());  
+        }  
+          
+        return cacheFile;  
+    }  
+      
+    public static String getFileName(String path) {  
+        int index = path.lastIndexOf("/");  
+        return path.substring(index + 1);  
+    }  
 }

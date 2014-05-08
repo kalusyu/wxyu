@@ -1,6 +1,11 @@
 package com.hly.fontxiu.bean;
 
 public class FontFile {
+	
+	/**
+	 * 字体名称 中文全称
+	 */
+	private String fontDisplayName;
 
 	/**
 	 * 字体名称 pinyin全称
@@ -163,6 +168,16 @@ public class FontFile {
 	public void setPackageName(String packageName) {
 		this.packageName = packageName;
 	}
+
+	public String getFontDisplayName() {
+		return fontDisplayName;
+	}
+
+	public void setFontDisplayName(String fontDisplayName) {
+		this.fontDisplayName = fontDisplayName;
+	}
+	
+	
 
 	
 	

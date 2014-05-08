@@ -43,6 +43,13 @@
             android:name="com.hly.fontxiu.fontquality.FontDetailActivity"
             android:screenOrientation="portrait" >
         </activity>
+        
+        <activity
+            android:name="com.hly.fontxiu.fontall.PreviewActivity"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:screenOrientation="portrait" >
+        </activity>
+        
 
         <!-- SDK 必须配置 -->
         <activity

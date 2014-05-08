@@ -316,7 +316,7 @@ public class FontAllFragment extends ListFragment {
 				holder = (ViewHolder) view.getTag();
 			}
 			FontFile fontFile = mFontFiles.get(position);
-			holder.mFontName.setText(fontFile.getFontName());
+			holder.mFontName.setText(fontFile.getFontDisplayName());
 			holder.mFontSize.setText(fontFile.getFontSize());
 			//TODO
 			if (fontFile.isDownloaded()){
@@ -349,6 +349,9 @@ public class FontAllFragment extends ListFragment {
 				final FontFile fontFile = mFontFiles.get(mPostion);
 				switch (v.getId()) {
 				case R.id.btn_preview:
+					Intent preIntent = new Intent(getActivity(),PreviewActivity.class);
+					preIntent.putExtra("previewUrl", fontFile.getFontNamePicUri());
+					startActivity(preIntent);
 					// TODO
 					break;
 				case R.id.btn_download:
