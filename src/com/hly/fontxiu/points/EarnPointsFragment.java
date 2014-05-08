@@ -95,8 +95,8 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 	}
 	
 	public void onDestroy() {
-		super.onDestroy();
 		getActivity().unregisterReceiver(mReceiver);
+		super.onDestroy();
 	};
 
 	BroadcastReceiver mReceiver = new BroadcastReceiver() {

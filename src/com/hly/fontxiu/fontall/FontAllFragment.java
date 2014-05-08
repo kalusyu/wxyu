@@ -10,7 +10,9 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -127,6 +129,15 @@ public class FontAllFragment extends ListFragment {
 		getListView().setDivider(getResources().getDrawable(R.drawable.list_divider_light));
 		getListView().setDividerHeight(4);
 	}
+	
+	String[] mPackagesExclude = new String[] { 
+			"com.monotype.android.font.xiaonaipaozhongwen",
+			"com.monotype.android.font.cuojuehuiyi",
+			"com.monotype.android.font.wuyunkuaizoukai",
+			"com.monotype.android.font.jiangnandiao",
+			"com.monotype.android.font.zhihualuo"
+			
+			 };
 
 	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -136,7 +147,8 @@ public class FontAllFragment extends ListFragment {
 			PackageManager pm = mContext.getPackageManager();
 			List<PackageInfo> packegeInfoList = FontResUtil
 					.getFontPackegeInfoList(pm);
-			if (pkgName!= null && pkgName.contains("android.font")){
+			boolean defaultFont = Arrays.asList(mPackagesExclude).contains(pkgName);
+			if (pkgName!= null && pkgName.contains("android.font") && !defaultFont){
 				Log.d(TAG, "font apk had installed ,applying it to system packageName=" + pkgName);
 				int index = pkgName.indexOf(":");
 				String packageName = pkgName.substring(index + 1, pkgName.length());
@@ -359,7 +371,8 @@ public class FontAllFragment extends ListFragment {
 					// Toast.LENGTH_SHORT).show();
 					DownloadFileAsync downloadTask = new DownloadFileAsync(
 							mHolder);
-					downloadTask.execute(fontFile);
+//					downloadTask.execute(fontFile);
+					downloadTask.executeOnExecutor(Executors.newSingleThreadExecutor(),fontFile);
 					mHolder.mDownload.setVisibility(View.GONE);
 					break;
 				case R.id.btn_apply:
@@ -402,7 +415,8 @@ public class FontAllFragment extends ListFragment {
 										}).show();
 					} else {
 						ApplyFontAsyncTask applyFontTask = new ApplyFontAsyncTask();
-						applyFontTask.execute(fontFile);
+//						applyFontTask.execute(fontFile);
+						applyFontTask.executeOnExecutor(Executors.newSingleThreadExecutor(),fontFile);
 					}
 					
 
@@ -474,7 +488,8 @@ public class FontAllFragment extends ListFragment {
 							Log.d(TAG, "font apk had installed ,applying it to system packageName=" + packageName);
 							FontLoadTask task = new FontLoadTask(
 									mContext.getPackageManager(), mContext, packegeInfoList);
-							task.execute(packageName);
+//							task.execute(packageName);
+							task.executeOnExecutor(Executors.newSingleThreadExecutor(),packageName);
 						}
 					}
 				} else {
@@ -521,12 +536,13 @@ public class FontAllFragment extends ListFragment {
 					// 计算文件长度
 					int lenghtOfFile = c.getContentLength();
 
-					String fileName = fontFile[0].getFontName() + ".apk";
+					String fileName = fontFile[0].getFontName() + ".apk.temp";
 					File file = new File(FileUtils.getSDCardPath() + "/download");
 					if (!file.exists()){
 						file.mkdirs();
 					}
-					fos = new FileOutputStream(new File(file.getAbsolutePath()+File.separatorChar+fileName)); // TODO 文件处理细节
+					File fontFileTemp = new File(file.getAbsolutePath()+File.separatorChar+fileName);
+					fos = new FileOutputStream(fontFileTemp); // TODO 文件处理细节
 
 					InputStream in = c.getInputStream();
 
@@ -543,6 +559,20 @@ public class FontAllFragment extends ListFragment {
 					}
 
 					fos.flush();
+					
+					InputStream stream = new FileInputStream(fontFileTemp);
+					long size = stream != null? stream.available():0;
+					if (total == size){
+						boolean isSuccessed = fontFileTemp.renameTo(new File(file, fontFile[0].getFontName()+".apk"));
+						if (isSuccessed){
+							fontFileTemp.delete();
+						}
+					} else {
+						fontFileTemp.delete();
+					}
+					if (stream !=null){
+						stream.close();
+					}
 
 				} catch (Exception e) {
 					e.printStackTrace();
