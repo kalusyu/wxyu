@@ -3,12 +3,14 @@ package com.hly.fontxiu.points;
 import net.youmi.android.offers.OffersAdSize;
 import net.youmi.android.offers.OffersBanner;
 import net.youmi.android.offers.OffersManager;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +24,8 @@ import com.hly.fontxiu.R;
 import com.hly.fontxiu.utils.PointsHelper;
 
 public class EarnPointsFragment extends Fragment implements OnClickListener{
+	
+	public static final String TAG = "EarnPointsFragment";
 	
 	/**
 	 * 积分 Banner
@@ -56,11 +60,16 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 		mBanner = new OffersBanner(getActivity(), OffersAdSize.SIZE_MATCH_SCREENx60);
 		RelativeLayout layoutOffersBanner = (RelativeLayout) v.findViewById(R.id.offersBannerLayout);
 		layoutOffersBanner.addView(mBanner);
-		
+		return v;
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("com.hly.fontxiu.showpoints");
 		getActivity().registerReceiver(mReceiver, filter);
-		return v;
 	}
 	
 	private void fillText() {
@@ -95,7 +104,14 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 	}
 	
 	public void onDestroy() {
-		getActivity().unregisterReceiver(mReceiver);
+		Activity activity = getActivity();
+		try {
+			if (activity != null) {
+				activity.unregisterReceiver(mReceiver);
+			}
+		} catch (IllegalArgumentException e) {
+			Log.e(TAG, e.getMessage());
+		}
 		super.onDestroy();
 	};
 
