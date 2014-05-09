@@ -200,8 +200,10 @@ public class FontAllFragment extends ListFragment {
 		// 加载fontlist.xml 列表
 		FileInputStream fis = null;
 		try {
-			fis = getActivity().openFileInput("fontlist.xml");
-			mFontFiles = FileUtils.parseXmlFile(fis);
+			if (mContext != null){
+				fis = mContext.getApplicationContext().openFileInput("fontlist.xml");
+				mFontFiles = FileUtils.parseXmlFile(fis);
+			}
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}

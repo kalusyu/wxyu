@@ -38,6 +38,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hly.fontxiu.feedback.FeedBackActivity;
 import com.hly.fontxiu.fontall.FontAllFragment;
@@ -293,9 +294,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 	}
     
     public void silentInstall(String packageName, String path) {
-		Uri uri = Uri.fromFile(new File(path));
-		PackageManager pm = getPackageManager();
-		pm.installPackage(uri, null, 0, packageName);
+    	try{
+			Uri uri = Uri.fromFile(new File(path));
+			PackageManager pm = getPackageManager();
+			pm.installPackage(uri, null, 0, packageName);
+    	}catch (SecurityException e){
+    		Toast.makeText(this, "没有权限，请使用美图2使用或则测试", Toast.LENGTH_SHORT).show();
+    		Log.e(TAG, e.getMessage());
+    	}
 	}
 
 	/**
