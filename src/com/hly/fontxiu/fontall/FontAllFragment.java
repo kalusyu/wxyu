@@ -92,6 +92,8 @@ public class FontAllFragment extends ListFragment {
 				if (mFontFiles != null){
 					mAdapter.notifyDataSetChanged();
 				}
+			} else if (msg.what == MainActivity.NO_INSTALL_PERMISSION){
+				Toast.makeText(getActivity(), R.string.font_apply_only_in_meitu2, Toast.LENGTH_LONG).show();
 			}
 		};
 	};
@@ -501,9 +503,16 @@ public class FontAllFragment extends ListFragment {
 			}
 
 			public void silentInstall(String packageName, String path) {
-				Uri uri = Uri.fromFile(new File(path));
-				PackageManager pm = mContext.getPackageManager();
-				pm.installPackage(uri, null, 0, packageName);
+				try{
+					Uri uri = Uri.fromFile(new File(path));
+					PackageManager pm = mContext.getPackageManager();
+					pm.installPackage(uri, null, 0, packageName);
+				}catch (SecurityException e	){
+					Log.e(TAG, e.getMessage());
+					mHandler.sendEmptyMessage(MainActivity.NO_INSTALL_PERMISSION);
+				} catch (Exception e){
+					e.printStackTrace();
+				}
 			}
 
 			@Override
