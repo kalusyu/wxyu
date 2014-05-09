@@ -160,7 +160,7 @@ public class FontResUtil {
         fontResInfo.edit().putString(FONT_RES_FONT_FILE_PATH_KEY, fontFilePath).commit();
     }
 
-    public static void updateSysteFontConfiguration(FontResource fontRes) {
+    public static void updateSysteFontConfiguration(FontResource fontRes) throws NoSuchFieldError{
         Configuration curConfig = new Configuration();
         try {
             curConfig.fontPackageName = fontRes.getPackageName();

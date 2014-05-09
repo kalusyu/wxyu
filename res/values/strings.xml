@@ -26,5 +26,7 @@
     <string name="obtain_more_points">获取更多积分</string>
 	
 	<string name="feed_back_submit">提交</string>
+	
+	<string name="font_apply_only_in_meitu2">无此权限，请使用美图2使用或则测试！</string>
 
 </resources>

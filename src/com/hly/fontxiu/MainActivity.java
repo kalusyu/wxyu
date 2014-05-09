@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -77,12 +78,23 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     String mKey = "mAwardFirstTime";  // key
     String defaultValue = null;    // 默认的 value，当获取不到在线参数时，会返回该值
 
-    public static String sAwardPoints;
+    public static String sAwardPoints = "300";
     
     
     String updateKey = "mUpdate";
     public static String sUpdateFontFile;
     public static String sFontFileUri;
+    
+    public static final int NO_INSTALL_PERMISSION = 1;
+    
+    private Handler mHandler = new Handler(){
+    	public void handleMessage(android.os.Message msg) {
+    		super.handleMessage(msg);
+    		if (msg.what == NO_INSTALL_PERMISSION){
+    			Toast.makeText(getApplicationContext(), R.string.font_apply_only_in_meitu2, Toast.LENGTH_LONG).show();
+    		}
+    	};
+    };
     
 
     @Override
@@ -299,8 +311,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			PackageManager pm = getPackageManager();
 			pm.installPackage(uri, null, 0, packageName);
     	}catch (SecurityException e){
-    		Toast.makeText(this, "没有权限，请使用美图2使用或则测试", Toast.LENGTH_SHORT).show();
     		Log.e(TAG, e.getMessage());
+    		mHandler.sendEmptyMessage(NO_INSTALL_PERMISSION);
     	}
 	}
 

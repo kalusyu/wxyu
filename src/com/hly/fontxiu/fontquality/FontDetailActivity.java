@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -32,6 +33,8 @@ import com.hly.fontxiu.utils.PointsHelper;
 import com.hly.fontxiu.utils.SharedPreferencesHelper;
 
 public class FontDetailActivity extends Activity implements OnClickListener {
+	
+	public static final String TAG = "FontDetailActivity";
 
 	// private ImageView ivFontDetal;
 	public static final int NEED_POINTS = 200;
@@ -70,13 +73,13 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
-			String pkgName = intent.getData().toSafeString();
-			int index = pkgName.indexOf(":");
-			String packageName = pkgName.substring(index + 1, pkgName.length());
-			String packageName2 = mPackgeName;
-			if (packageName.equals(packageName2)) {
-				switchFont(packageName2);
-			}
+//			String pkgName = intent.getData().toSafeString();
+//			int index = pkgName.indexOf(":");
+//			String packageName = pkgName.substring(index + 1, pkgName.length());
+//			String packageName2 = mPackgeName;
+//			if (packageName.equals(packageName2)) {
+//				switchFont(packageName2);
+//			}
 		}
 	};
 	
@@ -87,6 +90,7 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		FontLoadTask task = new FontLoadTask(getPackageManager(),
 				FontDetailActivity.this, packegeInfoList);
 		task.execute(packageName);
+		
 	}
 	
 	protected void onDestroy() {
@@ -172,15 +176,22 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 
 		@Override
 		protected void onPostExecute(FontResource result) {
-			FontResource fontRes = result;
-            FontResUtil.updateSysteFontConfiguration(fontRes);
-            FontResUtil.saveSystemFontRes(mContext, fontRes);
-            if (!SharedPreferencesHelper.isFontApplied(mContext, fontRes.getPackageName())){
-	            SharedPreferencesHelper.addToApplied(mContext, fontRes.getPackageName());
-	            PointsHelper.spendPoints(mContext, NEED_POINTS);
-            }
-            Toast.makeText(mContext, "设置成功", Toast.LENGTH_SHORT).show();
-            finish();
+			try{
+				FontResource fontRes = result;
+	            FontResUtil.updateSysteFontConfiguration(fontRes);
+	            FontResUtil.saveSystemFontRes(mContext, fontRes);
+	            if (!SharedPreferencesHelper.isFontApplied(mContext, fontRes.getPackageName())){
+		            SharedPreferencesHelper.addToApplied(mContext, fontRes.getPackageName());
+		            PointsHelper.spendPoints(mContext, NEED_POINTS);
+	            }
+	            Toast.makeText(mContext, "设置成功", Toast.LENGTH_SHORT).show();
+	            finish();
+			}catch (NoSuchFieldError e){
+				Log.e(TAG, e.getMessage());
+				Toast.makeText(getApplicationContext(), R.string.font_apply_only_in_meitu2, Toast.LENGTH_LONG).show();
+			} catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 

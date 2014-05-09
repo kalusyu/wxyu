@@ -144,23 +144,30 @@ public class FontAllFragment extends ListFragment {
 
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
-			String pkgName = intent.getDataString();
-			PackageManager pm = mContext.getPackageManager();
-			List<PackageInfo> packegeInfoList = FontResUtil
-					.getFontPackegeInfoList(pm);
-			boolean defaultFont = Arrays.asList(mPackagesExclude).contains(pkgName);
-			if (pkgName!= null && pkgName.contains("android.font") && !defaultFont){
-				Log.d(TAG, "font apk had installed ,applying it to system packageName=" + pkgName);
-				int index = pkgName.indexOf(":");
-				String packageName = pkgName.substring(index + 1, pkgName.length());
-				FontLoadTask task = new FontLoadTask(
-						mContext.getPackageManager(), mContext, packegeInfoList);
-				task.execute(packageName);
-			}
-			
-			if (intent.getAction().equals(GENERATED_FONTFILE_ACTION)){
-				Log.d(TAG, "intent.getAction()="+intent.getAction());
-				mHandler.post(mLoadFontFileListRunnable);
+			try{
+				String pkgName = intent.getDataString();
+				PackageManager pm = mContext.getPackageManager();
+				List<PackageInfo> packegeInfoList = FontResUtil
+						.getFontPackegeInfoList(pm);
+				String packageName = null;
+				if (pkgName != null){
+					int index = pkgName.indexOf(":");
+					packageName = pkgName.substring(index + 1, pkgName.length());
+				}
+				boolean defaultFont = Arrays.asList(mPackagesExclude).contains(packageName);
+				if (packageName!= null && packageName.contains("android.font") && !defaultFont){
+					Log.d(TAG, "font apk had installed ,applying it to system packageName=" + packageName);
+					FontLoadTask task = new FontLoadTask(
+							mContext.getPackageManager(), mContext, packegeInfoList);
+					task.execute(packageName);
+				}
+				
+				if (intent.getAction().equals(GENERATED_FONTFILE_ACTION)){
+					Log.d(TAG, "intent.getAction()="+intent.getAction());
+					mHandler.post(mLoadFontFileListRunnable);
+				}
+			}catch (Exception e){
+				Log.e(TAG, "some errors message="+e.getMessage());
 			}
 		}
 	};
@@ -274,30 +281,36 @@ public class FontAllFragment extends ListFragment {
 
 		@Override
 		protected void onPostExecute(FontResource result) {
-			FontResource fontRes = result;
-			FontResUtil.updateSysteFontConfiguration(fontRes);
-			FontResUtil.saveSystemFontRes(mContext, fontRes);
-
-			if (!SharedPreferencesHelper.isFontApplied(mContext,fontRes.getPackageName())) {
-				SharedPreferencesHelper.addToApplied(mContext,fontRes.getPackageName());
-				PointsHelper.spendPoints(mContext,FontDetailActivity.NEED_POINTS);
+			try{
+				FontResource fontRes = result;
+				FontResUtil.updateSysteFontConfiguration(fontRes);
+				FontResUtil.saveSystemFontRes(mContext, fontRes);
+	
+				if (!SharedPreferencesHelper.isFontApplied(mContext,fontRes.getPackageName())) {
+					SharedPreferencesHelper.addToApplied(mContext,fontRes.getPackageName());
+					PointsHelper.spendPoints(mContext,FontDetailActivity.NEED_POINTS);
+				}
+	
+				final ProgressDialog lProgress = mProgress.get();
+				Activity activity = getActivity();
+				boolean isFinish = false;
+				if(null != activity){
+					isFinish = activity.isFinishing();
+				}
+				if (lProgress != null && lProgress.isShowing() && !isFinish) {
+					lProgress.dismiss();
+					Toast.makeText(
+							mContext,
+							getResources().getString(
+									R.string.font_apply_success),
+							Toast.LENGTH_SHORT).show();
+				}				
+				Toast.makeText(mContext, "设置成功", Toast.LENGTH_SHORT).show();
+			} catch(NoSuchFieldError error){
+				Toast.makeText(mContext, R.string.font_apply_only_in_meitu2, Toast.LENGTH_LONG).show();
+			}catch (Exception e){
+				e.printStackTrace();
 			}
-
-			final ProgressDialog lProgress = mProgress.get();
-			Activity activity = getActivity();
-			boolean isFinish = false;
-			if(null != activity){
-				isFinish = activity.isFinishing();
-			}
-			if (lProgress != null && lProgress.isShowing() && !isFinish) {
-				lProgress.dismiss();
-				Toast.makeText(
-						mContext,
-						getResources().getString(
-								R.string.font_apply_success),
-						Toast.LENGTH_SHORT).show();
-			}				
-			Toast.makeText(mContext, "设置成功", Toast.LENGTH_SHORT).show();
 		}
 	}
 
