@@ -1,5 +1,9 @@
 package com.hly.fontxiu.bean;
 
+import java.io.File;
+
+import com.hly.fontxiu.utils.FileUtils;
+
 public class FontFile {
 	
 	/**
@@ -154,6 +158,12 @@ public class FontFile {
 	}
 
 	public boolean isDownloaded() {
+		String filePath = FileUtils.getSDCardPath() + File.separatorChar
+				+ "download" + File.separatorChar + fontName + ".apk";
+		File file = new File(filePath);
+		if (file.exists()) {
+			return true;
+		}
 		return isDownloaded;
 	}
 

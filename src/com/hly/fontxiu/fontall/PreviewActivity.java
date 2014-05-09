@@ -15,7 +15,7 @@ public class PreviewActivity extends Activity{
 		String picUrl = getIntent().getStringExtra("previewUrl");
 		setContentView(R.layout.preview_layout);
 		ImageView imgPreview = (ImageView) findViewById(R.id.img_preview);
-		AsynImageLoader asynImageLoader = new AsynImageLoader();
+		AsynImageLoader asynImageLoader = new AsynImageLoader(this);
 		asynImageLoader.showImageAsyn(imgPreview, picUrl, R.drawable.downloading_preview);
 	}
 }

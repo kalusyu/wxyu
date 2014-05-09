@@ -7,7 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hly.fontxiu.utils.FileUtils;
+
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -24,12 +28,15 @@ public class AsynImageLoader {
 	
 	public static final String CACHE_DIR = "AsynImageLoaderCacheDir";
 	
-	public AsynImageLoader(){
+	private Context mContext;
+	
+	public AsynImageLoader(Context context){
 		// 初始化变量
 		caches = new HashMap<String, SoftReference<Bitmap>>();
 		taskQueue = new ArrayList<AsynImageLoader.Task>();
 		// 启动图片下载线程
 		isRunning = true;
+		mContext = context;
 		new Thread(runnable).start();
 	}
 	
@@ -66,6 +73,14 @@ public class AsynImageLoader {
 				return bitmap;
 			}
 		}else{
+			Bitmap b = null;
+			String fileName = FileUtils.getNameByUrl(path);
+			if(FileUtils.isFileExist("/images/"+ fileName)){
+				 b= BitmapFactory.decodeFile(FileUtils.getImagePath(mContext) + fileName);
+			}
+			if(null != b){
+				return b;
+			}
 			// 如果缓存中不常在该图片，则创建图片下载任务
 			Task task = new Task();
 			task.path = path;
@@ -128,6 +143,7 @@ public class AsynImageLoader {
 					// 将下载的图片添加到缓存
 					task.bitmap = PicUtil.getbitmap(task.path);
 					caches.put(task.path, new SoftReference<Bitmap>(task.bitmap));
+					FileUtils.saveBitmap(task.bitmap, FileUtils.getNameByUrl(task.path), mContext);
 					if(handler != null){
 						// 创建消息对象，并将完成的任务添加到消息对象中
 						Message msg = handler.obtainMessage();

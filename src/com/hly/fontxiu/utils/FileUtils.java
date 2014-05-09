@@ -1,6 +1,8 @@
 package com.hly.fontxiu.utils;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +12,8 @@ import java.util.List;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
 import android.util.Xml;
@@ -22,7 +26,7 @@ public class FileUtils {
 	public static final String TAG = "FileUtils";
 	
 	private static String mPath = Environment.getExternalStorageDirectory()
-			+ "/fontxiuxiu";;
+			+ "/fontxiuxiu";
 
 	public static String getSDCardPath() {
 		return mPath;
@@ -195,4 +199,93 @@ public class FileUtils {
         int index = path.lastIndexOf("/");  
         return path.substring(index + 1);  
     }  
+    
+    // add 
+	public static final String SDCARD_PATH = Environment
+			.getExternalStorageDirectory().getPath() + File.separator;
+	private static final String IMAGE_FOLDER_NAME = "images";
+
+	public static final String NEW_LINE = System.getProperty("line.separator",
+			"\n");
+
+	public static void saveBitmap(Bitmap bm, String fileName, Context context) {
+		if (null == bm || isEmpty(fileName) || null == context)
+			return;
+//		String sdPath = getAppName(context);
+//		if (isEmpty(sdPath))
+//			return;
+		File dirFile = new File(mPath + File.separator + IMAGE_FOLDER_NAME
+				+ File.separator);
+		if (!dirFile.exists()) {
+			dirFile.mkdirs();
+		}
+		File myCaptureFile = new File(mPath + File.separator
+				+ IMAGE_FOLDER_NAME + File.separator + fileName + "bak");
+		BufferedOutputStream bos = null;
+		try {
+			bos = new BufferedOutputStream(new FileOutputStream(myCaptureFile));
+			bm.compress(Bitmap.CompressFormat.PNG, 80, bos);
+			bos.flush();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (null != bos) {
+					bos.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		myCaptureFile.renameTo(new File(mPath + File.separator
+				+ IMAGE_FOLDER_NAME + File.separator + fileName));
+	}
+
+	public static String getAppName(Context context) {
+		String packageName = context.getPackageName();
+		if (packageName == null)
+			return null;
+		int index = packageName.lastIndexOf(".");
+		if (index <= 0)
+			return null;
+		return packageName.substring(index + 1, packageName.length());
+	}
+
+	public static String getAppSDCardPath(Context context) {
+		String appName = getAppName(context);
+		if (appName == null)
+			return null;
+		return SDCARD_PATH + appName;
+	}
+
+	public static String getImagePath(Context context) {
+		// return getAppSDCardPath(context) + File.separator + IMAGE_FOLDER_NAME
+		// + File.separator;
+		return mPath + File.separator + IMAGE_FOLDER_NAME + File.separator;
+	}
+
+	public static String getNameByUrl(String url) {
+		if (isEmpty(url))
+			return null;
+		return url.substring(url.lastIndexOf("/") + 1, url.length())
+				.replace(".jpg", "").replace(".png", "");
+	}
+
+	public static boolean isSdCardExist() {
+		if (android.os.Environment.getExternalStorageState().equals(
+				android.os.Environment.MEDIA_MOUNTED)) {
+			return true;
+		}
+		return false;
+	}
+
+	private static boolean isEmpty(String str) {
+		if (null == str || str.length() == 0) {
+			return true;
+		}
+		return false;
+	}
 }

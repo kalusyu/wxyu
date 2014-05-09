@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -281,8 +282,12 @@ public class FontAllFragment extends ListFragment {
 			}
 
 			final ProgressDialog lProgress = mProgress.get();
-			if (lProgress != null && lProgress.isShowing()
-					&& !getActivity().isFinishing()) {
+			Activity activity = getActivity();
+			boolean isFinish = false;
+			if(null != activity){
+				isFinish = activity.isFinishing();
+			}
+			if (lProgress != null && lProgress.isShowing() && !isFinish) {
 				lProgress.dismiss();
 				Toast.makeText(
 						mContext,
@@ -367,6 +372,8 @@ public class FontAllFragment extends ListFragment {
 					// TODO
 					break;
 				case R.id.btn_download:
+					//删除代码，将两个按钮合并，在文件不存在的情况下，进行下载操作，不然直接应用字体
+					/*
 					// Toast.makeText(mContext, fontFile.getFontName(),
 					// Toast.LENGTH_SHORT).show();
 					DownloadFileAsync downloadTask = new DownloadFileAsync(
@@ -375,12 +382,23 @@ public class FontAllFragment extends ListFragment {
 					downloadTask.executeOnExecutor(Executors.newSingleThreadExecutor(),fontFile);
 					mHolder.mDownload.setVisibility(View.GONE);
 					break;
+					*/
 				case R.id.btn_apply:
 					
 					String file = FileUtils.getSDCardPath()
 							+ File.separatorChar + "download"
 							+ File.separatorChar + fontFile.getFontName()
 							+ ".apk";
+					File fontApk = new File(file);
+					if(!fontApk.exists()){
+						DownloadFileAsync myDownloadTast = new DownloadFileAsync(
+								mHolder);
+						myDownloadTast.executeOnExecutor(Executors.newSingleThreadExecutor(),fontFile);
+						mHolder.mDownload.setVisibility(View.GONE);
+						mHolder.mApply.setVisibility(View.GONE);
+						Toast.makeText(getActivity(), "正在下载...", Toast.LENGTH_SHORT).show();
+						return;
+					}
 					PackageManager pm = mContext.getPackageManager();
 					PackageInfo info = pm.getPackageArchiveInfo(file,
 							PackageManager.GET_ACTIVITIES);
@@ -542,6 +560,9 @@ public class FontAllFragment extends ListFragment {
 						file.mkdirs();
 					}
 					File fontFileTemp = new File(file.getAbsolutePath()+File.separatorChar+fileName);
+					if(fontFileTemp.exists()){
+						fontFileTemp.delete();
+					}
 					fos = new FileOutputStream(fontFileTemp); // TODO 文件处理细节
 
 					InputStream in = c.getInputStream();
