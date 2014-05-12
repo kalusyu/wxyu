@@ -1,7 +1,10 @@
 package com.hly.fontxiu.feedback;
 
 import android.app.Activity;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -43,6 +46,9 @@ public class FeedBackActivity extends Activity{
 			
 			String mailContent = "反馈内容：\n\n";
 			mailContent += mTextContent.getText().toString();
+			
+			mailContent += getPhoneInfo();
+			
 			mailContent +="\n反馈人联系方式："+mTextContacts.getText().toString(); 
 			mailInfo.setContent(mailContent);
 			// 这个类主要来发送邮件
@@ -58,5 +64,18 @@ public class FeedBackActivity extends Activity{
 		} 
 		Toast.makeText(this, R.string.send_successed, Toast.LENGTH_SHORT).show();
 		finish();
+	}
+
+	private String getPhoneInfo() {
+		try{
+			TelephonyManager telephonyManager= (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+			StringBuilder sb = new StringBuilder();
+			String imei=telephonyManager.getDeviceId();
+			sb.append("imei="+imei);
+			sb.append("\n model=").append(Build.MODEL);
+			return sb.toString();
+		}catch (Exception e){
+			return "";
+		}
 	}
 }
