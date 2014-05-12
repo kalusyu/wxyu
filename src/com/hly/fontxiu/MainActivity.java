@@ -150,6 +150,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
             	final String fontFileName = "fontlist.xml";
             	File fontlist = new File(f.getAbsolutePath(),fontFileName);
             	if (!fontlist.exists() || sUpdateFontFile.equals("true")){
+            		if (fontlist.exists()){
+            			fontlist.delete();
+            		}
             		new Thread(new Runnable() {
 						
 						@Override
