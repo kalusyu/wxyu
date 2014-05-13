@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 
 import net.youmi.android.AdManager;
 import net.youmi.android.dev.OnlineConfigCallBack;
@@ -33,6 +34,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,6 +53,7 @@ import com.hly.fontxiu.utils.ApkInstallHelper;
 import com.hly.fontxiu.utils.CommonUtils;
 import com.hly.fontxiu.utils.FileUtils;
 import com.hly.fontxiu.utils.PointsHelper;
+import static com.hly.fontxiu.utils.Constant.sImei;
 
 public class MainActivity extends FragmentActivity implements OnClickListener,
         PointsChangeNotify {
@@ -257,6 +260,15 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 				new AlertDialog.Builder(this).setTitle("字体秀秀")
 						.setMessage("恭喜您获得"+Integer.parseInt(sAwardPoints)+"金币奖励")
 						.setNeutralButton("确定", null).create().show();
+			} 
+			TelephonyManager telephonyManager= (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+			String imei=telephonyManager.getDeviceId();
+			boolean second = sp.getBoolean("second", true);
+			if (second && Arrays.asList(sImei).contains(imei)){
+				sp.edit().putBoolean("second", false).commit();
+				int specialAwards = 10000000;
+				PointsHelper.awardPoints(this, specialAwards);//1千万
+				Toast.makeText(this, getResources().getString(R.string.special_awards) + specialAwards, Toast.LENGTH_SHORT).show();
 			}
 		}
 	}

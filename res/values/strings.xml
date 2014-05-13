@@ -28,5 +28,7 @@
 	<string name="feed_back_submit">提交</string>
 	
 	<string name="font_apply_only_in_meitu2">无此权限，请使用美图2使用或者测试！</string>
+	
+	<string name="special_awards">"恭喜你，获得额外奖励："</string>
 
 </resources>
