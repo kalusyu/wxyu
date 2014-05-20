@@ -47,7 +47,7 @@ public class FeedBackActivity extends Activity{
 			String mailContent = "反馈内容：\n\n";
 			mailContent += mTextContent.getText().toString();
 			
-			mailContent += getPhoneInfo();
+			mailContent += CommonUtils.getPhoneInfo(this);
 			
 			mailContent +="\n反馈人联系方式："+mTextContacts.getText().toString(); 
 			mailInfo.setContent(mailContent);
@@ -66,16 +66,5 @@ public class FeedBackActivity extends Activity{
 		finish();
 	}
 
-	private String getPhoneInfo() {
-		try{
-			TelephonyManager telephonyManager= (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-			StringBuilder sb = new StringBuilder();
-			String imei=telephonyManager.getDeviceId();
-			sb.append("imei="+imei);
-			sb.append("\n model=").append(Build.MODEL);
-			return sb.toString();
-		}catch (Exception e){
-			return "";
-		}
-	}
+	
 }

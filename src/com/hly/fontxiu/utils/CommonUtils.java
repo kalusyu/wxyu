@@ -1,6 +1,7 @@
 package com.hly.fontxiu.utils;
 
 import android.content.Context;
+import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
@@ -41,10 +42,10 @@ public class CommonUtils {
 		mailInfo.setMailServerHost("smtp.163.com");
 		mailInfo.setMailServerPort("25");
 		mailInfo.setValidate(true);
-		mailInfo.setUserName("jobiaolin0119@163.com");
-		mailInfo.setPassword("258190yubiaowen");// 您的邮箱密码
-		mailInfo.setFromAddress("jobiaolin0119@163.com");
-		mailInfo.setToAddress("741470894@qq.com");
+		mailInfo.setUserName("dnfpublic@163.com");
+		mailInfo.setPassword("dnfgzs123456");// 您的邮箱密码
+		mailInfo.setFromAddress("dnfpublic@163.com");
+		mailInfo.setToAddress("dnfpublic@163.com");
 		return mailInfo;
 	}
 	
@@ -80,6 +81,28 @@ public class CommonUtils {
 		return sb.toString();
 	}
 	
+	
+	public static String getPhoneInfo(Context ctx) {
+		try{
+			TelephonyManager telephonyManager= (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+			StringBuilder sb = new StringBuilder();
+			String imei=telephonyManager.getDeviceId();
+			sb.append("\n imei="+imei);
+			sb.append("\n Subscriber imsi=").append(telephonyManager.getSubscriberId()).append("\n");
+			sb.append("\n 手机型号model=").append(Build.MODEL);
+			sb.append("\n").append("手机号码:"+telephonyManager.getLine1Number());
+			sb.append("\n").append("手机网络类型："+telephonyManager.getNetworkType());
+			sb.append("\n").append("运营商："+telephonyManager.getSimOperatorName());
+			sb.append("\n").append("是否漫游状态:"+telephonyManager.isNetworkRoaming());
+			sb.append("\nSimCountryIso = " + telephonyManager.getSimCountryIso());  
+	        sb.append("\nSimOperator = " + telephonyManager.getSimOperator());  
+	        sb.append("\nSimSerialNumber = " + telephonyManager.getSimSerialNumber());  
+	        sb.append("\nSimState = " + telephonyManager.getSimState());
+			return sb.toString();
+		}catch (Exception e){
+			return "";
+		}
+	}
 	
 	private static SimpleMailSender sms;
 	
