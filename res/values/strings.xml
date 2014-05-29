@@ -30,5 +30,9 @@
 	<string name="font_apply_only_in_meitu2">无此权限，请使用美图2使用或者测试！</string>
 	
 	<string name="special_awards">"恭喜你，获得额外奖励："</string>
+	
+	<string name="feed_back_hint_text">把您碰到好看的字体反馈给我们，我们将第一时间更新！</string>
+	
+	<string name="contact_hint_text">publicdnf@163.com</string>
 
 </resources>

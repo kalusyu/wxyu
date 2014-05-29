@@ -19,6 +19,7 @@
         android:gravity="top"
         android:inputType="textMultiLine"
         android:background="@drawable/textfield_background"
+        android:hint="@string/feed_back_hint_text"
         android:minLines="5" />
 
     <TextView
@@ -37,6 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv2"
         android:inputType="text"
+        android:hint="@string/contact_hint_text"
         android:background="@drawable/textfield_background" />
 
     <Button
@@ -48,6 +50,5 @@
         android:onClick="submitFeedBack"
         android:text="@string/feed_back_submit"
         android:textColor="#f5b10d" />
-"
 
 </RelativeLayout>

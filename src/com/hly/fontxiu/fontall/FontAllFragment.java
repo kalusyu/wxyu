@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+import net.youmi.android.AdManager;
+import net.youmi.android.dev.OnlineConfigCallBack;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,12 +28,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -74,6 +79,9 @@ public class FontAllFragment extends ListFragment {
 	
 	public static final String GENERATED_FONTFILE_ACTION = "com.hly.fontxiu.FONTFILELIST";
 	
+	public static String sDescription;
+	
+	private TextView mTxtDescription;
 	private Runnable mLoadFontFileListRunnable = new Runnable() {
 		
 		@Override
@@ -103,6 +111,7 @@ public class FontAllFragment extends ListFragment {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_font_all, container,
 				false);
+		mTxtDescription = (TextView) view.findViewById(R.id.txt_description);
 		return view;
 	}
 
@@ -114,6 +123,10 @@ public class FontAllFragment extends ListFragment {
 		loadInstalledFont();
 		mAdapter = new AllListAdapter();
 		setListAdapter(mAdapter);
+		
+		
+		initDescriptionParameter(getActivity());
+		
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_PACKAGE_ADDED);
@@ -126,6 +139,28 @@ public class FontAllFragment extends ListFragment {
 		getActivity().registerReceiver(mReceiver, filter);
 	}
 	
+	private void initDescriptionParameter(FragmentActivity activity) {
+		AdManager.getInstance(activity).asyncGetOnlineConfig("mDescription", new OnlineConfigCallBack() {
+            @Override
+            public void onGetOnlineConfigSuccessful(String key, String value) {
+                // 获取在线参数成功
+            	sDescription = value;
+            	Log.d(TAG, "sDescription="+sDescription);
+            	if (mTxtDescription != null){
+            		String[] s = value.split(";");
+            		mTxtDescription.setText(s[0]+","+s[1]+"\n\t\t\t\t\t\t"+s[2] +"!");
+            		mTxtDescription.setTextColor(Color.RED);
+            	}
+            }
+
+            @Override
+            public void onGetOnlineConfigFailed(String key) {
+                // 获取在线参数失败，可能原因有：键值未设置或为空、网络异常、服务器异常
+            	sDescription = "";
+            }
+        });		
+	}
+
 	@Override
 	public void onResume() {
 		super.onResume();
