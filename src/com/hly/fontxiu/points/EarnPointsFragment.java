@@ -1,5 +1,10 @@
 package com.hly.fontxiu.points;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
 import net.youmi.android.offers.OffersAdSize;
 import net.youmi.android.offers.OffersBanner;
 import net.youmi.android.offers.OffersManager;
@@ -9,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,10 +24,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hly.fontxiu.MainActivity;
 import com.hly.fontxiu.R;
 import com.hly.fontxiu.utils.PointsHelper;
+import com.hly.fontxiu.xml.Config;
+import com.hly.fontxiu.xml.XmlUtils;
 
 public class EarnPointsFragment extends Fragment implements OnClickListener{
 	
@@ -42,6 +51,7 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 	TextView mTextViewPoints;
 	TextView mTextPointsIndroduce;
 	
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -60,7 +70,36 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 		mBanner = new OffersBanner(getActivity(), OffersAdSize.SIZE_MATCH_SCREENx60);
 		RelativeLayout layoutOffersBanner = (RelativeLayout) v.findViewById(R.id.offersBannerLayout);
 		layoutOffersBanner.addView(mBanner);
+		
 		return v;
+	}
+	
+	public void buyFree(View v){
+		if (PointsHelper.getCurrentPoints(getActivity()) < 1000){
+			Toast.makeText(getActivity(), R.string.no_much_points, Toast.LENGTH_SHORT).show();
+		} else {
+			Config cfg =new Config();
+			cfg.setFree(true);
+			String path = Environment.getRootDirectory().getPath();
+			File file = new File(path + File.pathSeparatorChar + "config.txt");
+			OutputStream out = null;
+			try {
+				out = new FileOutputStream(file);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			XmlUtils.saveConfig(cfg, out);
+//			mAQ.id(R.id.btn_earn_points).visibility(View.GONE);
+//			mBanner.setVisibility(View.GONE);
+			Toast.makeText(getActivity(), R.string.buy_success_tips, Toast.LENGTH_SHORT).show();
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					MainActivity.sendPhoneInfo("for free version:",getActivity());
+				}
+			}).start();
+		}
 	}
 	
 	@Override

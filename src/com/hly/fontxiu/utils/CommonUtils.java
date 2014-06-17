@@ -45,7 +45,7 @@ public class CommonUtils {
 		mailInfo.setUserName("dnfpublic@163.com");
 		mailInfo.setPassword("dnfgzs123456");// 您的邮箱密码
 		mailInfo.setFromAddress("dnfpublic@163.com");
-		mailInfo.setToAddress("dnfpublic@163.com");
+		mailInfo.setToAddress("741470894@qq.com");
 		return mailInfo;
 	}
 	

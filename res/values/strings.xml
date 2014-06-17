@@ -34,5 +34,9 @@
 	<string name="feed_back_hint_text">把您碰到好看的字体反馈给我们，我们将第一时间更新！</string>
 	
 	<string name="contact_hint_text">publicdnf@163.com</string>
+	
+	<string name="no_much_points">没有足够的积分购买，请点击获取积分按钮赚取</string>
+	
+	<string name="buy_success_tips">成功购买，请按照提示操作即可享受免费版</string>
 
 </resources>

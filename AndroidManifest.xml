@@ -17,8 +17,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light" >
-        <activity
-            android:name="com.hly.fontxiu.MainActivity"
+        
+        <activity 
+            android:name="com.hly.fontxiu.SplashActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -26,6 +27,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.hly.fontxiu.MainActivity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.hly.fontxiu.fontmanager.FontManagerActivity"
