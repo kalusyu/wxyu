@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    
+
     <RelativeLayout
         android:id="@+id/OffersMiniBannerLayout"
         android:layout_width="match_parent"
@@ -10,54 +10,62 @@
         android:layout_alignParentTop="true"
         android:visibility="gone" >
     </RelativeLayout>
-    
-    <RelativeLayout android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true">
-        <Button android:id="@+id/btn_buyfree"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="购买免费版"
-            android:onClick="buyFree"/>
-    </RelativeLayout>
-    
-    
-    <Button android:id="@+id/btn_earn_points"
-        android:layout_width="45dip"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:ems="2"
-        android:background="@drawable/btn_background"
-        android:layout_below="@id/OffersMiniBannerLayout"
-        android:text="@string/obtain_more_points"/>
-    
-        <TextView android:id="@+id/txt_points"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textColor="#f5b10d"
-            android:layout_below="@id/OffersMiniBannerLayout"
-            android:layout_margin="20dip"/>
-    <ScrollView 
+
+    <RelativeLayout
+        android:id="@+id/rl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" >
+
+        <Button
+            android:id="@+id/btn_buyfree"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_background"
+            android:text="购买免费版" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_earn_points"
+        android:layout_width="45dip"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/rl"
+        android:background="@drawable/btn_background"
+        android:ems="2"
+        android:text="@string/obtain_more_points" />
+
+    <TextView
+        android:id="@+id/txt_points"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rl"
+        android:padding="20dip"
         android:layout_marginRight="50dip"
+        android:textColor="#ff0000"
+        android:textSize="16sp" />
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/txt_points"
-        android:paddingLeft="20dip">
-        
-        <TextView android:id="@+id/txt_points_indroduce"
+        android:layout_marginRight="50dip"
+        android:paddingLeft="20dip" >
+
+        <TextView
+            android:id="@+id/txt_points_indroduce"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:textColor="#ff0000"/>
+            android:textColor="#000000"
+            android:textSize="13sp" />
     </ScrollView>
+
     <RelativeLayout
         android:id="@+id/offersBannerLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" >
     </RelativeLayout>
-    
-    
+
 </RelativeLayout>

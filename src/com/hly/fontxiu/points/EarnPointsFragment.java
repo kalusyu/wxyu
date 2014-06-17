@@ -60,6 +60,9 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 		btn.setOnClickListener(this);
 		initUI(v);
 		
+		Button buy = (Button) v.findViewById(R.id.btn_buyfree);
+		buy.setOnClickListener(this);
+		
 		
 		// (可选)使用积分Mini Banner-一个新的积分墙入口点，随时随地让用户关注新的积分广告
 		mMiniBanner = new OffersBanner(getActivity(), OffersAdSize.SIZE_MATCH_SCREENx32);//
@@ -112,7 +115,10 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 	}
 	
 	private void fillText() {
-		mTextViewPoints.setText("当前积分："+ PointsHelper.getCurrentPoints(getActivity()));
+		StringBuilder sbP = new StringBuilder();
+		sbP.append("当前积分："+ PointsHelper.getCurrentPoints(getActivity()))
+		.append("\n1.美图手机2字体福利到：只要您的积分大于等于1000分就可以购买永久免费版了！\n2.购买完成之后，退出程序，长安Home键，即中间的那个键，到多任务删除美图手机2字体应用，然后重新打开就可以享受免费无广告版的美图手机2换字体了");
+		mTextViewPoints.setText(sbP.toString());
 		StringBuilder sb =  new StringBuilder();
 		sb.append("\n\n积分规则：").append("\n\n")
 		.append("1. 用户初次登陆应用奖励").append(MainActivity.sAwardPoints).append("积分，使用字体需要有足够的积分才可以使用。").append("\n\n")
@@ -120,7 +126,7 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 		.append("   2.1) 通过点击页面显示的广告赚取.").append("\n")
 		.append("   2.2) 通过点击获取更多积分按钮.").append("\n\n")
 		.append("3. 点击进入下载页面，按照要求下载使用即可获取对应的积分。").append("\n\n")
-		.append("4.当有足够的积分时，每应用一种新字体都会消耗对应的积分，旧字体可任意切换。").append("\n\n")
+		.append("4. 当有足够的积分时，每应用一种新字体都会消耗对应的积分，旧字体可任意切换。").append("\n\n")
 		.append("\n").append("\n")
 		.append("附：如您对我们的产品有任何疑问，请点击右上角的问题反馈，我们将及时采纳！").append("\n");
 		
@@ -166,6 +172,8 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 	public void onClick(View view) {
 		if (view.getId() == R.id.btn_earn_points){
 			OffersManager.getInstance(getActivity()).showOffersWall();
+		} else if (view.getId() == R.id.btn_buyfree){
+			buyFree(view);
 		}
 		
 	}

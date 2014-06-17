@@ -439,8 +439,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     private void initAd() {
         // 初始化接口，应用启动的时候调用
         // 参数：appId, appSecret, 调试模式
-        AdManager.getInstance(this).init("cf94d98f827676b6",
-                "5f0af37c8bb20297", false);
+        AdManager.getInstance(this).init("8152fb2979a26eff",
+                "1e4fed19960bdcf3", false);
         // 如果使用积分广告，请务必调用积分广告的初始化接口:
         OffersManager.getInstance(this).onAppLaunch();
 
