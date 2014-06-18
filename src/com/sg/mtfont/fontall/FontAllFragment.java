@@ -455,7 +455,7 @@ public class FontAllFragment extends ListFragment {
 							PackageManager.GET_ACTIVITIES);
 					String packageName = info.applicationInfo.packageName;
 					int currentPoints = PointsHelper.getCurrentPoints(getActivity());
-					if (currentPoints < FontDetailActivity.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
+					if (!MainActivity.mConfig.isFree() && currentPoints < FontDetailActivity.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
 						new AlertDialog.Builder(getActivity())
 								.setTitle("提示")
 								.setMessage(

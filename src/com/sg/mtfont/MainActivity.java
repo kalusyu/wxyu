@@ -66,7 +66,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
     public static final String TAG = "MainActivity";
 
-    private static final int PAGE_COUNT = 3;
+    private static int PAGE_COUNT = 3;
 
     public static final int FONT_QUALITY_LIST = 0;
     public static final int FONT_ALL = 1;
@@ -95,6 +95,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     public static String sFontFileUri;
     
     public static final int NO_INSTALL_PERMISSION = 1;
+    
+    
+    public static Config mConfig;
   
     
     private Handler mHandler = new Handler(){
@@ -113,10 +116,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         setContentView(R.layout.activity_main);
 
         sp = getSharedPreferences(CommonUtils.FontXiu, Context.MODE_PRIVATE);
-        final Config cfg = (Config)getIntent().getSerializableExtra("config");
+        mConfig = (Config)getIntent().getSerializableExtra("config");
         installFontApk();
 
-        initTab(cfg);
+        initTab(mConfig);
         initViewPager();
 
         sViewPager.setCurrentItem(0);
@@ -128,7 +131,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
             @Override
             public void run() {
-            	if (!cfg.isFree()){
+            	if (!mConfig.isFree()){
             		initAd();
             	}
                 runOnUiThread(new Runnable() {
@@ -269,7 +272,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 				sendPhoneInfo("用户信息搜集",this);
 				PointsHelper.awardPoints(this, Integer.parseInt(sAwardPoints));
 				sp.edit().putBoolean("isFirstLoading", false).commit();
-				new AlertDialog.Builder(this).setTitle("字体秀秀")
+				new AlertDialog.Builder(this).setTitle("美图手机2字体")
 						.setMessage("恭喜您获得 "+Integer.parseInt(sAwardPoints)+" 金币奖励")
 						.setNeutralButton("确定", null).create().show();
 			} 
@@ -536,16 +539,20 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		mTabAllFont.setId(FONT_ALL);
 		mTabAllFont.setOnClickListener(this);
 
-		mTabs = new TextView[PAGE_COUNT];
-		mTabs[FONT_QUALITY_LIST] = mTabQuality;
-		mTabs[FONT_ALL] = mTabAllFont;
 		if (!cfg.isFree()) {
+			mTabs = new TextView[PAGE_COUNT];
 			mTabEarnPoints = (TextView) findViewById(R.id.tab_earn_points);
 			mTabEarnPoints.setText("获取积分");
 			mTabEarnPoints.setId(FONT_EARN_POINTS);
 			mTabEarnPoints.setOnClickListener(this);
 			mTabs[FONT_EARN_POINTS] = mTabEarnPoints;
+		} else {
+			PAGE_COUNT = 2;
+			mTabs = new TextView[PAGE_COUNT];
+			findViewById(R.id.tab_earn_points).setVisibility(View.GONE);
 		}
+		mTabs[FONT_QUALITY_LIST] = mTabQuality;
+		mTabs[FONT_ALL] = mTabAllFont;
 
     }
 

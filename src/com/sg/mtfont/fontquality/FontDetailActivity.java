@@ -113,7 +113,7 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		// final ProgressDialog dialog = ProgressDialog.show(this, "提示",
 		// "正在应用字体...");
 		int currentPoints = PointsHelper.getCurrentPoints(this);
-		if (currentPoints < NEED_POINTS && !SharedPreferencesHelper.isFontApplied(this, mPackgeName)) {
+		if (!MainActivity.mConfig.isFree() && currentPoints < NEED_POINTS && !SharedPreferencesHelper.isFontApplied(this, mPackgeName)) {
 			new AlertDialog.Builder(this)
 					.setTitle("提示")
 					.setMessage(

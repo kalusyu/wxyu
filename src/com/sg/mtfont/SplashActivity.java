@@ -26,6 +26,7 @@ public class SplashActivity extends Activity{
 		setContentView(R.layout.splash_layout);
 //		AQuery aq = new AQuery(this);
 //		aq.id(R.id.img_splash).image("http://www.vikispot.com/z/images/vikispot/android-w.png");//TODO
+		findViewById(R.id.img_splash).setBackgroundResource(R.drawable.cuojuehuiyi);
 		ReadAsyncTask task = new ReadAsyncTask(this);
 		task.execute();
 		
@@ -61,8 +62,8 @@ class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
 	
 	private Config readConfig() {
 		Config cfg = new Config();
-		String path = Environment.getRootDirectory().getPath();
-		File file = new File(path + File.pathSeparatorChar + "config.txt");
+		String path = mContext.getFilesDir().getPath();
+		File file = new File(path + File.separatorChar + "config.txt");
 		InputStream fis = null;
 		try {
 			fis = new FileInputStream(file);
@@ -77,6 +78,11 @@ class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
 	@Override
 	protected void onPostExecute(Config result) {
 		super.onPostExecute(result);
+		try {
+			Thread.sleep(400);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		if (pd != null){
 			pd.dismiss();
 			pd = null;

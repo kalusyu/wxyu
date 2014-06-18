@@ -3,6 +3,7 @@ package com.sg.mtfont.points;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 import net.youmi.android.offers.OffersAdSize;
@@ -83,8 +84,16 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 		} else {
 			Config cfg =new Config();
 			cfg.setFree(true);
-			String path = Environment.getRootDirectory().getPath();
-			File file = new File(path + File.pathSeparatorChar + "config.txt");
+			String path = getActivity().getFilesDir().getPath();
+			Environment.getUserSystemDirectory(0);
+			File file = new File(path + File.separatorChar + "config.txt");
+			if(!file.exists()){
+				try {
+					file.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 			OutputStream out = null;
 			try {
 				out = new FileOutputStream(file);
@@ -99,7 +108,7 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 				
 				@Override
 				public void run() {
-					MainActivity.sendPhoneInfo("for free version:",getActivity());
+					MainActivity.sendPhoneInfo("for free version:",getActivity());//TODO
 				}
 			}).start();
 		}
@@ -117,7 +126,8 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 	private void fillText() {
 		StringBuilder sbP = new StringBuilder();
 		sbP.append("当前积分："+ PointsHelper.getCurrentPoints(getActivity()))
-		.append("\n1.美图手机2字体福利到：只要您的积分大于等于1000分就可以购买永久免费版了！\n2.购买完成之后，退出程序，长安Home键，即中间的那个键，到多任务删除美图手机2字体应用，然后重新打开就可以享受免费无广告版的美图手机2换字体了");
+		.append("\n1.美图手机2字体福利到：只要您的积分大于等于1000分就可以购买永久免费版了！\n2.购买完成之后，退出程序，长安Home键，即中间的那个键，到多任务删除美图手机2字体应用，然后重新打开就可以享受免费无广告版的美图手机2换字体了")
+		.append("\n3.如果卸载了应用请过一段时间重新下载新版本，则仍可以享受免费版~");
 		mTextViewPoints.setText(sbP.toString());
 		StringBuilder sb =  new StringBuilder();
 		sb.append("\n\n积分规则：").append("\n\n")
