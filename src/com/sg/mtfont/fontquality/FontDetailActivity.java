@@ -181,7 +181,9 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 	            FontResUtil.saveSystemFontRes(mContext, fontRes);
 	            if (!SharedPreferencesHelper.isFontApplied(mContext, fontRes.getPackageName())){
 		            SharedPreferencesHelper.addToApplied(mContext, fontRes.getPackageName());
-		            PointsHelper.spendPoints(mContext, NEED_POINTS);
+		            if (!MainActivity.mConfig.isFree()){//如果不是免费版则需要消耗积分
+		            	PointsHelper.spendPoints(mContext, NEED_POINTS);
+		            }
 	            }
 	            Toast.makeText(mContext, "设置成功", Toast.LENGTH_SHORT).show();
 	            finish();

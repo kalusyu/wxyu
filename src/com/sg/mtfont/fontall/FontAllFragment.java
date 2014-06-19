@@ -324,7 +324,9 @@ public class FontAllFragment extends ListFragment {
 	
 				if (!SharedPreferencesHelper.isFontApplied(mContext,fontRes.getPackageName())) {
 					SharedPreferencesHelper.addToApplied(mContext,fontRes.getPackageName());
-					PointsHelper.spendPoints(mContext,FontDetailActivity.NEED_POINTS);
+					if (!MainActivity.mConfig.isFree()){ //如果不是免费版则需要消耗积分
+						PointsHelper.spendPoints(mContext,FontDetailActivity.NEED_POINTS);
+					}
 				}
 	
 				final ProgressDialog lProgress = mProgress.get();

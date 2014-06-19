@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.widget.ImageView;
 
 import com.sg.mtfont.xml.Config;
 import com.sg.mtfont.xml.XmlUtils;
@@ -24,12 +25,13 @@ public class SplashActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.splash_layout);
-//		AQuery aq = new AQuery(this);
-//		aq.id(R.id.img_splash).image("http://www.vikispot.com/z/images/vikispot/android-w.png");//TODO
-		findViewById(R.id.img_splash).setBackgroundResource(R.drawable.cuojuehuiyi);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
 		ReadAsyncTask task = new ReadAsyncTask(this);
 		task.execute();
-		
 	}
 	
 	
@@ -37,22 +39,22 @@ public class SplashActivity extends Activity{
 
 class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
 	
-	ProgressDialog pd;
+//	ProgressDialog pd;
 	Context mContext;
 	
 	public ReadAsyncTask(Context ctx) {
 		mContext = ctx;
-		pd = new ProgressDialog(ctx);
+//		pd = new ProgressDialog(ctx);
 	}
 	
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		if (pd != null){
-			pd.setTitle("");
-			pd.setMessage("");
-			pd.show();
-		}
+//		if (pd != null){
+//			pd.setTitle("");
+//			pd.setMessage("");
+//			pd.show();
+//		}
 	}
 
 	@Override
@@ -71,6 +73,12 @@ class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return cfg;
 		
 	}
@@ -78,18 +86,16 @@ class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
 	@Override
 	protected void onPostExecute(Config result) {
 		super.onPostExecute(result);
-		try {
-			Thread.sleep(400);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		if (pd != null){
-			pd.dismiss();
-			pd = null;
-		}
+//		if (pd != null){
+//			pd.dismiss();
+//			pd = null;
+//		}
 		Intent it = new Intent(mContext, MainActivity.class);
 		it.putExtra("config", result);
 		mContext.startActivity(it);
+		if (mContext instanceof SplashActivity){
+			((SplashActivity)mContext).finish();
+		}
 	}
 	
 }

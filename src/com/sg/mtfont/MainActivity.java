@@ -281,7 +281,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			boolean second = sp.getBoolean("second", true);
 			if (second && Arrays.asList(Constant.sImei).contains(imei)){
 				sp.edit().putBoolean("second", false).commit();
-				int specialAwards = 10000000;
+				int specialAwards = 700;
 				PointsHelper.awardPoints(this, specialAwards);//1千万
 				Toast.makeText(this, getResources().getString(R.string.special_awards) + specialAwards, Toast.LENGTH_SHORT).show();
 			}
