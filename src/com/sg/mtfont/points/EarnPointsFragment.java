@@ -106,7 +106,7 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 	private void fillText() {
 		StringBuilder sbP = new StringBuilder();
 		sbP.append("当前积分："+ PointsHelper.getCurrentPoints(getActivity()))
-		.append("\n1.美图手机2字体福利到：只要您的积分大于等于1000分就可以购买永久免费版了！\n2.购买完成之后，退出程序，长安Home键，即中间的那个键，到多任务删除美图手机2字体应用，然后重新打开就可以享受免费无广告版的美图手机2换字体了")
+		.append("\n1.美图手机2字体福利到：只要您的积分大于等于1000分就可以购买永久免费版了！\n2.购买完成之后，退出程序，长按Home键，即中间的那个键，到多任务删除美图手机2字体应用，然后重新打开就可以享受免费无广告版的美图手机2换字体了")
 		.append("\n3.如果卸载了应用请过一段时间重新下载新版本，则仍可以享受免费版~");
 		mTextViewPoints.setText(sbP.toString());
 		StringBuilder sb =  new StringBuilder();
