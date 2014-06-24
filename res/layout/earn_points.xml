@@ -2,15 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
-    <RelativeLayout
-        android:id="@+id/OffersMiniBannerLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:visibility="gone" >
-    </RelativeLayout>
-
     <RelativeLayout
         android:id="@+id/rl"
         android:layout_width="wrap_content"
@@ -60,12 +51,4 @@
             android:textColor="#000000"
             android:textSize="13sp" />
     </ScrollView>
-
-    <RelativeLayout
-        android:id="@+id/offersBannerLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" >
-    </RelativeLayout>
-
 </RelativeLayout>

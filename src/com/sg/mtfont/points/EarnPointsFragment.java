@@ -38,15 +38,6 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 	public static final String TAG = "EarnPointsFragment";
 	
 	/**
-	 * 积分 Banner
-	 */
-	private OffersBanner mBanner;
-	/**
-	 * 积分 Mini Banner
-	 */
-	private OffersBanner mMiniBanner;
-	
-	/**
 	 * 显示积分余额的控件
 	 */
 	TextView mTextViewPoints;
@@ -63,18 +54,6 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 		
 		Button buy = (Button) v.findViewById(R.id.btn_buyfree);
 		buy.setOnClickListener(this);
-		
-		
-		// (可选)使用积分Mini Banner-一个新的积分墙入口点，随时随地让用户关注新的积分广告
-		mMiniBanner = new OffersBanner(getActivity(), OffersAdSize.SIZE_MATCH_SCREENx32);//
-		RelativeLayout layoutOffersMiniBanner = (RelativeLayout) v.findViewById(R.id.OffersMiniBannerLayout);
-		layoutOffersMiniBanner.addView(mMiniBanner);
-
-		// (可选)使用积分Banner-一个新的积分墙入口点，随时随地让用户关注新的积分广告
-		mBanner = new OffersBanner(getActivity(), OffersAdSize.SIZE_MATCH_SCREENx60);
-		RelativeLayout layoutOffersBanner = (RelativeLayout) v.findViewById(R.id.offersBannerLayout);
-		layoutOffersBanner.addView(mBanner);
-		
 		return v;
 	}
 	
@@ -82,6 +61,7 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 		if (PointsHelper.getCurrentPoints(getActivity()) < 1000){
 			Toast.makeText(getActivity(), R.string.no_much_points, Toast.LENGTH_SHORT).show();
 		} else {
+			PointsHelper.spendPoints(getActivity(), 1000);//消耗1000
 			Config cfg =new Config();
 			cfg.setFree(true);
 			String path = getActivity().getFilesDir().getPath();
