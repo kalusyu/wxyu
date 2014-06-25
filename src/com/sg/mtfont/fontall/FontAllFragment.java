@@ -11,7 +11,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 import net.youmi.android.AdManager;
@@ -19,12 +21,15 @@ import net.youmi.android.dev.OnlineConfigCallBack;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.app.DownloadManager.Request;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -52,6 +57,7 @@ import android.widget.Toast;
 import com.sg.mtfont.MainActivity;
 import com.sg.mtfont.R;
 import com.sg.mtfont.bean.FontFile;
+import com.sg.mtfont.fontall.FontAllFragment.AllListAdapter.ViewHolder;
 import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
 import com.sg.mtfont.fontquality.FontDetailActivity;
@@ -79,6 +85,10 @@ public class FontAllFragment extends ListFragment {
 	public static final String GENERATED_FONTFILE_ACTION = "com.hly.fontxiu.FONTFILELIST";
 	
 	public static String sDescription;
+	
+	private static final boolean DEBUG = true;
+	
+	private static Map<Long, ViewHolder> sBgMaps = new HashMap<Long,ViewHolder>();
 	
 	private TextView mTxtDescription;
 	private Runnable mLoadFontFileListRunnable = new Runnable() {
@@ -134,6 +144,10 @@ public class FontAllFragment extends ListFragment {
 		getActivity().registerReceiver(mReceiver, filter);
 		
 		filter = new IntentFilter();
+		filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+		getActivity().registerReceiver(mDownloadRecevier, filter);
+		
+		filter = new IntentFilter();
 		filter.addAction(GENERATED_FONTFILE_ACTION);
 		getActivity().registerReceiver(mReceiver, filter);
 	}
@@ -175,21 +189,40 @@ public class FontAllFragment extends ListFragment {
 			"com.monotype.android.font.zhihualuo"
 			
 			 };
+	
+	private BroadcastReceiver mDownloadRecevier = new BroadcastReceiver() {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			String action = intent.getAction();
+			if (action.equals(DownloadManager.ACTION_DOWNLOAD_COMPLETE)) {
+				long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0); // TODO
+				boolean isDownload = SharedPreferencesHelper.getSharepreferences(getActivity()).getBoolean(String.valueOf(id), false);
+				if (isDownload){
+					ViewHolder holder = sBgMaps.get(id);
+					holder.mApply.setVisibility(View.VISIBLE);
+				}
+			} else if (action.equals(DownloadManager.ACTION_NOTIFICATION_CLICKED)) {
+				 Toast.makeText(context, "通知", Toast.LENGTH_LONG).show();
+			}
+
+		}
+	};
 
 	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
 			try{
-				String pkgName = intent.getDataString();
 				PackageManager pm = mContext.getPackageManager();
 				List<PackageInfo> packegeInfoList = FontResUtil
 						.getFontPackegeInfoList(pm);
-				String packageName = null;
-				if (pkgName != null){
-					int index = pkgName.indexOf(":");
-					packageName = pkgName.substring(index + 1, pkgName.length());
+				String packageName = intent.getData().getSchemeSpecificPart();
+				if (DEBUG){
+					Log.d(TAG, packageName);
 				}
+				
 				boolean defaultFont = Arrays.asList(mPackagesExclude).contains(packageName);
 				if (packageName!= null && packageName.contains("android.font") && !defaultFont){
 					Log.d(TAG, "font apk had installed ,applying it to system packageName=" + packageName);
@@ -211,6 +244,7 @@ public class FontAllFragment extends ListFragment {
 	public void onDestroy() {
 		super.onDestroy();
 		getActivity().unregisterReceiver(mReceiver);
+		getActivity().unregisterReceiver(mDownloadRecevier);
 	};
 	
 	private void loadInstalledFont() {
@@ -426,16 +460,6 @@ public class FontAllFragment extends ListFragment {
 					break;
 				case R.id.btn_download:
 					//删除代码，将两个按钮合并，在文件不存在的情况下，进行下载操作，不然直接应用字体
-					/*
-					// Toast.makeText(mContext, fontFile.getFontName(),
-					// Toast.LENGTH_SHORT).show();
-					DownloadFileAsync downloadTask = new DownloadFileAsync(
-							mHolder);
-//					downloadTask.execute(fontFile);
-					downloadTask.executeOnExecutor(Executors.newSingleThreadExecutor(),fontFile);
-					mHolder.mDownload.setVisibility(View.GONE);
-					break;
-					*/
 				case R.id.btn_apply:
 					
 					String file = FileUtils.getSDCardPath()
@@ -444,12 +468,26 @@ public class FontAllFragment extends ListFragment {
 							+ ".apk";
 					File fontApk = new File(file);
 					if(!fontApk.exists()){
-						DownloadFileAsync myDownloadTast = new DownloadFileAsync(
-								mHolder);
-						myDownloadTast.executeOnExecutor(Executors.newSingleThreadExecutor(),fontFile);
+//						DownloadFileAsync myDownloadTast = new DownloadFileAsync(
+//								mHolder);
+//						myDownloadTast.executeOnExecutor(Executors.newSingleThreadExecutor(),fontFile);
+						DownloadManager dm = (DownloadManager)getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+						Uri uri = Uri.parse(fontFile.getFontUri());
+						Request request = new Request(uri);
+						request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE|DownloadManager.Request.NETWORK_WIFI);
+						request.setDestinationInExternalFilesDir(getActivity(), null, file);//TODO 考虑sd卡问题，可以考虑先下载安装完再删除存到应用files下面
+						request.setDestinationInExternalPublicDir("fontxiuxiu/download", fontFile.getFontName()+".apk");
+						long id = dm.enqueue(request);
+						SharedPreferences sp = SharedPreferencesHelper.getSharepreferences(mContext);
+						sp.edit().putBoolean(String.valueOf(id), true).commit();
+						sBgMaps.put(id, mHolder);
+						request.setTitle("字体下载");
+						request.setDescription(fontFile.getFontDisplayName()+"下载中");
+						
+						
 						mHolder.mDownload.setVisibility(View.GONE);
 						mHolder.mApply.setVisibility(View.GONE);
-						Toast.makeText(getActivity(), "正在下载...", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "后台正在下载...", Toast.LENGTH_SHORT).show();
 						return;
 					}
 					PackageManager pm = mContext.getPackageManager();
