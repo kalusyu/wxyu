@@ -163,7 +163,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
             	sUpdateFontFile = str[1];
             	Log.d(TAG, "sUpdateFontFile="+sUpdateFontFile+",sFontFileUri="+sFontFileUri);
             	File f = getFilesDir();
-            	final String fontFileName = "fontlist.xml";
+            	final String fontFileName = getString(R.string.resource_file);
             	File fontlist = new File(f.getAbsolutePath(),fontFileName);
             	if (!fontlist.exists() || sUpdateFontFile.equals("true")){
             		if (fontlist.exists()){

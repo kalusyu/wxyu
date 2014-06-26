@@ -278,7 +278,7 @@ public class FontAllFragment extends ListFragment {
 		FileInputStream fis = null;
 		try {
 			if (mContext != null){
-				fis = mContext.getApplicationContext().openFileInput("fontlist.xml");
+				fis = mContext.getApplicationContext().openFileInput(getActivity().getString(R.string.resource_file));
 				mFontFiles = FileUtils.parseXmlFile(fis);
 			}
 		} catch (FileNotFoundException e1) {
