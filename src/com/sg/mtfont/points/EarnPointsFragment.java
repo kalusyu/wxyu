@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Process;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -81,8 +82,6 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 				e.printStackTrace();
 			}
 			XmlUtils.saveConfig(cfg, out);
-//			mAQ.id(R.id.btn_earn_points).visibility(View.GONE);
-//			mBanner.setVisibility(View.GONE);
 			Toast.makeText(getActivity(), R.string.buy_success_tips, Toast.LENGTH_SHORT).show();
 			new Thread(new Runnable() {
 				
@@ -91,6 +90,12 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 					MainActivity.sendPhoneInfo("for free version:",getActivity());//TODO
 				}
 			}).start();
+			
+			Intent i = getActivity().getPackageManager()  
+			        .getLaunchIntentForPackage(getActivity().getPackageName());  
+			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  
+			startActivity(i); 
+			
 		}
 	}
 	
