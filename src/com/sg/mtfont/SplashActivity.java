@@ -25,13 +25,15 @@ public class SplashActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.splash_layout);
+		ReadAsyncTask task = new ReadAsyncTask(this);
+		task.execute();
+		//TODO request need data
+		//TODO progress tips
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		ReadAsyncTask task = new ReadAsyncTask(this);
-		task.execute();
 	}
 	
 	
@@ -71,12 +73,6 @@ class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
 			fis = new FileInputStream(file);
 			XmlUtils.readConfig(cfg,fis);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return cfg;

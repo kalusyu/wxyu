@@ -375,13 +375,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		}).start();
         
 	}
-
-
-
-	@Override
-    protected void onResume() {
-        super.onResume();
-    }
 	
     private void installFontApk() {
     	// 初始化数据pb
