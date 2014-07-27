@@ -1,64 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginLeft="5dip"
+    android:layout_marginRight="5dip"
+    android:gravity="center"
+    android:orientation="vertical" >
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btn_recover_system_font"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_background"
+        android:text="@string/recover_system_font_txt" />
+
+    <com.sg.mtfont.view.PullToRefreshView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/main_pull_refresh_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="5dip"
-        android:layout_marginRight="5dip"
-        android:gravity="center"
+        android:background="#d6fed6"
         android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/btn_recover_system_font"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/btn_background"
-            android:text="@string/recover_system_font_txt" />
+        <!--
+    这里放置listview,gridview或者scrollview的布局 ,PullToRefreshView
+	要设置android:orientation="vertical"属性
+	否则,显示不正确
+        -->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dip"
-            android:gravity="center"
-            android:orientation="horizontal" >
+        <GridView
+            android:id="@+id/gridview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:numColumns="2"
+            android:verticalSpacing="10dip" />
+    </com.sg.mtfont.view.PullToRefreshView>
 
-            <TextView
-                android:id="@+id/iv_font_1"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="2dip"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/iv_font_2"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="2dip"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/iv_font_3"
-            android:layout_width="match_parent"
-            android:layout_height="280dip"
-            android:layout_marginTop="5dip" />
-
-        <TextView
-            android:id="@+id/iv_font_4"
-            android:layout_width="match_parent"
-            android:layout_height="280dip"
-            android:layout_marginRight="2dip"
-            android:layout_marginTop="5dip" />
-
-        <TextView
-            android:id="@+id/iv_font_5"
-            android:layout_width="match_parent"
-            android:layout_height="280dip"
-            android:layout_marginLeft="2dip"
-            android:layout_marginTop="5dip" />
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

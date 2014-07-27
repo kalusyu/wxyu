@@ -117,7 +117,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
         sp = getSharedPreferences(CommonUtils.FontXiu, Context.MODE_PRIVATE);
         mConfig = (Config)getIntent().getSerializableExtra("config");
-        installFontApk();
+//        installFontApk();
 
         initTab(mConfig);
         initViewPager();

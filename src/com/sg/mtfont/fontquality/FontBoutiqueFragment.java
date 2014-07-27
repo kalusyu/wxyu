@@ -14,41 +14,54 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.GridView;
 
 import com.sg.mtfont.R;
 import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
+import com.sg.mtfont.view.PullToRefreshView;
+import com.sg.mtfont.view.PullToRefreshView.OnFooterRefreshListener;
+import com.sg.mtfont.view.PullToRefreshView.OnHeaderRefreshListener;
 
-
-public class FontBoutiqueFragment extends Fragment implements OnClickListener {
+public class FontBoutiqueFragment extends Fragment implements OnClickListener,OnHeaderRefreshListener, OnFooterRefreshListener {
 
 	public static final String FONT_DETAIL_RESOURCE = "fontDetailResource";
 	public static final String FONT_FILE_PATCH_RESOURCE = "fontFilePatchResource";
-	
-	public static final String FONT_FILENAME ="fontFileName";
+
+	public static final String FONT_FILENAME = "fontFileName";
 
 	private List<View> fontsImageView = new ArrayList<View>();
-	
+
 	private WeakReference<ProgressDialog> mProgress;
-	
+
 	@SuppressLint("HandlerLeak")
-	Handler mHandler = new Handler(){
+	Handler mHandler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
 			super.handleMessage(msg);
-			if (msg.what == 1){
-//				final ProgressDialog lProgress = mProgress.get();
-//				if (lProgress != null && lProgress.isShowing()) {
-//					lProgress.dismiss();
-//				}
-				//Toast.makeText(getActivity(), "恢复成功", Toast.LENGTH_SHORT).show();
+			if (msg.what == 1) {
+				// final ProgressDialog lProgress = mProgress.get();
+				// if (lProgress != null && lProgress.isShowing()) {
+				// lProgress.dismiss();
+				// }
+				// Toast.makeText(getActivity(), "恢复成功",
+				// Toast.LENGTH_SHORT).show();
 			}
 		};
 	};
 
+//	private PullToRefreshListView listView;
+//	private PullToRefreshListViewAdapter adapter;
+	
+	PullToRefreshView mPullToRefreshView;
+	GridView mGridView;
+	private LayoutInflater mInflater;
+	private List<Integer> listDrawable = new ArrayList<Integer>();
+	private MyAdapter adapter;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 	}
 
@@ -57,43 +70,38 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_font_boutique, null,
 				false);
-		View v1 = view.findViewById(R.id.iv_font_1);
-		v1.setBackgroundResource(R.drawable.xiaonaipao);
-		fontsImageView.add(v1);
-		View v2 = view.findViewById(R.id.iv_font_2);
-		v2.setBackgroundResource(R.drawable.cuojuehuiyi);
-		fontsImageView.add(v2);
-		View v3 = view.findViewById(R.id.iv_font_3);
-		v3.setBackgroundResource(R.drawable.wuyunkuaizoukai);
-		fontsImageView.add(v3);
-		View v4 = view.findViewById(R.id.iv_font_4);
-		v4.setBackgroundResource(R.drawable.jiangnandiao);
-		fontsImageView.add(v4);
-		View v5 = view.findViewById(R.id.iv_font_5);
-		v5.setBackgroundResource(R.drawable.zhihualuo);
-		fontsImageView.add(v5);
-		for (View v : fontsImageView) {
-			v.setOnClickListener(this);
-		}
-		Button btn = (Button)view.findViewById(R.id.btn_recover_system_font);
+		mInflater = inflater;
+		listDrawable.add(R.drawable.test_image);
+		listDrawable.add(R.drawable.test_image);
+		
+		mPullToRefreshView = (PullToRefreshView) view.findViewById(R.id.main_pull_refresh_view);
+		mGridView = (GridView) view.findViewById(R.id.gridview);
+		adapter = new MyAdapter();
+//		mGridView.setAdapter(new DataAdapter(this));
+		mGridView.setAdapter(adapter);
+		mPullToRefreshView.setOnHeaderRefreshListener(this);
+		mPullToRefreshView.setOnFooterRefreshListener(this);
+
+		Button btn = (Button) view.findViewById(R.id.btn_recover_system_font);
 		btn.setOnClickListener(mRecoverSystemFontClickListener);
 		return view;
 	}
-	
+
 	OnClickListener mRecoverSystemFontClickListener = new OnClickListener() {
-		
+
 		@Override
 		public void onClick(View arg0) {
-			
-//			mProgress = new WeakReference<ProgressDialog>(
-//					ProgressDialog
-//							.show(getActivity(),
-//									null,
-//									getResources().getString(
-//											R.string.font_applying), true,
-//									false));
+
+			// mProgress = new WeakReference<ProgressDialog>(
+			// ProgressDialog
+			// .show(getActivity(),
+			// null,
+			// getResources().getString(
+			// R.string.font_applying), true,
+			// false));
+			// TODO CommonUtils.isRooted();
 			mHandler.post(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					FontResource fontRes = new FontResource("", "", "", null);
@@ -111,58 +119,92 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener {
 		int resoureceId = -1;
 		String fontFilePath = null;
 		String fontFileName = null;
-		
-		String[] str = new String[] { 
+
+		String[] str = new String[] {
 				"com.monotype.android.font.xiaonaipaozhongwen",
 				"com.monotype.android.font.cuojuehuiyi",
 				"com.monotype.android.font.wuyunkuaizoukai",
 				"com.monotype.android.font.jiangnandiao",
 				"com.monotype.android.font.zhihualuo"
-				
-				 };
-		String[] fileName = new String[]{
-				 "wuyunkuaizoukai.apk",
-				 "xiaonaipaozhongwen.apk",
-				 "zhihualuo.apk",	
-				 "cuojuehuiyi.apk",
-				 "jiangnandiao.apk"
-		};
-		switch (arg0.getId()) {
 
-		case R.id.iv_font_1:
-			resoureceId = R.drawable.xiaonaipao;
-			fontFilePath = str[4];
-			fontFileName = fileName[4];
-			break;
-		case R.id.iv_font_2:
-			resoureceId = R.drawable.cuojuehuiyi;
-			fontFilePath = str[3];
-			fontFileName = fileName[3];
-			break;
-		case R.id.iv_font_3:
-			resoureceId = R.drawable.wuyunkuaizoukai;
-			fontFilePath = str[2];
-			fontFileName = fileName[2];
-			break;
-		case R.id.iv_font_4:
-			resoureceId = R.drawable.jiangnandiao;
-			fontFilePath = str[1];
-			fontFileName = fileName[1];
-			break;
-		case R.id.iv_font_5:
-			resoureceId = R.drawable.zhihualuo;
-			fontFilePath = str[0];
-			fontFileName = fileName[0];
-			break;
-		default:
-			resoureceId = R.drawable.jiangnandiao;
-			fontFilePath = str[0];
-			fontFileName = fileName[0];
-			break;
-		}
+		};
+		String[] fileName = new String[] { "wuyunkuaizoukai.apk",
+				"xiaonaipaozhongwen.apk", "zhihualuo.apk", "cuojuehuiyi.apk",
+				"jiangnandiao.apk" };
+
 		intent.putExtra(FONT_DETAIL_RESOURCE, resoureceId);
 		intent.putExtra(FONT_FILE_PATCH_RESOURCE, fontFilePath);
 		intent.putExtra(FONT_FILENAME, fontFileName);
 		startActivity(intent);
+	}
+
+//	viewHolder.fontName = (TextView) view
+//			.findViewById(R.id.txt_font_name);
+//	viewHolder.fontLoveNumbers = (TextView) view
+//			.findViewById(R.id.txt_love_font_numbers);
+//	viewHolder.fontDownloadNumbers = (TextView) view
+//			.findViewById(R.id.txt_download_font_numbers);
+//	viewHolder.imageThumbnail = (ImageView) view
+//			.findViewById(R.id.img_thumbnail);
+
+	@Override
+	public void onFooterRefresh(PullToRefreshView view) {
+		mPullToRefreshView.postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				System.out.println("上拉加载");
+				listDrawable.add(R.drawable.test_image);
+				adapter.notifyDataSetChanged();
+				mPullToRefreshView.onFooterRefreshComplete();
+			}
+		}, 1000);		
+	}
+
+	@Override
+	public void onHeaderRefresh(PullToRefreshView view) {
+		mPullToRefreshView.postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				// 设置更新时间
+				// mPullToRefreshView.onHeaderRefreshComplete("最近更新:01-23 12:01");
+				System.out.println("下拉更新");
+				listDrawable.add(R.drawable.test_image);
+				adapter.notifyDataSetChanged();
+				mPullToRefreshView.onHeaderRefreshComplete();
+			}
+		}, 1000);
+		
+	}
+	
+	private class MyAdapter extends BaseAdapter{
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return listDrawable.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return listDrawable.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			View view = mInflater.inflate(R.layout.list_item, null);
+			
+			return view;
+		}
+		
 	}
 }

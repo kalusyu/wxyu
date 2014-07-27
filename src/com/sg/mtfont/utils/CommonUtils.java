@@ -119,4 +119,15 @@ public class CommonUtils {
 		sms.sendTextMail(mailInfo);
 	}
 	
+	/**
+	 * 
+	 *
+	 * @param ctx
+	 * @return
+	 * 2014年7月27日 下午2:56:21
+	 */
+	public static boolean isRooted(Context ctx){
+		return false;
+	}
+	
 }
