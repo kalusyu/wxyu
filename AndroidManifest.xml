@@ -31,7 +31,8 @@
         </activity>
         <activity
             android:name="com.sg.mtfont.MainActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" >
         </activity>
         <activity
             android:name="com.sg.mtfont.fontmanager.FontManagerActivity"

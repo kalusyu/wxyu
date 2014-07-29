@@ -51,14 +51,13 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		};
 	};
 
-//	private PullToRefreshListView listView;
-//	private PullToRefreshListViewAdapter adapter;
+
 	
 	PullToRefreshView mPullToRefreshView;
 	GridView mGridView;
 	private LayoutInflater mInflater;
 	private List<Integer> listDrawable = new ArrayList<Integer>();
-	private MyAdapter adapter;
+	private GridViewAdapter adapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -76,8 +75,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		
 		mPullToRefreshView = (PullToRefreshView) view.findViewById(R.id.main_pull_refresh_view);
 		mGridView = (GridView) view.findViewById(R.id.gridview);
-		adapter = new MyAdapter();
-//		mGridView.setAdapter(new DataAdapter(this));
+		adapter = new GridViewAdapter();
 		mGridView.setAdapter(adapter);
 		mPullToRefreshView.setOnHeaderRefreshListener(this);
 		mPullToRefreshView.setOnFooterRefreshListener(this);
@@ -178,7 +176,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		
 	}
 	
-	private class MyAdapter extends BaseAdapter{
+	private class GridViewAdapter extends BaseAdapter{
 
 		@Override
 		public int getCount() {
