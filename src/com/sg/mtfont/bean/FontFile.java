@@ -1,11 +1,12 @@
 package com.sg.mtfont.bean;
 
 import java.io.File;
+import java.io.Serializable;
 
 import com.sg.mtfont.utils.FileUtils;
 
 
-public class FontFile {
+public class FontFile implements Serializable{
 	
 	/**
 	 * 字体名称 中文全称
@@ -26,6 +27,10 @@ public class FontFile {
 	 * 字体名称对应的图片uri
 	 */
 	private String fontNamePicUri;
+	
+	private String fontThumnailPic;
+	
+	private String fontThumnailPicUri;
 	
 	/**
 	 * 预览图片名称
@@ -56,10 +61,36 @@ public class FontFile {
 	
 	private String packageName;
 	
+	private String loveNumbers;
+	
+	private String downloadNumbers;
+	
 	public FontFile() {
 	}
-
 	
+	public FontFile(String fontDisplayName, String fontName,
+			String fontNamePic, String fontNamePicUri, String fontThumnailPic,
+			String fontThumnailPicUri, String[] pictureNames, String fontSize,
+			String fontUri, String pictureUri, String fontLocalPath,
+			String pictureLocalPath, boolean isApplied, boolean isDownloaded,
+			String packageName) {
+		super();
+		this.fontDisplayName = fontDisplayName;
+		this.fontName = fontName;
+		this.fontNamePic = fontNamePic;
+		this.fontNamePicUri = fontNamePicUri;
+		this.fontThumnailPic = fontThumnailPic;
+		this.fontThumnailPicUri = fontThumnailPicUri;
+		this.pictureNames = pictureNames;
+		this.fontSize = fontSize;
+		this.fontUri = fontUri;
+		this.pictureUri = pictureUri;
+		this.fontLocalPath = fontLocalPath;
+		this.pictureLocalPath = pictureLocalPath;
+		this.isApplied = isApplied;
+		this.isDownloaded = isDownloaded;
+		this.packageName = packageName;
+	}
 
 	public FontFile(String fontName, String fontNamePic, String fontNamePicUri,
 			String[] pictureNames, String fontSize, String fontUri,
@@ -187,6 +218,39 @@ public class FontFile {
 	public void setFontDisplayName(String fontDisplayName) {
 		this.fontDisplayName = fontDisplayName;
 	}
+
+	public String getFontThumnailPic() {
+		return fontThumnailPic;
+	}
+
+	public void setFontThumnailPic(String fontThumnailPic) {
+		this.fontThumnailPic = fontThumnailPic;
+	}
+
+	public String getFontThumnailPicUri() {
+		return fontThumnailPicUri;
+	}
+
+	public void setFontThumnailPicUri(String fontThumnailPicUri) {
+		this.fontThumnailPicUri = fontThumnailPicUri;
+	}
+
+	public String getLoveNumbers() {
+		return loveNumbers;
+	}
+
+	public void setLoveNumbers(String loveNumbers) {
+		this.loveNumbers = loveNumbers;
+	}
+
+	public String getDownloadNumbers() {
+		return downloadNumbers;
+	}
+
+	public void setDownloadNumbers(String downloadNumbers) {
+		this.downloadNumbers = downloadNumbers;
+	}
+	
 	
 	
 

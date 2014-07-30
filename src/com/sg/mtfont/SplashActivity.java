@@ -41,22 +41,17 @@ public class SplashActivity extends Activity{
 
 class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
 	
-//	ProgressDialog pd;
 	Context mContext;
 	
 	public ReadAsyncTask(Context ctx) {
 		mContext = ctx;
-//		pd = new ProgressDialog(ctx);
+
 	}
 	
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-//		if (pd != null){
-//			pd.setTitle("");
-//			pd.setMessage("");
-//			pd.show();
-//		}
+
 	}
 
 	@Override
@@ -82,10 +77,6 @@ class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
 	@Override
 	protected void onPostExecute(Config result) {
 		super.onPostExecute(result);
-//		if (pd != null){
-//			pd.dismiss();
-//			pd = null;
-//		}
 		Intent it = new Intent(mContext, MainActivity.class);
 		it.putExtra("config", result);
 		mContext.startActivity(it);

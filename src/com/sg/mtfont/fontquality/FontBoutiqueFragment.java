@@ -17,8 +17,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.sg.mtfont.R;
+import com.sg.mtfont.bean.FontFile;
 import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
 import com.sg.mtfont.view.PullToRefreshView;
@@ -58,6 +61,15 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	private LayoutInflater mInflater;
 	private List<Integer> listDrawable = new ArrayList<Integer>();
 	private GridViewAdapter adapter;
+	private List<FontFile> mFontFiles;
+	
+	private OnClickListener mGridItemOnclickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View view) {
+			// TODO
+		}
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -177,6 +189,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	}
 	
 	private class GridViewAdapter extends BaseAdapter{
+		
 
 		@Override
 		public int getCount() {
@@ -198,11 +211,39 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			// TODO Auto-generated method stub
-			View view = mInflater.inflate(R.layout.list_item, null);
+			View view = convertView;
+			ViewHolder holder = null;
+			if (view == null) {
+                view = mInflater.inflate(R.layout.list_item, null);
+                holder = new ViewHolder();
+                holder.mThumnailImage = (ImageView)view
+                        .findViewById(R.id.img_thumbnail);
+                holder.mFontNameCh = (TextView) view.findViewById(R.id.txt_font_name);
+                holder.mLoveNumbers = (TextView) view.findViewById(R.id.txt_love_font_numbers);
+                holder.mDownloadNumbers = (TextView) view.findViewById(R.id.txt_download_font_numbers);
+                view.setTag(holder);
+            } else {
+                holder = (ViewHolder)view.getTag();
+            }
+			// TODO function
+			// set data
+			
+			
+			// set click listener
+			holder.mThumnailImage.setOnClickListener(mGridItemOnclickListener);
+			holder.mFontNameCh.setOnClickListener(mGridItemOnclickListener);
+			holder.mLoveNumbers.setOnClickListener(mGridItemOnclickListener);
+			holder.mDownloadNumbers.setOnClickListener(mGridItemOnclickListener);
 			
 			return view;
 		}
 		
+	}
+	
+	class ViewHolder{
+		ImageView mThumnailImage;
+		TextView mFontNameCh;
+		TextView mLoveNumbers;
+		TextView mDownloadNumbers;
 	}
 }

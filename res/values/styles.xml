@@ -21,6 +21,13 @@
         <item name="android:background">@drawable/action_bar_background</item>   标题栏颜色
         <item name="android:backgroundStacked">#BBBBBB</item>  导航栏颜色
         <item name="android:backgroundSplit">#000000</item>  底部操作栏颜色
+        <item name="android:titleTextStyle">@style/ActionBarTitleText</item>
+    </style>
+    
+    <!--ActionBar title style-->
+    <style name="ActionBarTitleText" 
+           parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"  >
+        <item name="android:textColor">#ffffff</item>
     </style>
 
 </resources>

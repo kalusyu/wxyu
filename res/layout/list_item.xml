@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingTop="2dip"
-    android:background="#c0c0c0" >
+    android:background="#ffffff" >
 
     <FrameLayout
         android:layout_width="wrap_content"
