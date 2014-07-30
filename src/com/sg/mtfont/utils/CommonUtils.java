@@ -2,9 +2,12 @@ package com.sg.mtfont.utils;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
+import com.sg.mtfont.MainActivity;
+import com.sg.mtfont.R;
 import com.sg.mtfont.mail.MailSenderInfo;
 import com.sg.mtfont.mail.SimpleMailSender;
 
@@ -129,5 +132,4 @@ public class CommonUtils {
 	public static boolean isRooted(Context ctx){
 		return false;
 	}
-	
 }

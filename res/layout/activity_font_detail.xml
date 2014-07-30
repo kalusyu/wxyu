@@ -10,11 +10,23 @@
         android:layout_height="wrap_content"
         android:layout_weight="1" />
 
-    <Button
+    <FrameLayout 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Button
+        android:id="@+id/btn_download_font"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_background"
+        android:text="@string/font_download" />
+        <Button
         android:id="@+id/btn_use_font"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/btn_background"
         android:text="@string/font_apply" />
+        
+    </FrameLayout>
+    
 
 </LinearLayout>

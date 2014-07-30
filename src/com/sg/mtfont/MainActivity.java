@@ -30,6 +30,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -100,14 +101,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     public static Config mConfig;
   
     
-    private Handler mHandler = new Handler(){
-    	public void handleMessage(android.os.Message msg) {
-    		super.handleMessage(msg);
-    		if (msg.what == NO_INSTALL_PERMISSION){
-    			Toast.makeText(getApplicationContext(), R.string.font_apply_only_in_meitu2, Toast.LENGTH_LONG).show();
-    		}
-    	};
-    };
+    
+    public static FontHandler mHandler;
     
 
     @Override
@@ -118,6 +113,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         sp = getSharedPreferences(CommonUtils.FontXiu, Context.MODE_PRIVATE);
         mConfig = (Config)getIntent().getSerializableExtra("config");
 //        installFontApk();
+        mHandler = new FontHandler(getApplicationContext());
 
         initTab(mConfig);
         initViewPager();
@@ -632,4 +628,5 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     public static ViewPager getViewPager() {
         return sViewPager;
     }
+    
 }

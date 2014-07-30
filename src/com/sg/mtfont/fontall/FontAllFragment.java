@@ -102,15 +102,13 @@ public class FontAllFragment extends ListFragment {
 	};
 	
 	@SuppressLint("HandlerLeak")
-	private Handler mHandler = new Handler(){
+	Handler mHandler = new Handler(){
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			if (msg.what == LOAD_MSG_OK){
 				if (mFontFiles != null){
 					mAdapter.notifyDataSetChanged();
 				}
-			} else if (msg.what == MainActivity.NO_INSTALL_PERMISSION){
-				Toast.makeText(getActivity(), R.string.font_apply_only_in_meitu2, Toast.LENGTH_LONG).show();
 			}
 		};
 	};
@@ -468,9 +466,6 @@ public class FontAllFragment extends ListFragment {
 							+ ".apk";
 					File fontApk = new File(file);
 					if(!fontApk.exists()){
-//						DownloadFileAsync myDownloadTast = new DownloadFileAsync(
-//								mHolder);
-//						myDownloadTast.executeOnExecutor(Executors.newSingleThreadExecutor(),fontFile);
 						DownloadManager dm = (DownloadManager)getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
 						Uri uri = Uri.parse(fontFile.getFontUri());
 						Request request = new Request(uri);
@@ -524,7 +519,6 @@ public class FontAllFragment extends ListFragment {
 										}).show();
 					} else {
 						ApplyFontAsyncTask applyFontTask = new ApplyFontAsyncTask();
-//						applyFontTask.execute(fontFile);
 						applyFontTask.executeOnExecutor(Executors.newSingleThreadExecutor(),fontFile);
 					}
 					
@@ -568,7 +562,7 @@ public class FontAllFragment extends ListFragment {
 							PackageManager.GET_ACTIVITIES);
 					String packageName = info.applicationInfo.packageName;
 					if (!ApkInstallHelper.checkProgramInstalled(mContext, packageName)){
-						silentInstall(packageName, file);
+						ApkInstallHelper.silentInstall(getActivity(),packageName, file,MainActivity.mHandler);
 					}
 					return packageName;
 				} else {
@@ -576,18 +570,6 @@ public class FontAllFragment extends ListFragment {
 				}
 			}
 
-			public void silentInstall(String packageName, String path) {
-				try{
-					Uri uri = Uri.fromFile(new File(path));
-					PackageManager pm = mContext.getPackageManager();
-					pm.installPackage(uri, null, 0, packageName);
-				}catch (SecurityException e	){
-					Log.e(TAG, e.getMessage());
-					mHandler.sendEmptyMessage(MainActivity.NO_INSTALL_PERMISSION);
-				} catch (Exception e){
-					e.printStackTrace();
-				}
-			}
 
 			@Override
 			protected void onPostExecute(String packageName) {
@@ -611,113 +593,6 @@ public class FontAllFragment extends ListFragment {
 				} else {
 					Toast.makeText(mContext, "找不到对应的文件", Toast.LENGTH_SHORT).show();
 				}
-			}
-
-		}
-
-
-		/**
-		 * 
-		 * @author
-		 * 
-		 */
-		class DownloadFileAsync extends AsyncTask<FontFile, String, String> {
-
-			private ViewHolder mHolder;
-			private FontFile mFontFile;
-
-			public DownloadFileAsync(ViewHolder holder) {
-				mHolder = holder;
-			}
-
-			@Override
-			protected void onPreExecute() {
-				super.onPreExecute();
-				mHolder.pb.setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			protected String doInBackground(FontFile... fontFile) {
-				mFontFile = fontFile[0];
-				FileOutputStream fos = null;
-				try {
-					// 连接地址
-					URL u = new URL(fontFile[0].getFontUri());
-					HttpURLConnection c = (HttpURLConnection) u
-							.openConnection();
-					// c.setRequestMethod("GET");
-					// c.setDoOutput(true);
-					// c.connect();
-
-					// 计算文件长度
-					int lenghtOfFile = c.getContentLength();
-
-					String fileName = fontFile[0].getFontName() + ".apk.temp";
-					File file = new File(FileUtils.getSDCardPath() + "/download");
-					if (!file.exists()){
-						file.mkdirs();
-					}
-					File fontFileTemp = new File(file.getAbsolutePath()+File.separatorChar+fileName);
-					if(fontFileTemp.exists()){
-						fontFileTemp.delete();
-					}
-					fos = new FileOutputStream(fontFileTemp); // TODO 文件处理细节
-
-					InputStream in = c.getInputStream();
-
-					// 下载的代码
-					byte[] buffer = new byte[1024];
-					int len = 0;
-					long total = 0;
-
-					while ((len = in.read(buffer)) > 0) {
-						total += len; // total = total + len1
-						publishProgress(""
-								+ (int) ((total * 100) / lenghtOfFile));
-						fos.write(buffer, 0, len);
-					}
-
-					fos.flush();
-					
-					InputStream stream = new FileInputStream(fontFileTemp);
-					long size = stream != null? stream.available():0;
-					if (total == size){
-						boolean isSuccessed = fontFileTemp.renameTo(new File(file, fontFile[0].getFontName()+".apk"));
-						if (isSuccessed){
-							fontFileTemp.delete();
-						}
-					} else {
-						fontFileTemp.delete();
-					}
-					if (stream !=null){
-						stream.close();
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					if (fos != null) {
-						try {
-							fos.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-
-				return null;
-			}
-
-			protected void onProgressUpdate(String... progress) {
-				mHolder.pb.setProgress(Integer.parseInt(progress[0]));
-			}
-
-			@Override
-			protected void onPostExecute(String unused) {
-				// dismiss the dialog after the file was downloaded
-				mHolder.pb.setVisibility(View.GONE);
-				mHolder.mApply.setVisibility(View.VISIBLE);
-				
 			}
 
 		}

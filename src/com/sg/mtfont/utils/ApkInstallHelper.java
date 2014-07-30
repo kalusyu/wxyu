@@ -10,14 +10,19 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.sg.mtfont.MainActivity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 
 public class ApkInstallHelper {
+	
+	private static final String TAG = "ApkInstallHelper";
 
 	public static Intent getIntentFromApk(File file) {
 		Intent intent = new Intent();
@@ -177,15 +182,25 @@ public class ApkInstallHelper {
 		return flag;
 	 }
 
-	// com.meitu.android.font.huakangshaonv
-	// com.hly.android.font.wawa
-	// com.hly.android.font.tianranmeng
-	// com.hly.android.font.qingniao
-	// com.hly.android.font.jiandaiyu
-
-	// Font_Huakangshaonv.apk
-	// Font_Waiwai.apk
-	// MiniJianDaiyu.apk
-	// QingNiao.apk
-	// TianRanMeng.apk
+	/**
+	 * 
+	 *
+	 * @param packageName
+	 * @param path
+	 * 2014年7月30日 下午11:32:26
+	 */
+	public static void silentInstall(Context context,String packageName, String path,Handler handler) {
+		try{
+			Uri uri = Uri.fromFile(new File(path));
+			PackageManager pm = context.getPackageManager();
+			pm.installPackage(uri, null, 0, packageName);
+		}catch (SecurityException e	){
+			Log.e(TAG, e.getMessage());
+			if (handler != null){
+				handler.sendEmptyMessage(MainActivity.NO_INSTALL_PERMISSION);
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+	}
 }

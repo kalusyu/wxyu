@@ -67,7 +67,22 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		
 		@Override
 		public void onClick(View view) {
-			// TODO
+			switch(view.getId()){
+			case R.id.img_thumbnail:
+			case R.id.txt_font_name:
+				Intent it = new Intent(getActivity(),FontDetailActivity.class);
+				//TODO
+				startActivity(it);
+				break;
+			case R.id.txt_love_font_numbers:
+				//TODO 数据变化，刷新数据，与服务器交互
+				break;
+			case R.id.txt_download_font_numbers:
+				//TODO
+				break;
+				default:
+					;
+			}
 		}
 	};
 
@@ -227,7 +242,11 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
             }
 			// TODO function
 			// set data
-			
+			FontFile fontFile = mFontFiles.get(position);
+//			holder.mThumnailImage.setImageDrawable();
+			holder.mFontNameCh.setText(fontFile.getFontDisplayName());
+			holder.mLoveNumbers.setText(fontFile.getLoveNumbers());
+			holder.mDownloadNumbers.setText(fontFile.getDownloadNumbers());
 			
 			// set click listener
 			holder.mThumnailImage.setOnClickListener(mGridItemOnclickListener);

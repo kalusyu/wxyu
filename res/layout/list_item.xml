@@ -42,6 +42,7 @@
             android:drawableLeft="@drawable/download_flag"
             android:drawablePadding="3dip"
             android:paddingLeft="10dip"
+            android:background="@drawable/gridview_item_btn_background"
             android:text="2390" />
 
         <TextView
@@ -51,6 +52,7 @@
             android:drawableLeft="@drawable/love_flag"
             android:drawablePadding="3dip"
             android:paddingLeft="10dip"
+            android:background="@drawable/gridview_item_btn_background"
             android:text="3458" />
     </LinearLayout>
 

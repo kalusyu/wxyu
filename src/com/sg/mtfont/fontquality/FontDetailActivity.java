@@ -6,13 +6,17 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.app.DownloadManager.Request;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,6 +32,7 @@ import com.sg.mtfont.R;
 import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
 import com.sg.mtfont.utils.ApkInstallHelper;
+import com.sg.mtfont.utils.FileUtils;
 import com.sg.mtfont.utils.PointsHelper;
 import com.sg.mtfont.utils.SharedPreferencesHelper;
 
@@ -41,6 +46,9 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 	List<FontResource> mFontRes = new ArrayList<FontResource>();
 	
 	private String mPackgeName,mFontFileName;
+	
+	private String mUri;
+	private String mFontName;
 	
 
 	@Override
@@ -61,6 +69,7 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 			ivFontDetal.setImageResource(resourceId);
 		}
 		
+		//TODO 注册应用安装完成广播
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_PACKAGE_ADDED);
 		filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
@@ -72,13 +81,11 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
-//			String pkgName = intent.getData().toSafeString();
-//			int index = pkgName.indexOf(":");
-//			String packageName = pkgName.substring(index + 1, pkgName.length());
-//			String packageName2 = mPackgeName;
-//			if (packageName.equals(packageName2)) {
-//				switchFont(packageName2);
-//			}
+			String packageName = intent.getData().getSchemeSpecificPart();
+			String packageName2 = mPackgeName;
+			if (packageName.equals(packageName2)) {
+				switchFont(packageName2);
+			}
 		}
 	};
 	
@@ -103,8 +110,38 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		case R.id.btn_use_font:
 			getFontAndUse();
 			break;
+		case R.id.btn_download_font:
+			//TODO
+			downloadFontFile(mUri);
 		default:
 			break;
+		}
+	}
+
+	/**
+	 * 
+	 *
+	 * @param pUri
+	 * 2014年7月30日 下午11:58:33
+	 */
+	private void downloadFontFile(String pUri) {
+		String file = FileUtils.getSDCardPath()
+				+ File.separatorChar + "download"
+				+ File.separatorChar + mFontName
+				+ ".apk";
+		File fontApk = new File(file);
+		if (!fontApk.exists()){
+			DownloadManager dm = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+			Uri uri = Uri.parse(pUri);
+			Request request = new Request(uri);
+			request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE|DownloadManager.Request.NETWORK_WIFI);
+			request.setDestinationInExternalFilesDir(this, null, file);//TODO 考虑sd卡问题，可以考虑先下载安装完再删除存到应用files下面
+			request.setDestinationInExternalPublicDir("fontxiuxiu/download", mFontName+".apk");
+			long id = dm.enqueue(request);
+			SharedPreferences sp = SharedPreferencesHelper.getSharepreferences(this);
+			sp.edit().putBoolean(String.valueOf(id), true).commit();
+			request.setTitle("字体下载");
+			request.setDescription(mFontFileName+"下载中");	
 		}
 	}
 
