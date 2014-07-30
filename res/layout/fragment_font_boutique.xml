@@ -33,7 +33,7 @@
             android:numColumns="2"
             android:scrollbarStyle="outsideInset"
             android:columnWidth="10dip"
-            android:paddingLeft="10dip"
+            android:paddingLeft="20dip"
             android:paddingRight="10dip"
             android:horizontalSpacing="10dip"
             android:verticalSpacing="10dip" />
