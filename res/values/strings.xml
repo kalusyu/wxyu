@@ -17,6 +17,7 @@
     <string name="font_preview">预览</string>
     <string name="font_download">下载</string>
     <string name="font_apply">应用</string>
+    <string name="font_install">安装</string>
     <string name="font_applying">"正在应用中&#8230;"</string>
     <string name="font_apply_success">字体应用成功</string>
     <string name="font_download_file_is_not_exist">fontxiuxu下的download文件夹不存在或则fontxiuxiu已被删除</string>

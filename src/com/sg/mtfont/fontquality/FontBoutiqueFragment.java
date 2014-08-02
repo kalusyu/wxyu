@@ -68,17 +68,17 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		@Override
 		public void onClick(View view) {
 			switch(view.getId()){
+			//TODO goto detail page
 			case R.id.img_thumbnail:
 			case R.id.txt_font_name:
 				Intent it = new Intent(getActivity(),FontDetailActivity.class);
-				//TODO
 				startActivity(it);
 				break;
+			//TODO 数据变化，刷新数据，与服务器交互
 			case R.id.txt_love_font_numbers:
-				//TODO 数据变化，刷新数据，与服务器交互
 				break;
+			//TODO
 			case R.id.txt_download_font_numbers:
-				//TODO
 				break;
 				default:
 					;

@@ -132,4 +132,25 @@ public class CommonUtils {
 	public static boolean isRooted(Context ctx){
 		return false;
 	}
+	
+	/**
+	 * 
+	 * @param useCustomFont
+	 * @param isFree
+	 * @return
+	 * 2014年8月1日 下午5:48:28
+	 */
+	public static boolean checkFontInstalled(boolean useCustomFont,boolean isFree){
+		if (useCustomFont){
+			// TODO 
+		} else {
+			// TODO find from sharePreference
+		}
+		
+		if (isFree){
+			// TODO
+		}
+		
+		return false;
+	}
 }

@@ -62,6 +62,7 @@ import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
 import com.sg.mtfont.fontquality.FontDetailActivity;
 import com.sg.mtfont.utils.ApkInstallHelper;
+import com.sg.mtfont.utils.Constant;
 import com.sg.mtfont.utils.FileUtils;
 import com.sg.mtfont.utils.PointsHelper;
 import com.sg.mtfont.utils.SharedPreferencesHelper;
@@ -357,7 +358,7 @@ public class FontAllFragment extends ListFragment {
 				if (!SharedPreferencesHelper.isFontApplied(mContext,fontRes.getPackageName())) {
 					SharedPreferencesHelper.addToApplied(mContext,fontRes.getPackageName());
 					if (!MainActivity.mConfig.isFree()){ //如果不是免费版则需要消耗积分
-						PointsHelper.spendPoints(mContext,FontDetailActivity.NEED_POINTS);
+						PointsHelper.spendPoints(mContext,Constant.NEED_POINTS);
 					}
 				}
 	
@@ -490,7 +491,7 @@ public class FontAllFragment extends ListFragment {
 							PackageManager.GET_ACTIVITIES);
 					String packageName = info.applicationInfo.packageName;
 					int currentPoints = PointsHelper.getCurrentPoints(getActivity());
-					if (!MainActivity.mConfig.isFree() && currentPoints < FontDetailActivity.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
+					if (!MainActivity.mConfig.isFree() && currentPoints < Constant.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
 						new AlertDialog.Builder(getActivity())
 								.setTitle("提示")
 								.setMessage(

@@ -14,4 +14,7 @@ public class Constant {
 			"863564021188991", "863564021231890",
 
 	};
+	
+	// private ImageView ivFontDetal;
+	public static final int NEED_POINTS = 200;
 }
