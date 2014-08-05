@@ -102,6 +102,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		
 		mPullToRefreshView = (PullToRefreshView) view.findViewById(R.id.main_pull_refresh_view);
 		mGridView = (GridView) view.findViewById(R.id.gridview);
+		mFontFiles = new ArrayList<FontFile>();//TODO get data from server
 		adapter = new GridViewAdapter();
 		mGridView.setAdapter(adapter);
 		mPullToRefreshView.setOnHeaderRefreshListener(this);
@@ -208,19 +209,16 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
-			return listDrawable.size();
+			return mFontFiles.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
-			return listDrawable.get(position);
+			return mFontFiles.get(position);
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// TODO Auto-generated method stub
 			return position;
 		}
 
