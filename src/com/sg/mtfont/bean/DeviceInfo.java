@@ -177,6 +177,20 @@ public class DeviceInfo implements Serializable{
     public void setSimState(String simState) {
         this.simState = simState;
     }
+    @Override
+    public String toString() {
+        return "DeviceInfo [id=" + id + ", imei=" + imei + ", macAddress="
+                + macAddress + ", imsi=" + imsi + ", product=" + product
+                + ", brand=" + brand + ", manufacturer=" + manufacturer
+                + ", device=" + device + ", sdk=" + sdk + ", board=" + board
+                + ", display=" + display + ", host=" + host + ", model="
+                + model + ", time=" + time + ", androidVersion="
+                + androidVersion + ", telephone=" + telephone
+                + ", networkType=" + networkType + ", simOperatorName="
+                + simOperatorName + ", simSerialNumber=" + simSerialNumber
+                + ", simState=" + simState + "]";
+    }
+    
     
     
     

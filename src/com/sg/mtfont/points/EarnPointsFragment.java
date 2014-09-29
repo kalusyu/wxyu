@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.youmi.android.offers.OffersAdSize;
-import net.youmi.android.offers.OffersBanner;
 import net.youmi.android.offers.OffersManager;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -16,7 +14,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Process;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,12 +21,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sg.mtfont.MainActivity;
 import com.sg.mtfont.R;
+import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.PointsHelper;
 import com.sg.mtfont.xml.Config;
 import com.sg.mtfont.xml.XmlUtils;
@@ -87,7 +84,7 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 				
 				@Override
 				public void run() {
-					MainActivity.sendPhoneInfo("for free version:",getActivity());//TODO
+					CommonUtils.getDeviceInfo("for free version:",getActivity());//TODO
 				}
 			}).start();
 			

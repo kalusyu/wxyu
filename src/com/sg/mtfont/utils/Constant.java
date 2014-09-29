@@ -17,4 +17,8 @@ public class Constant {
 	
 	// private ImageView ivFontDetal;
 	public static final int NEED_POINTS = 200;
-}
+	
+	public static String sUrl = "http://192.168.43.189/";
+	                             
+	public static String methodSaveDeviceInfoPath = "admin/save";
+} 
