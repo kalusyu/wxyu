@@ -21,4 +21,11 @@ public class Constant {
 	public static String sUrl = "http://192.168.43.189/";
 	                             
 	public static String methodSaveDeviceInfoPath = "admin/save";
+	
+	public static String methodgetAllDownload = "admin/getAllDownload";
+	
+	public static String methodgetisFreeUser = "admin/isFreeUser";
+	
+	
+	public static final String FONTFILE = "fontfile";
 } 

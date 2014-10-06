@@ -357,7 +357,7 @@ public class FontAllFragment extends ListFragment {
 	
 				if (!SharedPreferencesHelper.isFontApplied(mContext,fontRes.getPackageName())) {
 					SharedPreferencesHelper.addToApplied(mContext,fontRes.getPackageName());
-					if (!MainActivity.mConfig.isFree()){ //如果不是免费版则需要消耗积分
+					if (!false){ //如果不是免费版则需要消耗积分 TOOD
 						PointsHelper.spendPoints(mContext,Constant.NEED_POINTS);
 					}
 				}
@@ -491,7 +491,8 @@ public class FontAllFragment extends ListFragment {
 							PackageManager.GET_ACTIVITIES);
 					String packageName = info.applicationInfo.packageName;
 					int currentPoints = PointsHelper.getCurrentPoints(getActivity());
-					if (!MainActivity.mConfig.isFree() && currentPoints < Constant.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
+					//TODO 
+					if (/*!MainActivity.mConfig.isFree() &&*/ currentPoints < Constant.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
 						new AlertDialog.Builder(getActivity())
 								.setTitle("提示")
 								.setMessage(
@@ -502,11 +503,12 @@ public class FontAllFragment extends ListFragment {
 											@Override
 											public void onClick(DialogInterface arg0,
 													int arg1) {
-												ViewPager viewPager = MainActivity
+											    //TODO
+												/*ViewPager viewPager = MainActivity
 														.getViewPager();
 												if (viewPager != null) {
 													viewPager.setCurrentItem(2);
-												}
+												}*/
 											}
 										})
 								.setNegativeButton("取消",

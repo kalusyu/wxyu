@@ -1,11 +1,10 @@
 package com.sg.mtfont.fontquality;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,29 +31,9 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 
 	public static final String FONT_DETAIL_RESOURCE = "fontDetailResource";
 	public static final String FONT_FILE_PATCH_RESOURCE = "fontFilePatchResource";
-
 	public static final String FONT_FILENAME = "fontFileName";
-
-	private List<View> fontsImageView = new ArrayList<View>();
-
-	private WeakReference<ProgressDialog> mProgress;
-
-	@SuppressLint("HandlerLeak")
-	Handler mHandler = new Handler() {
-		public void handleMessage(android.os.Message msg) {
-			super.handleMessage(msg);
-			if (msg.what == 1) {
-				// final ProgressDialog lProgress = mProgress.get();
-				// if (lProgress != null && lProgress.isShowing()) {
-				// lProgress.dismiss();
-				// }
-				// Toast.makeText(getActivity(), "恢复成功",
-				// Toast.LENGTH_SHORT).show();
-			}
-		};
-	};
-
-
+	
+	BoutiqueFragmentListener mListener;
 	
 	PullToRefreshView mPullToRefreshView;
 	GridView mGridView;
@@ -86,6 +65,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		}
 	};
 
+
+    
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -102,7 +83,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		
 		mPullToRefreshView = (PullToRefreshView) view.findViewById(R.id.main_pull_refresh_view);
 		mGridView = (GridView) view.findViewById(R.id.gridview);
-		mFontFiles = new ArrayList<FontFile>();//TODO get data from server
+		mFontFiles = mListener.getFontFileList();
 		adapter = new GridViewAdapter();
 		mGridView.setAdapter(adapter);
 		mPullToRefreshView.setOnHeaderRefreshListener(this);
@@ -117,14 +98,6 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 
 		@Override
 		public void onClick(View arg0) {
-
-			// mProgress = new WeakReference<ProgressDialog>(
-			// ProgressDialog
-			// .show(getActivity(),
-			// null,
-			// getResources().getString(
-			// R.string.font_applying), true,
-			// false));
 			// TODO CommonUtils.isRooted();
 			mHandler.post(new Runnable() {
 
@@ -138,6 +111,31 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 			});
 		}
 	};
+	
+	@Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (BoutiqueFragmentListener) activity;
+        } catch (ClassCastException e){
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressLint("HandlerLeak")
+    Handler mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+                // final ProgressDialog lProgress = mProgress.get();
+                // if (lProgress != null && lProgress.isShowing()) {
+                // lProgress.dismiss();
+                // }
+                // Toast.makeText(getActivity(), "恢复成功",
+                // Toast.LENGTH_SHORT).show();
+            }
+        };
+    };
 
 	@Override
 	public void onClick(View arg0) {
@@ -163,15 +161,6 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		intent.putExtra(FONT_FILENAME, fontFileName);
 		startActivity(intent);
 	}
-
-//	viewHolder.fontName = (TextView) view
-//			.findViewById(R.id.txt_font_name);
-//	viewHolder.fontLoveNumbers = (TextView) view
-//			.findViewById(R.id.txt_love_font_numbers);
-//	viewHolder.fontDownloadNumbers = (TextView) view
-//			.findViewById(R.id.txt_download_font_numbers);
-//	viewHolder.imageThumbnail = (ImageView) view
-//			.findViewById(R.id.img_thumbnail);
 
 	@Override
 	public void onFooterRefresh(PullToRefreshView view) {
@@ -203,6 +192,10 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		}, 1000);
 		
 	}
+	
+    public interface BoutiqueFragmentListener{
+        ArrayList<FontFile> getFontFileList();
+    }
 	
 	private class GridViewAdapter extends BaseAdapter{
 		

@@ -57,7 +57,8 @@ public class ChangeFontLoaderTask extends AsyncTask<String, Void, FontResource> 
 					fontRes.getPackageName())) {
 				SharedPreferencesHelper.addToApplied(mContext,
 						fontRes.getPackageName());
-				if (!MainActivity.mConfig.isFree()) {// 如果不是免费版则需要消耗积分
+				//TODO
+				if (/*!MainActivity.mConfig.isFree()*/ false) {// 如果不是免费版则需要消耗积分
 					PointsHelper.spendPoints(mContext, Constant.NEED_POINTS);
 				}
 			}

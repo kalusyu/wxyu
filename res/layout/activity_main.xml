@@ -5,53 +5,8 @@
     android:orientation="vertical" >
 
     <FrameLayout
-        android:id="@+id/title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="0dip"
-        android:layout_weight="1" >
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/view_pager_contain"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/tab_font_quality"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:background="@drawable/btn_background"
-            android:text="@string/boutique" />
-
-        <TextView
-            android:id="@+id/tab_font_all"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:background="@drawable/btn_background"
-            android:text="@string/all" />
-
-        <TextView
-            android:id="@+id/tab_earn_points"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:background="@drawable/btn_background"
-            android:text="@string/get_points" />
-    </LinearLayout>
+        android:id="@+id/tab_fragment_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

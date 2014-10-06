@@ -113,7 +113,7 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 		mTextViewPoints.setText(sbP.toString());
 		StringBuilder sb =  new StringBuilder();
 		sb.append("\n\n积分规则：").append("\n\n")
-		.append("1. 用户初次登陆应用奖励").append(MainActivity.sAwardPoints).append("积分，使用字体需要有足够的积分才可以使用。").append("\n\n")
+		.append("1. 用户初次登陆应用奖励").append(MainActivity.AWARD_POINTS).append("积分，使用字体需要有足够的积分才可以使用。").append("\n\n")
 		.append("2. 获取积分途径:").append("\n\n")
 		.append("   2.1) 通过点击页面显示的广告赚取.").append("\n")
 		.append("   2.2) 通过点击获取更多积分按钮.").append("\n\n")

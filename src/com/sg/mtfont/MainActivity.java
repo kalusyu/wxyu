@@ -2,12 +2,12 @@
 package com.sg.mtfont;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.youmi.android.AdManager;
@@ -15,245 +15,183 @@ import net.youmi.android.dev.OnlineConfigCallBack;
 import net.youmi.android.offers.OffersManager;
 import net.youmi.android.offers.PointsChangeNotify;
 import net.youmi.android.offers.PointsManager;
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
+
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.TextView;
+
 import android.widget.Toast;
 
+import com.sg.mtfont.bean.FontFile;
 import com.sg.mtfont.feedback.FeedBackActivity;
 import com.sg.mtfont.fontall.FontAllFragment;
 import com.sg.mtfont.fontquality.FontBoutiqueFragment;
-import com.sg.mtfont.mail.MailSenderInfo;
-import com.sg.mtfont.mail.SimpleMailSender;
+import com.sg.mtfont.fontquality.FontBoutiqueFragment.BoutiqueFragmentListener;
 import com.sg.mtfont.points.EarnPointsFragment;
 import com.sg.mtfont.setting.AboutActivity;
 import com.sg.mtfont.setting.UpdateHelper;
-import com.sg.mtfont.utils.ApkInstallHelper;
 import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.Constant;
+import com.sg.mtfont.utils.HttpRequestUtils;
 import com.sg.mtfont.utils.PointsHelper;
-import com.sg.mtfont.xml.Config;
 
 
-
+/**
+ * 
+ * @author Kalus Yu
+ *
+ */
 public class MainActivity extends FragmentActivity implements OnClickListener,
-        PointsChangeNotify {
+        PointsChangeNotify ,BoutiqueFragmentListener{
 
-    public static final String TAG = "MainActivity";
-
-    private static int PAGE_COUNT = 3;
+    public static final String TAG = MainActivity.class.getSimpleName();
 
     public static final int FONT_QUALITY_LIST = 0;
     public static final int FONT_ALL = 1;
     public static final int FONT_EARN_POINTS = 2;
+    public static int PAGE_COUNT = 3;
 
-    private TextView mTabQuality;
-    private TextView mTabAllFont;
-    private TextView mTabEarnPoints;
-
-    ListFragmentAdapter mAdapter;
-    private static ViewPager sViewPager;
-    private TextView[] mTabs;
-
-    public int mLastPosition;
-
-    SharedPreferences sp;
-    
-    String mKey = "mAwardFirstTime";  // key
-    String defaultValue = null;    // 默认的 value，当获取不到在线参数时，会返回该值
-
-    public static String sAwardPoints = "300";
-    
-    
-    String updateKey = "mUpdate";
-    public static String sUpdateFontFile;
-    public static String sFontFileUri;
+    private SharedPreferences sp;
     
     public static final int NO_INSTALL_PERMISSION = 1;
-    
-    
-    public static Config mConfig;
-  
-    
-    
+    public static final String PREFER_FONTXIU_KEY = "FontXiu";
+    public static final String UPDATE_KEY = "mUpdate";
+    public static final String AWARD_FIRST_TIME_KEY = "mAwardFirstTime";  // key
+    public static String AWARD_POINTS = "300";
     public static FontHandler mHandler;
+    private ArrayList<FontFile> mFontFiles;
     
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sp = getSharedPreferences(CommonUtils.FontXiu, Context.MODE_PRIVATE);
-        mConfig = (Config)getIntent().getSerializableExtra("config");
-//        installFontApk();
+        sp = getSharedPreferences(PREFER_FONTXIU_KEY, Context.MODE_PRIVATE);
         mHandler = new FontHandler(getApplicationContext());
+        mFontFiles = (ArrayList<FontFile>)getIntent().getExtras().get(Constant.FONTFILE);
 
-        initTab(mConfig);
-        initViewPager();
-
-        sViewPager.setCurrentItem(0);
-        updateTab(0);
+        checkAndInitUI();
+        
         initOnlineParameter(this);
-        initUpdateParameter(this);
         
-        new Thread(new Runnable() {
-
-            @Override
+        udpateVersion();
+        
+    }
+    
+    
+    private void checkAndInitUI() {
+        new Thread("GetFreeUser"){
             public void run() {
-            	if (!mConfig.isFree()){
-            		initAd();
-            	}
+                final boolean isFree = HttpRequestUtils.checkIsFreeUser(CommonUtils.getImei(MainActivity.this));
                 runOnUiThread(new Runnable() {
-					
-					@Override
-					public void run() {
-						firstLoadApp(sp);
-					}
-				});
-            }
-        }).start();
-        
+                    public void run() {
+                        initActionBar();
+                        initAdvertisement(isFree);
+                    }
 
+                });
+            };
+        }.start();
+    }
+    
+    private void initActionBar(){
+        ActionBar bar = getActionBar();
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        bar.setDisplayShowTitleEnabled(false);
+        Tab boutique = bar.newTab().setText(R.string.boutique).setIcon(R.drawable.ic_launcher);
+        Tab all = bar.newTab().setText(R.string.all).setIcon(R.drawable.ic_launcher);
+        Tab points = bar.newTab().setText(R.string.get_points).setIcon(R.drawable.ic_launcher);
+        
+        boutique.setTabListener(new FontTabListener(new FontBoutiqueFragment()));
+        all.setTabListener(new FontTabListener(new FontAllFragment()));
+        points.setTabListener(new FontTabListener(new EarnPointsFragment()));
+        
+        bar.addTab(boutique);
+        bar.addTab(all);
+        bar.addTab(points);
+    }
+
+
+    /**
+     * 版本更新
+     * @author Kalus Yu
+     * 2014年10月3日 下午8:03:54
+     */
+    private void udpateVersion(){
         UpdateHelper task = new UpdateHelper(this);
         task.execute(false);
     }
 
-
-
-	private void initUpdateParameter(MainActivity mainActivity) {
-		// 2. 异步调用（可在任意线程中调用）
-        AdManager.getInstance(this).asyncGetOnlineConfig(updateKey, new OnlineConfigCallBack() {
-            @Override
-            public void onGetOnlineConfigSuccessful(String key, String value) {
-                // 获取在线参数成功
-            	if (value != null){
-            	String[] str = value.split(";");
-            	sFontFileUri = str[0];
-            	sUpdateFontFile = str[1];
-            	Log.d(TAG, "sUpdateFontFile="+sUpdateFontFile+",sFontFileUri="+sFontFileUri);
-            	File f = getFilesDir();
-            	final String fontFileName = getString(R.string.resource_file);
-            	File fontlist = new File(f.getAbsolutePath(),fontFileName);
-            	if (!fontlist.exists() || sUpdateFontFile.equals("true")){
-            		if (fontlist.exists()){
-            			fontlist.delete();
-            		}
-            		new Thread(new Runnable() {
-						
-						@Override
-						public void run() {
-							FileOutputStream fos = null;
-		    				try {
-		    					// 连接地址
-		    					URL u = new URL(sFontFileUri);
-		    					HttpURLConnection c = (HttpURLConnection) u
-		    							.openConnection();
-		    					// c.setRequestMethod("GET");
-		    					// c.setDoOutput(true);
-		    					// c.connect();
-
-		    					// 计算文件长度
-		    					int lenghtOfFile = c.getContentLength();
-
-		    					String fileName = fontFileName;
-		    					fos = openFileOutput(fileName, Context.MODE_PRIVATE);// 文件处理细节
-		    					
-		    					
-		    					InputStream in = c.getInputStream();
-
-		    					// 下载的代码
-		    					byte[] buffer = new byte[1024];
-		    					int len = 0;
-		    					long total = 0;
-
-		    					while ((len = in.read(buffer)) > 0) {
-//		    						total += len; // total = total + len1
-//		    						publishProgress(""
-//		    								+ (int) ((total * 100) / lenghtOfFile));
-		    						fos.write(buffer, 0, len);
-		    					}
-
-		    					fos.flush();
-
-		    				} catch (Exception e) {
-		    					e.printStackTrace();
-		    				} finally {
-		    					if (fos != null) {
-		    						try {
-		    							fos.close();
-		    						} catch (IOException e) {
-		    							e.printStackTrace();
-		    						}
-		    					}
-		    					Intent intent = new Intent();
-		    					intent.setAction(FontAllFragment.GENERATED_FONTFILE_ACTION);
-		    					sendBroadcast(intent);
-		    				}
-						}
-					}).start();
-            	}
-            }
-            }
+    private void initAdvertisement(final boolean isFree) {
+        new Thread(new Runnable() {
 
             @Override
-            public void onGetOnlineConfigFailed(String key) {
-                // 获取在线参数失败，可能原因有：键值未设置或为空、网络异常、服务器异常
-            	sUpdateFontFile = "false";
+            public void run() {
+                if (!isFree){
+                    initAd();
+                }
+                runOnUiThread(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        startAppFirstTime(sp);
+                    }
+                });
             }
-        });		
-	}
+        }).start();
+    }
 
 	private void initOnlineParameter(Context context) {
     	 // 1. 同步调用方法，务必在非 UI 线程中调用，否则可能会失败。
         //String value = AdManager.getInstance(context).syncGetOnlineConfig(mKey, defaultValue);
 
         // 2. 异步调用（可在任意线程中调用）
-        AdManager.getInstance(this).asyncGetOnlineConfig(mKey, new OnlineConfigCallBack() {
+        AdManager.getInstance(this).asyncGetOnlineConfig(AWARD_FIRST_TIME_KEY, new OnlineConfigCallBack() {
             @Override
             public void onGetOnlineConfigSuccessful(String key, String value) {
                 // 获取在线参数成功
-            	sAwardPoints = value;
+            	AWARD_POINTS = value;
             }
 
             @Override
             public void onGetOnlineConfigFailed(String key) {
                 // 获取在线参数失败，可能原因有：键值未设置或为空、网络异常、服务器异常
-            	sAwardPoints = 280+"";
+            	AWARD_POINTS = 280+"";
             }
         });
 	}
 
-	private void firstLoadApp(SharedPreferences sp) {
+	/**
+	 * 第一次启动项目
+	 * @author Kalus Yu
+	 * @param sp
+	 * 2014年10月3日 下午8:07:28
+	 */
+	private void startAppFirstTime(SharedPreferences sp) {
     	WifiManager wm = (WifiManager) getSystemService(
 				Context.WIFI_SERVICE);
-		// WifiInfo wifiInfo = wm.getConnectionInfo();
 		boolean isWifi = wm.isWifiEnabled()
 				&& (wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED);
 
@@ -266,10 +204,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			boolean isFirstLoading = sp.getBoolean("isFirstLoading", true);
 			if (isFirstLoading){
 				CommonUtils.getDeviceInfo("用户信息搜集",this);
-				PointsHelper.awardPoints(this, Integer.parseInt(sAwardPoints));
+				PointsHelper.awardPoints(this, Integer.parseInt(AWARD_POINTS));
 				sp.edit().putBoolean("isFirstLoading", false).commit();
 				new AlertDialog.Builder(this).setTitle("美图手机2字体")
-						.setMessage("恭喜您获得 "+Integer.parseInt(sAwardPoints)+" 金币奖励")
+						.setMessage("恭喜您获得 "+Integer.parseInt(AWARD_POINTS)+" 金币奖励")
 						.setNeutralButton("确定", null).create().show();
 			} 
 			TelephonyManager telephonyManager= (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
@@ -284,52 +222,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		}
 	}
 	
-    private void installFontApk() {
-    	// 初始化数据pb
-    	new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					String filePath = Environment.getExternalStorageDirectory()+"/fontxiuxiu";
-					File file = new File(filePath);
-					if (!file.exists()){
-						ApkInstallHelper.unZip(MainActivity.this, "fontapk.zip",filePath );
-					}
-					
-					//过滤apk文件
-					File[] files = file.listFiles(new FileFilter() {
-						
-						@Override
-						public boolean accept(File pathname) {
-							if (pathname.getName().endsWith(".apk")){
-								return true;
-							}
-							return false;
-						}
-					});
-					//静默安装精品
-					for (int i=0; i < files.length; i++){
-						String apkFilePath = files[i].getAbsolutePath();
-						PackageManager pm = getPackageManager();
-						PackageInfo info = pm.getPackageArchiveInfo(apkFilePath,
-								PackageManager.GET_ACTIVITIES);
-						String packageName = info.applicationInfo.packageName;
-						silentInstall(packageName,apkFilePath);
-					}
-					
-				} catch (IOException e) {
-					e.printStackTrace();
-				} 
-				
-			}
-		}).start();
-	}
     
-    public void silentInstall(String packageName, String path) {
+    
+    public static void silentInstall(Context ctx,String packageName, String path) {
     	try{
 			Uri uri = Uri.fromFile(new File(path));
-			PackageManager pm = getPackageManager();
+			PackageManager pm = ctx.getPackageManager();
 			pm.installPackage(uri, null, 0, packageName);
     	}catch (SecurityException e){
     		Log.e(TAG, e.getMessage());
@@ -381,11 +279,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         case R.id.menu_share:
             intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_SUBJECT, "分享");
-            /*
-             * File f = new File(Environment.getExternalStorageDirectory()
-             * 　　　　　　 +"/Pictures/2.png"); 　　　　 Uri u = Uri.fromFile(f); 　　　　
-             * it.putExtra(Intent.EXTRA_STREAM, u);
-             */
             intent.setType("text/plain");
             StringBuilder sb = new StringBuilder();
             initShareContent(sb);
@@ -424,121 +317,50 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
     @Override
     public void onClick(View v) {
-        int position = v.getId();
-        mTabs[position].setSelected(true);
-        sViewPager.setCurrentItem(position);
-    }
-
-    private void initTab(Config cfg) {
-		mTabQuality = (TextView) findViewById(R.id.tab_font_quality);
-		mTabQuality.setText("精品");
-		mTabQuality.setId(FONT_QUALITY_LIST);
-		mTabQuality.setOnClickListener(this);
-
-		mTabAllFont = (TextView) findViewById(R.id.tab_font_all);
-		mTabAllFont.setText("全部");
-		mTabAllFont.setId(FONT_ALL);
-		mTabAllFont.setOnClickListener(this);
-
-		if (!cfg.isFree()) {
-			mTabs = new TextView[PAGE_COUNT];
-			mTabEarnPoints = (TextView) findViewById(R.id.tab_earn_points);
-			mTabEarnPoints.setText("获取积分");
-			mTabEarnPoints.setId(FONT_EARN_POINTS);
-			mTabEarnPoints.setOnClickListener(this);
-			mTabs[FONT_EARN_POINTS] = mTabEarnPoints;
-		} else {
-			PAGE_COUNT = 2;
-			mTabs = new TextView[PAGE_COUNT];
-			findViewById(R.id.tab_earn_points).setVisibility(View.GONE);
-		}
-		mTabs[FONT_QUALITY_LIST] = mTabQuality;
-		mTabs[FONT_ALL] = mTabAllFont;
-
-    }
-
-    private void initViewPager() {
-        mAdapter = new ListFragmentAdapter(getSupportFragmentManager(),
-                PAGE_COUNT);
-        sViewPager = (ViewPager)findViewById(R.id.view_pager_contain);
-        sViewPager.setAdapter(mAdapter);
-        sViewPager.setOnPageChangeListener(mOnPageChangeListener);
-    }
-
-    private SimpleOnPageChangeListener mOnPageChangeListener = new SimpleOnPageChangeListener() {
-
-        @Override
-        public void onPageSelected(int position) {
-            updateTab(position);
-        }
-    };
-
-    private void updateTab(int currentPosition) {
-        if (currentPosition >= 0 && currentPosition < PAGE_COUNT) {
-            mTabs[mLastPosition].setSelected(false);
-            mLastPosition = currentPosition;
-            mTabs[currentPosition].setSelected(true);
-        }
-    }
-
-    private class ListFragmentAdapter extends FragmentPagerAdapter {
-        private Fragment[] mListFragment;
-
-        public ListFragmentAdapter(FragmentManager fm, int pageCount) {
-            super(fm);
-            mListFragment = new Fragment[pageCount];
-        }
-
-        /**
-         * 跳转到相关页面 mListFragment[position] = new
-         * WhiteListFragment().setSimId(BlockCenterActivity.this.getSimId());
-         */
-        @Override
-        public Fragment getItem(int position) {
-            if (null == mListFragment[position]) {
-                switch (position) {
-                case FONT_QUALITY_LIST:
-                    // TODO
-                    mListFragment[position] = new FontBoutiqueFragment();
-                    break;
-
-                case FONT_ALL:
-                    // TODO
-                    mListFragment[position] = new FontAllFragment();
-                    break;
-                case FONT_EARN_POINTS:
-                    // TODO
-                    mListFragment[position] = new EarnPointsFragment();
-                    break;
-                default:
-                    break;
-                }
-            }
-            return mListFragment[position];
-        }
-
-        @Override
-        public int getCount() {
-            return mListFragment.length;
-        }
-    }
-
-    public int getLastPosition() {
-        return mLastPosition;
     }
 
     @Override
     public void onPointBalanceChange(int currentPoints) {
         PointsHelper.sCurrPoints = currentPoints;
-        Log.d(TAG, "current points is:" + currentPoints);
+        //Log.d(TAG, "current points is:" + currentPoints);
         sp.edit().putInt(CommonUtils.CURRENT_POINTS, currentPoints).commit();
         Intent i = new Intent();
         i.setAction("com.hly.fontxiu.showpoints");
         sendBroadcast(i);
     }
-
-    public static ViewPager getViewPager() {
-        return sViewPager;
-    }
     
+    
+    class FontTabListener implements TabListener{
+        
+        private Fragment mFragment;
+        
+        public FontTabListener(Fragment fragment) {
+            mFragment = fragment;
+        }
+
+        @Override
+        public void onTabReselected(Tab tab, FragmentTransaction ft) {
+        }
+
+        @Override
+        public void onTabSelected(Tab tab, FragmentTransaction ft) {
+            android.support.v4.app.FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+            tr.add(R.id.tab_fragment_content, mFragment);
+            tr.commit();
+        }
+
+        @Override
+        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+            android.support.v4.app.FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
+            tr.remove(mFragment);
+            tr.commit();
+        }
+        
+    }
+
+
+    @Override
+    public ArrayList<FontFile> getFontFileList() {
+        return mFontFiles;
+    }
 }

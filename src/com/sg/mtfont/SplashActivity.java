@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.concurrent.Executors;
 
 import android.app.Activity;
@@ -13,7 +14,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.sg.mtfont.bean.DeviceInfo;
+import com.sg.mtfont.bean.FontFile;
 import com.sg.mtfont.utils.CommonUtils;
+import com.sg.mtfont.utils.Constant;
 import com.sg.mtfont.utils.HttpRequestUtils;
 import com.sg.mtfont.xml.Config;
 import com.sg.mtfont.xml.XmlUtils;
@@ -32,6 +35,8 @@ public class SplashActivity extends Activity{
 		//t.execute(CommonUtils.getDeviceInfo(this));
 		t.executeOnExecutor(Executors.newSingleThreadExecutor(), CommonUtils.getDeviceInfo(this));
 		//TODO request need data
+		GetFontFileAsyncTask fontTask = new GetFontFileAsyncTask(this);
+		fontTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		//TODO progress tips
 	}
 	
@@ -41,6 +46,35 @@ public class SplashActivity extends Activity{
 	}
 	
 	
+}
+
+/**
+ * 
+ * @author Kalus Yu
+ *
+ */
+class GetFontFileAsyncTask extends AsyncTask<Void, Void, ArrayList<FontFile>>{
+    Context mContext;
+    
+    public GetFontFileAsyncTask(Context ctx) {
+        mContext = ctx;
+    }
+
+    @Override
+    protected ArrayList<FontFile> doInBackground(Void... arg0) {
+        return HttpRequestUtils.getFontFileLists();
+    }
+    
+    @Override
+    protected void onPostExecute(ArrayList<FontFile> result) {
+        Intent it = new Intent(mContext, MainActivity.class);
+        it.putExtra(Constant.FONTFILE, result);
+        mContext.startActivity(it);
+        if (mContext instanceof SplashActivity){
+            ((SplashActivity)mContext).finish();
+        }
+    }
+    
 }
 
 /**
@@ -74,7 +108,7 @@ class SendInfoAsyncTask extends AsyncTask<DeviceInfo, Void, Integer>{
 /**
  * 
  * @author Kalus Yu
- *
+ * NO USE NOW  for reference
  */
 class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
 	

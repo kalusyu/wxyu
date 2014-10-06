@@ -14,8 +14,7 @@
         <ImageView
             android:id="@+id/img_thumbnail"
             android:layout_width="154dip"
-            android:layout_height="151dip"
-            android:src="@drawable/test_image" />
+            android:layout_height="151dip" />
 
         <TextView
             android:id="@+id/txt_font_name"

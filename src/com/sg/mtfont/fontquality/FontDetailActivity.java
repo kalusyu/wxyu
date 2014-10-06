@@ -230,8 +230,9 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		// final ProgressDialog dialog = ProgressDialog.show(this, "提示",
 		// "正在应用字体...");
 		int currentPoints = PointsHelper.getCurrentPoints(this);
-		if (!MainActivity.mConfig.isFree()
-				&& currentPoints < Constant.NEED_POINTS
+		//TODO
+		if (/*!MainActivity.mConfig.isFree()
+				&&*/ currentPoints < Constant.NEED_POINTS
 				&& !SharedPreferencesHelper.isFontApplied(this, mPackgeName)) {
 			new AlertDialog.Builder(this)
 					.setTitle("提示")
@@ -243,12 +244,13 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 								@Override
 								public void onClick(DialogInterface arg0,
 										int arg1) {
-									ViewPager viewPager = MainActivity
+								    //TODO
+									/*ViewPager viewPager = MainActivity
 											.getViewPager();
 									if (viewPager != null) {
 										FontDetailActivity.this.finish();
 										viewPager.setCurrentItem(2);
-									}
+									}*/
 								}
 							})
 					.setNegativeButton("取消",
@@ -267,8 +269,8 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 				startActivity(ApkInstallHelper.getIntentFromApk(new File(
 						filePath + "/" + mFontFileName)));
 			} else {
-				if (CommonUtils.checkFontInstalled(false,
-						MainActivity.mConfig.isFree())) { // TODO change false
+				if (CommonUtils.checkFontInstalled(false,false
+						/*MainActivity.mConfig.isFree()*/)) { // TODO change false
 															// to variable
 					switchFont(mPackgeName);
 				} else {
