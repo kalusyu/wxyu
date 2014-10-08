@@ -1,8 +1,8 @@
 package com.sg.mtfont.fontquality;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
@@ -17,19 +17,24 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.sg.mtfont.MainActivity;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.sg.mtfont.R;
 import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
@@ -56,14 +61,24 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 	int mDownloadResId = R.id.btn_download_font;
 	int mInstallResId = R.id.btn_install_font;
 	int mApplyResId = R.id.btn_apply_font;
+	
+	/**
+	 * 预览图片滑动
+	 */
+	private FontPreviewAdapter mAdapter;
+	private ViewPager mViewPager;
+	private ArrayList<String> mUris;
 
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		setContentView(R.layout.activity_font_detail);
 		setupViews();
-		ImageView ivFontDetal = (ImageView) findViewById(R.id.iv_font_detail);
-		ivFontDetal.setImageResource(R.drawable.test_image);// TODO test
+		String uri = getIntent().getStringExtra("url");
+		mUris = getIntent().getExtras().getStringArrayList("uris");
+		ImageLoader.getInstance().displayImage(uri, ivFontDetal);
+		initViewPager(uri);
+		
 		showButtonVisibility();
 
 		// TODO 注册应用安装完成广播
@@ -80,7 +95,14 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 
 	}
 
-	/**
+	private void initViewPager(String uri) {
+	    mAdapter = new FontPreviewAdapter(mUris);
+        mViewPager.setAdapter(mAdapter);
+        mViewPager.setOnPageChangeListener(mAdapter);
+        mViewPager.setCurrentItem(mUris.indexOf(uri));
+    }
+
+    /**
 	 * 
 	 * 显示对应的button
 	 * 2014年8月2日 下午5:06:46
@@ -102,6 +124,7 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		mDownload = (Button) findViewById(R.id.btn_apply_font);
 		mInstall = (Button) findViewById(R.id.btn_install_font);
 		mApply = (Button) findViewById(R.id.btn_download_font);
+		mViewPager = (ViewPager) findViewById(R.id.viewpager);
 	}
 
 	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -280,4 +303,76 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @author Kalus Yu
+	 *
+	 */
+	class FontPreviewAdapter extends PagerAdapter implements OnPageChangeListener{
+        
+        ArrayList<String> mUris;
+        SparseArray<WeakReference<ImageView>> mSparseArray;
+        
+        public FontPreviewAdapter(ArrayList<String> uris) {
+            mUris = uris;
+            mSparseArray = new SparseArray<WeakReference<ImageView>>(mUris.size());
+        }
+        
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            ImageView imageView = new ImageView(container.getContext());
+            ImageLoader.getInstance().displayImage(mUris.get(position), imageView);
+            container.addView(imageView,ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            mSparseArray.put(position, new WeakReference<ImageView>(imageView));
+            return imageView;
+        }
+        
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);  
+            final WeakReference<ImageView> imageView = mSparseArray.get(position);  
+            if (imageView != null) {  
+                imageView.clear();  
+            }  
+        }
+
+        @Override
+        public int getCount() {
+            return mUris.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(View arg0, Object arg1) {
+            return arg0 == arg1;
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int arg0) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            int size=mSparseArray.size();  
+            for (int k = 0; k < size; k++) {  
+                int key = mSparseArray.keyAt(k);  
+                WeakReference<ImageView> viewWeakReference=mSparseArray.get(key);  
+                if (null != viewWeakReference && null != viewWeakReference.get()) {  
+                    ImageView imagePageView = (ImageView) viewWeakReference.get();  
+                    if (key == position) {  
+                        ImageLoader.getInstance().displayImage(mUris.get(position), imagePageView);
+                    } 
+                } 
+            }  
+        }
+        
+    }
 }

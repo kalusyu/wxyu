@@ -6,6 +6,7 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,11 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.sg.mtfont.R;
 import com.sg.mtfont.bean.FontFile;
 import com.sg.mtfont.fontmanager.FontResUtil;
@@ -41,6 +47,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	private List<Integer> listDrawable = new ArrayList<Integer>();
 	private GridViewAdapter adapter;
 	private List<FontFile> mFontFiles;
+	private ArrayList<String> mUris = new ArrayList<String>();
 	
 	private OnClickListener mGridItemOnclickListener = new OnClickListener() {
 		
@@ -51,6 +58,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 			case R.id.img_thumbnail:
 			case R.id.txt_font_name:
 				Intent it = new Intent(getActivity(),FontDetailActivity.class);
+				it.putExtra("url", (String)view.getTag());
+				it.putExtra("uris", mUris);
 				startActivity(it);
 				break;
 			//TODO 数据变化，刷新数据，与服务器交互
@@ -65,11 +74,22 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		}
 	};
 
+	
+	private DisplayImageOptions options;
 
     
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		options = new DisplayImageOptions.Builder()
+        .showImageOnLoading(R.drawable.test_image)
+        .showImageForEmptyUri(R.drawable.feed_back)
+        .showImageOnFail(R.drawable.ic_launcher)
+        .cacheInMemory(true)
+        .cacheOnDisk(true)
+        .considerExifParams(true)
+        .bitmapConfig(Bitmap.Config.RGB_565)
+        .build();
 	}
 
 	@Override
@@ -78,12 +98,11 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		View view = inflater.inflate(R.layout.fragment_font_boutique, null,
 				false);
 		mInflater = inflater;
-		listDrawable.add(R.drawable.test_image);
-		listDrawable.add(R.drawable.test_image);
 		
 		mPullToRefreshView = (PullToRefreshView) view.findViewById(R.id.main_pull_refresh_view);
 		mGridView = (GridView) view.findViewById(R.id.gridview);
 		mFontFiles = mListener.getFontFileList();
+		initUris(mFontFiles);
 		adapter = new GridViewAdapter();
 		mGridView.setAdapter(adapter);
 		mPullToRefreshView.setOnHeaderRefreshListener(this);
@@ -94,7 +113,23 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		return view;
 	}
 
-	OnClickListener mRecoverSystemFontClickListener = new OnClickListener() {
+	/**
+	 * launch thread to init uris
+	 * @author Kalus Yu
+	 * @param mFontFiles2
+	 * 2014年10月7日 下午4:25:54
+	 */
+	private void initUris(final List<FontFile> mFontFiles) {
+	    new Thread(){
+	        public void run() {
+	            for (FontFile f : mFontFiles){
+	                mUris.add(f.getFontNamePicUri() + f.getFontNamePic());
+	            }
+	        };
+	    }.start();
+    }
+
+    OnClickListener mRecoverSystemFontClickListener = new OnClickListener() {
 
 		@Override
 		public void onClick(View arg0) {
@@ -234,7 +269,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 			// TODO function
 			// set data
 			FontFile fontFile = mFontFiles.get(position);
-//			holder.mThumnailImage.setImageDrawable();
+			holder.mThumnailImage.setTag(fontFile.getFontNamePicUri() + fontFile.getFontNamePic());
+			loadThumbnailImage(holder,fontFile.getFontThumnailPicUri()+fontFile.getFontThumnailPic());
 			holder.mFontNameCh.setText(fontFile.getFontDisplayName());
 			holder.mLoveNumbers.setText(fontFile.getLoveNumbers());
 			holder.mDownloadNumbers.setText(fontFile.getDownloadNumbers());
@@ -246,6 +282,32 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 			holder.mDownloadNumbers.setOnClickListener(mGridItemOnclickListener);
 			
 			return view;
+		}
+		
+		public void loadThumbnailImage(ViewHolder holder,String url){
+		    ImageLoader.getInstance()
+            .displayImage(url, holder.mThumnailImage, options, new SimpleImageLoadingListener() {
+                @Override
+                public void onLoadingStarted(String imageUri, View view) {
+//                    holder.progressBar.setProgress(0);
+//                    holder.progressBar.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                    //holder.progressBar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    //holder.progressBar.setVisibility(View.GONE);
+                }
+            }, new ImageLoadingProgressListener() {
+                @Override
+                public void onProgressUpdate(String imageUri, View view, int current, int total) {
+                    //holder.progressBar.setProgress(Math.round(100.0f * current / total));
+                }
+            });
 		}
 		
 	}
