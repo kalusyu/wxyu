@@ -39,6 +39,9 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	public static final String FONT_FILE_PATCH_RESOURCE = "fontFilePatchResource";
 	public static final String FONT_FILENAME = "fontFileName";
 	
+	public static final String EXTRA_SELECTED_URL = "selected_url";
+	public static final String EXTRA_ALL_URLS = "all_urls";
+	
 	BoutiqueFragmentListener mListener;
 	
 	PullToRefreshView mPullToRefreshView;
@@ -58,8 +61,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 			case R.id.img_thumbnail:
 			case R.id.txt_font_name:
 				Intent it = new Intent(getActivity(),FontDetailActivity.class);
-				it.putExtra("url", (String)view.getTag());
-				it.putExtra("uris", mUris);
+				it.putExtra(EXTRA_SELECTED_URL, (String)view.getTag());
+				it.putExtra(EXTRA_ALL_URLS, mUris);
 				startActivity(it);
 				break;
 			//TODO 数据变化，刷新数据，与服务器交互

@@ -74,9 +74,8 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 		super.onCreate(arg0);
 		setContentView(R.layout.activity_font_detail);
 		setupViews();
-		String uri = getIntent().getStringExtra("url");
-		mUris = getIntent().getExtras().getStringArrayList("uris");
-		ImageLoader.getInstance().displayImage(uri, ivFontDetal);
+		String uri = getIntent().getStringExtra(FontBoutiqueFragment.EXTRA_SELECTED_URL);
+		mUris = getIntent().getExtras().getStringArrayList(FontBoutiqueFragment.EXTRA_ALL_URLS);
 		initViewPager(uri);
 		
 		showButtonVisibility();
