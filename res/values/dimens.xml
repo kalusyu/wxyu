@@ -8,4 +8,6 @@
     
  	<dimen name="list_button_width">80dip</dimen>
  	<dimen name="list_button_height">30dip</dimen>
+ 	
+ 	<dimen name="apply_height">45dip</dimen>
 </resources>

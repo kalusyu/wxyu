@@ -49,10 +49,10 @@ public class FileUtils {
 	 * 
 	 * @param dirName
 	 */
-	public static File creatSDDir(String dirName) {
-		File dir = new File(mPath + dirName);
-		if (!dir.exists()) {
-			dir.mkdir();
+	public static File createSDDir(String dirName) {
+		File dir = new File(mPath + File.separatorChar + dirName);
+		if (!dir.exists()) { 
+			dir.mkdirs();
 		}
 		return dir;
 	}
@@ -73,7 +73,7 @@ public class FileUtils {
 		File file = null;
 		FileOutputStream os = null;
 		try {
-			creatSDDir(path);
+			createSDDir(path);
 			file = creatSDFile(path + File.separatorChar + fileName);
 			os = new FileOutputStream(file);
 			byte buffer[] = new byte[1024];

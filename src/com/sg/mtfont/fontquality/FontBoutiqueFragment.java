@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,7 +41,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	public static final String FONT_FILENAME = "fontFileName";
 	
 	public static final String EXTRA_SELECTED_URL = "selected_url";
-	public static final String EXTRA_ALL_URLS = "all_urls";
+	public static final String EXTRA_PICTURE_URLS = "all_urls";
+	public static final String EXTRA_FONT_URLS = "font_apk_urls";
 	
 	BoutiqueFragmentListener mListener;
 	
@@ -50,7 +52,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	private List<Integer> listDrawable = new ArrayList<Integer>();
 	private GridViewAdapter adapter;
 	private List<FontFile> mFontFiles;
-	private ArrayList<String> mUris = new ArrayList<String>();
+	private ArrayList<String> mPictureUris = new ArrayList<String>();
+	private ArrayList<String> mFontApkUris = new ArrayList<String>();
 	
 	private OnClickListener mGridItemOnclickListener = new OnClickListener() {
 		
@@ -62,7 +65,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 			case R.id.txt_font_name:
 				Intent it = new Intent(getActivity(),FontDetailActivity.class);
 				it.putExtra(EXTRA_SELECTED_URL, (String)view.getTag());
-				it.putExtra(EXTRA_ALL_URLS, mUris);
+				it.putExtra(EXTRA_PICTURE_URLS, mPictureUris);
+				it.putExtra(EXTRA_FONT_URLS, mFontApkUris);
 				startActivity(it);
 				break;
 			//TODO 数据变化，刷新数据，与服务器交互
@@ -126,7 +130,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	    new Thread(){
 	        public void run() {
 	            for (FontFile f : mFontFiles){
-	                mUris.add(f.getFontNamePicUri() + f.getFontNamePic());
+	                mPictureUris.add(f.getFontNamePicUri() + f.getFontNamePic());
+	                mFontApkUris.add(f.getFontUri() + f.getFontDisplayName());
 	            }
 	        };
 	    }.start();

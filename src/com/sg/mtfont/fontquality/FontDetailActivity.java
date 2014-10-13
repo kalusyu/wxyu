@@ -4,6 +4,8 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -45,18 +47,21 @@ import com.sg.mtfont.utils.Constant;
 import com.sg.mtfont.utils.FileUtils;
 import com.sg.mtfont.utils.PointsHelper;
 import com.sg.mtfont.utils.SharedPreferencesHelper;
-
+/**
+ * 
+ * @author Kalus Yu
+ *
+ */
 public class FontDetailActivity extends Activity implements OnClickListener {
 
 	public static final String TAG = "FontDetailActivity";
+	public static final String DOWNLOAD_FOLDER = "download";
+	public static final String APK_SUFFIX = ".apk";
 
 	List<FontResource> mFontRes = new ArrayList<FontResource>();
 
 	private String mPackgeName, mFontFileName;
 
-	private String mUri = "https://github.com/kalusyu/fontxiuxiu/raw/master/yijiaziti.apk";// TODO
-																							// test
-	private String mFontName = "yijiaziti";
 	Button mDownload, mInstall, mApply;
 	int mDownloadResId = R.id.btn_download_font;
 	int mInstallResId = R.id.btn_install_font;
@@ -67,15 +72,21 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 	 */
 	private FontPreviewAdapter mAdapter;
 	private ViewPager mViewPager;
-	private ArrayList<String> mUris;
+	private ArrayList<String> mPictureUris;
+	
+	// font apk uri
+	private ArrayList<String> mFontApkUris;
 
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		setContentView(R.layout.activity_font_detail);
 		setupViews();
+		Bundle bundle = getIntent().getExtras();
+		mPictureUris = bundle.getStringArrayList(FontBoutiqueFragment.EXTRA_PICTURE_URLS);
+		mFontApkUris = bundle.getStringArrayList(FontBoutiqueFragment.EXTRA_FONT_URLS);
+		
 		String uri = getIntent().getStringExtra(FontBoutiqueFragment.EXTRA_SELECTED_URL);
-		mUris = getIntent().getExtras().getStringArrayList(FontBoutiqueFragment.EXTRA_ALL_URLS);
 		initViewPager(uri);
 		
 		showButtonVisibility();
@@ -95,10 +106,10 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 	}
 
 	private void initViewPager(String uri) {
-	    mAdapter = new FontPreviewAdapter(mUris);
+	    mAdapter = new FontPreviewAdapter(mPictureUris);
         mViewPager.setAdapter(mAdapter);
         mViewPager.setOnPageChangeListener(mAdapter);
-        mViewPager.setCurrentItem(mUris.indexOf(uri));
+        mViewPager.setCurrentItem(mPictureUris.indexOf(uri));
     }
 
     /**
@@ -120,10 +131,13 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 	 * 2014年8月2日 下午5:07:11
 	 */
 	private void setupViews() {
-		mDownload = (Button) findViewById(R.id.btn_apply_font);
+		mDownload = (Button) findViewById(R.id.btn_download_font);
 		mInstall = (Button) findViewById(R.id.btn_install_font);
-		mApply = (Button) findViewById(R.id.btn_download_font);
+		mApply = (Button) findViewById(R.id.btn_apply_font);
 		mViewPager = (ViewPager) findViewById(R.id.viewpager);
+		mDownload.setOnClickListener(this);
+		mInstall.setOnClickListener(this);
+		mApply.setOnClickListener(this);
 	}
 
 	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -201,14 +215,14 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 	}
 
 	@Override
-	public void onClick(View arg0) {
-		switch (arg0.getId()) {
+	public void onClick(View view) {
+		switch (view.getId()) {
 		case R.id.btn_apply_font:
 			getFontAndUse();
 			break;
 		case R.id.btn_download_font:
 			// TODO
-			downloadFontFile(mUri);
+			downloadFontFile(mFontApkUris.get(mViewPager.getCurrentItem()));
 			break;
 		case R.id.btn_install_font:
 			// TODO
@@ -225,8 +239,10 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 	 *            2014年7月30日 下午11:58:33
 	 */
 	private void downloadFontFile(String pUri) {
+	    String fontFileName = UUID.randomUUID().toString();
+	    FileUtils.createSDDir(DOWNLOAD_FOLDER);
 		String file = FileUtils.getSDCardPath() + File.separatorChar
-				+ "download" + File.separatorChar + mFontName + ".apk";
+				+ DOWNLOAD_FOLDER + File.separatorChar + fontFileName + APK_SUFFIX;
 		File fontApk = new File(file);
 		if (!fontApk.exists()) {
 			DownloadManager dm = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
@@ -234,16 +250,16 @@ public class FontDetailActivity extends Activity implements OnClickListener {
 			Request request = new Request(uri);
 			request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE
 					| DownloadManager.Request.NETWORK_WIFI);
-			request.setDestinationInExternalFilesDir(this, null, file);// TODO
+			//request.setDestinationInExternalFilesDir(this, null, file);// TODO
 																		// 考虑sd卡问题，可以考虑先下载安装完再删除存到应用files下面
 			request.setDestinationInExternalPublicDir("fontxiuxiu/download",
-					mFontName + ".apk");
+			        fontFileName + APK_SUFFIX);
 			long id = dm.enqueue(request);
 			SharedPreferences sp = SharedPreferencesHelper
 					.getSharepreferences(this);
 			sp.edit().putBoolean(String.valueOf(id), true).commit();
-			request.setTitle("字体下载");
-			request.setDescription(mFontFileName + "下载中");
+			request.setTitle(getText(R.string.font_download_title));
+			request.setDescription(mFontFileName);
 		}
 	}
 
@@ -370,8 +386,10 @@ public class FontDetailActivity extends Activity implements OnClickListener {
                         ImageLoader.getInstance().displayImage(mUris.get(position), imagePageView);
                     } 
                 } 
-            }  
+            }
+            showButtonVisibility();
         }
+        
         
     }
 }

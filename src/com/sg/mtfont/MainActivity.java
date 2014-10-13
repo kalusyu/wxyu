@@ -29,17 +29,14 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-
 import android.widget.Toast;
 
 import com.sg.mtfont.bean.FontFile;
@@ -52,6 +49,7 @@ import com.sg.mtfont.setting.AboutActivity;
 import com.sg.mtfont.setting.UpdateHelper;
 import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.Constant;
+import com.sg.mtfont.utils.FileUtils;
 import com.sg.mtfont.utils.HttpRequestUtils;
 import com.sg.mtfont.utils.PointsHelper;
 
@@ -98,6 +96,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         
         udpateVersion();
         
+        FileUtils.createSDDir("download");
+        
     }
     
     
@@ -120,9 +120,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         ActionBar bar = getActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         bar.setDisplayShowTitleEnabled(false);
-        Tab boutique = bar.newTab().setText(R.string.boutique).setIcon(R.drawable.ic_launcher);
-        Tab all = bar.newTab().setText(R.string.all).setIcon(R.drawable.ic_launcher);
-        Tab points = bar.newTab().setText(R.string.get_points).setIcon(R.drawable.ic_launcher);
+        Tab boutique = bar.newTab().setText(R.string.boutique)/*.setIcon(R.drawable.ic_launcher)*/;
+        Tab all = bar.newTab().setText(R.string.all)/*.setIcon(R.drawable.ic_launcher)*/;
+        Tab points = bar.newTab().setText(R.string.get_points)/*.setIcon(R.drawable.ic_launcher)*/;
         
         boutique.setTabListener(new FontTabListener(new FontBoutiqueFragment()));
         all.setTabListener(new FontTabListener(new FontAllFragment()));
