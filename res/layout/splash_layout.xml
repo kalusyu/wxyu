@@ -5,9 +5,9 @@
     android:orientation="vertical" >
     
     <ImageView android:id="@+id/img_splash"
-        android:contentDescription="@string/hello_world"
+        android:contentDescription="@string/app_name"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/splash"/>
+        android:background="@drawable/splash"/>
 
 </LinearLayout>

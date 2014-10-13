@@ -8,6 +8,8 @@ import android.bluetooth.BluetoothClass.Device;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -275,4 +277,25 @@ public class CommonUtils {
         WifiInfo info = wifi.getConnectionInfo();  
         return info.getMacAddress();  
     } 
+	
+	/**
+	 * 
+	 * 
+	 * KaluYu
+	 * @param ctx
+	 * @return
+	 * 2014年10月13日 下午10:34:53
+	 */
+	public static boolean isConnected(Context ctx){
+		WifiManager wm = (WifiManager) ctx.getSystemService(
+				Context.WIFI_SERVICE);
+		boolean isWifi = wm.isWifiEnabled()
+				&& (wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED);
+
+		ConnectivityManager cm = (ConnectivityManager)
+				ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo ni = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+		boolean isNetData = ni.isConnected();
+		return isWifi || isNetData ;
+	}
 }

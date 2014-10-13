@@ -2,11 +2,6 @@
 package com.sg.mtfont;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -71,8 +66,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
     private SharedPreferences sp;
     
+    // first time get awards
+    public static final String PREFER_AWARDS_KEY = "prefers_awards_key";
     public static final int NO_INSTALL_PERMISSION = 1;
-    public static final String PREFER_FONTXIU_KEY = "FontXiu";
     public static final String UPDATE_KEY = "mUpdate";
     public static final String AWARD_FIRST_TIME_KEY = "mAwardFirstTime";  // key
     public static String AWARD_POINTS = "300";
@@ -86,7 +82,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sp = getSharedPreferences(PREFER_FONTXIU_KEY, Context.MODE_PRIVATE);
+        sp = getSharedPreferences(SplashActivity.SHARE_PREFER_KEYS, Context.MODE_PRIVATE);
         mHandler = new FontHandler(getApplicationContext());
         mFontFiles = (ArrayList<FontFile>)getIntent().getExtras().get(Constant.FONTFILE);
 
@@ -95,9 +91,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         initOnlineParameter(this);
         
         udpateVersion();
-        
-        FileUtils.createSDDir("download");
-        
     }
     
     
@@ -190,35 +183,16 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 	 * 2014年10月3日 下午8:07:28
 	 */
 	private void startAppFirstTime(SharedPreferences sp) {
-    	WifiManager wm = (WifiManager) getSystemService(
-				Context.WIFI_SERVICE);
-		boolean isWifi = wm.isWifiEnabled()
-				&& (wm.getWifiState() == WifiManager.WIFI_STATE_ENABLED);
-
-		ConnectivityManager cm = (ConnectivityManager)
-				getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo ni = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-		boolean isNetData = ni.isConnected();
-
-		if (isWifi || isNetData) {
-			boolean isFirstLoading = sp.getBoolean("isFirstLoading", true);
+		if (CommonUtils.isConnected(this)) {
+			boolean isFirstLoading = sp.getBoolean(PREFER_AWARDS_KEY, true);
 			if (isFirstLoading){
 				CommonUtils.getDeviceInfo("用户信息搜集",this);
 				PointsHelper.awardPoints(this, Integer.parseInt(AWARD_POINTS));
-				sp.edit().putBoolean("isFirstLoading", false).commit();
-				new AlertDialog.Builder(this).setTitle("美图手机2字体")
-						.setMessage("恭喜您获得 "+Integer.parseInt(AWARD_POINTS)+" 金币奖励")
-						.setNeutralButton("确定", null).create().show();
+				sp.edit().putBoolean(PREFER_AWARDS_KEY, false).apply();
+				new AlertDialog.Builder(this).setTitle(getText(R.string.app_name))
+						.setMessage(String.format(getResources().getString(R.string.dialog_alert_msg), AWARD_POINTS))
+						.setNeutralButton(getText(R.string.ok), null).create().show();
 			} 
-			TelephonyManager telephonyManager= (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-			String imei=telephonyManager.getDeviceId();
-			boolean second = sp.getBoolean("second", true);
-			if (second && Arrays.asList(Constant.sImei).contains(imei)){
-				sp.edit().putBoolean("second", false).commit();
-				int specialAwards = 700;
-				PointsHelper.awardPoints(this, specialAwards);//1千万
-				Toast.makeText(this, getResources().getString(R.string.special_awards) + specialAwards, Toast.LENGTH_SHORT).show();
-			}
 		}
 	}
 	
@@ -311,8 +285,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
                 .append("2.无需重启一键动态切换系统字体。").append("\n")
                 .append("3.首次运行软件会自动备份系统默认字体").append("\n")
                 .append("4.提供最精致的字体给用户").append("\n").append("[适配机器]")
-                .append("\n").append("美图手机2 专版").append("\n").append("交流群：")
-                .append("\n").append("QQ群：185378427");
+                .append("\n").append("美图手机2 专版").append("\n");
     }
 
     @Override

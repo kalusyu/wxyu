@@ -1,6 +1,7 @@
 package com.sg.mtfont.utils;
 
 import com.sg.mtfont.MainActivity;
+import com.sg.mtfont.SplashActivity;
 
 import net.youmi.android.offers.PointsManager;
 import android.content.Context;
@@ -37,7 +38,7 @@ public class PointsHelper {
 	 */
 	public static int getCurrentPoints(Context ctx){
 		if (sCurrPoints == -1){
-			SharedPreferences sp = ctx.getSharedPreferences(MainActivity.PREFER_FONTXIU_KEY, Context.MODE_PRIVATE);
+			SharedPreferences sp = ctx.getSharedPreferences(SplashActivity.LAUNCH_APP_FIRST, Context.MODE_PRIVATE);
 			sCurrPoints = sp.getInt(CommonUtils.CURRENT_POINTS, 0);
 		}
 		return sCurrPoints;

@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -24,22 +25,39 @@ import com.sg.mtfont.xml.XmlUtils;
 
 
 public class SplashActivity extends Activity{
+	
+	public static final String SHARE_PREFER_KEYS = "share_prefer_keys";
+	public static final String LAUNCH_APP_FIRST = "launch_app_first";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.splash_layout);
-//		ReadAsyncTask task = new ReadAsyncTask(this);
-//		task.execute();
-		SendInfoAsyncTask t = new SendInfoAsyncTask(this);
-		//t.execute(CommonUtils.getDeviceInfo(this));
-		t.executeOnExecutor(Executors.newSingleThreadExecutor(), CommonUtils.getDeviceInfo(this));
+		
+		checkIfFirstTimeLaunchApp();
 		//TODO request need data
 		GetFontFileAsyncTask fontTask = new GetFontFileAsyncTask(this);
 		fontTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		//TODO progress tips
 	}
 	
+	/**
+	 * 
+	 * check application first launch
+	 * KaluYu
+	 * 2014年10月13日 下午10:29:10
+	 */
+	private void checkIfFirstTimeLaunchApp() {
+		SharedPreferences sp = getSharedPreferences(SHARE_PREFER_KEYS, Context.MODE_PRIVATE);
+		boolean launchFirstTime = sp.getBoolean(LAUNCH_APP_FIRST, true);
+		// first launch application
+		if (launchFirstTime){
+			SendInfoAsyncTask t = new SendInfoAsyncTask(this);
+			t.executeOnExecutor(Executors.newSingleThreadExecutor(), CommonUtils.getDeviceInfo(this));
+			sp.edit().putBoolean(LAUNCH_APP_FIRST, false).apply();
+		}		
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -92,7 +110,6 @@ class SendInfoAsyncTask extends AsyncTask<DeviceInfo, Void, Integer>{
     @Override
     protected Integer doInBackground(DeviceInfo... arg0) {
         DeviceInfo info = arg0[0];
-//        int responseCode = HttpRequestUtils.sendJsonToServer(info);
         int responseCode = HttpRequestUtils.sendDeviceInfo(info);
         return responseCode;
     }
