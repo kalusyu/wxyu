@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.sg.mtfont.bean.DeviceInfo;
 import com.sg.mtfont.bean.FontFile;
@@ -24,15 +25,18 @@ import com.sg.mtfont.xml.XmlUtils;
 
 
 
-public class SplashActivity extends Activity{
+public class SplashActivity extends Activity implements IAsyncTaskHandler{
 	
 	public static final String SHARE_PREFER_KEYS = "share_prefer_keys";
 	public static final String LAUNCH_APP_FIRST = "launch_app_first";
+	
+	private TextView mTxtProgress;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.splash_layout);
+		mTxtProgress = (TextView) findViewById(R.id.txt_progress);
 		
 		checkIfFirstTimeLaunchApp();
 		//TODO request need data
@@ -62,6 +66,40 @@ public class SplashActivity extends Activity{
 	protected void onResume() {
 		super.onResume();
 	}
+
+	@Override
+	public int receiveData(Object o) {
+		if (o instanceof Integer){
+			Integer i = (Integer) o;
+			switch (i) {
+			case 1:
+				mTxtProgress.setText("初始化设置。。。");
+				break;
+			case 2:
+				mTxtProgress.setText("获取数据。。。");
+				break;
+			case 3:
+				mTxtProgress.setText("页面渲染中。。。");
+				break;
+			case 4:
+				mTxtProgress.setText("加载完成！");
+				break;
+
+			default:
+				break;
+			}
+		}
+		return 0;
+	}
+
+	@Override
+	public int onDataLoadCompleted(ArrayList<FontFile> result) {
+		Intent it = new Intent(this, MainActivity.class);
+        it.putExtra(Constant.FONTFILE, result);
+        startActivity(it);
+        finish();
+		return 0;
+	}
 	
 	
 }
@@ -71,26 +109,45 @@ public class SplashActivity extends Activity{
  * @author Kalus Yu
  *
  */
-class GetFontFileAsyncTask extends AsyncTask<Void, Void, ArrayList<FontFile>>{
-    Context mContext;
+class GetFontFileAsyncTask extends AsyncTask<Void, Integer, ArrayList<FontFile>>{
+    IAsyncTaskHandler mHander;
     
-    public GetFontFileAsyncTask(Context ctx) {
-        mContext = ctx;
+    public GetFontFileAsyncTask(IAsyncTaskHandler handler) {
+        mHander = handler;
     }
 
     @Override
     protected ArrayList<FontFile> doInBackground(Void... arg0) {
+    	publishProgress(1);
+    	try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    	publishProgress(2);
+    	try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    	publishProgress(3);
+    	try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    	publishProgress(4);
         return HttpRequestUtils.getFontFileLists();
     }
     
     @Override
     protected void onPostExecute(ArrayList<FontFile> result) {
-        Intent it = new Intent(mContext, MainActivity.class);
-        it.putExtra(Constant.FONTFILE, result);
-        mContext.startActivity(it);
-        if (mContext instanceof SplashActivity){
-            ((SplashActivity)mContext).finish();
-        }
+        mHander.onDataLoadCompleted(result);
+    }
+    
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+    	mHander.receiveData(values[0]);
     }
     
 }
