@@ -45,7 +45,7 @@ import com.sg.mtfont.setting.UpdateHelper;
 import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.Constant;
 import com.sg.mtfont.utils.FileUtils;
-import com.sg.mtfont.utils.HttpRequestUtils;
+import com.sg.mtfont.utils.HttpUtils;
 import com.sg.mtfont.utils.PointsHelper;
 
 
@@ -97,7 +97,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     private void checkAndInitUI() {
         new Thread("GetFreeUser"){
             public void run() {
-                final boolean isFree = HttpRequestUtils.checkIsFreeUser(CommonUtils.getImei(MainActivity.this));
+                final boolean isFree = HttpUtils.checkIsFreeUser(CommonUtils.getImei(MainActivity.this));
                 runOnUiThread(new Runnable() {
                     public void run() {
                         initActionBar();

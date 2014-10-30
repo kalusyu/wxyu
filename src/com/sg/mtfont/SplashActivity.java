@@ -19,7 +19,7 @@ import com.sg.mtfont.bean.DeviceInfo;
 import com.sg.mtfont.bean.FontFile;
 import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.Constant;
-import com.sg.mtfont.utils.HttpRequestUtils;
+import com.sg.mtfont.utils.HttpUtils;
 import com.sg.mtfont.xml.Config;
 import com.sg.mtfont.xml.XmlUtils;
 
@@ -137,7 +137,7 @@ class GetFontFileAsyncTask extends AsyncTask<Void, Integer, ArrayList<FontFile>>
 			e.printStackTrace();
 		}
     	publishProgress(4);
-        return HttpRequestUtils.getFontFileLists();
+        return HttpUtils.getFontFileLists();
     }
     
     @Override
@@ -167,7 +167,7 @@ class SendInfoAsyncTask extends AsyncTask<DeviceInfo, Void, Integer>{
     @Override
     protected Integer doInBackground(DeviceInfo... arg0) {
         DeviceInfo info = arg0[0];
-        int responseCode = HttpRequestUtils.sendDeviceInfo(info);
+        int responseCode = HttpUtils.sendDeviceInfo(info);
         return responseCode;
     }
     

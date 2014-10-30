@@ -26,13 +26,15 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpRequest;
 import com.sg.mtfont.bean.DeviceInfo;
 import com.sg.mtfont.bean.FontFile;
 
 /**
  * @author Kalus Yu
  */
-public class HttpRequestUtils {
+public class HttpUtils {
     static final String TAG = "HttpRequestUtils";
 
     static final int ERROR = -101;
@@ -104,8 +106,9 @@ public class HttpRequestUtils {
      * 2014年10月3日 下午5:30:20
      */
     public static ArrayList<FontFile> getFontFileLists(){
-        String urlStr = Constant.sUrl + Constant.methodgetAllDownload;
-        return handleResponse(commonReuest(urlStr));
+//        String urlStr = Constant.sUrl + Constant.methodgetAllDownload;
+//        return handleResponse(commonReuest(urlStr));
+        AsyncHttpRequest
     }
 
     /**
