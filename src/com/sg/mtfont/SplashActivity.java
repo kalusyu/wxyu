@@ -55,6 +55,10 @@ public class SplashActivity extends Activity implements IAsyncTaskHandler{
     		public void onSuccess(int statusCode, Header[] headers,
     				JSONArray response) {
     			Log.d(TAG, "ybw:"+response.toString());
+    			Intent it = new Intent(SplashActivity.this, MainActivity.class);
+    	        it.putExtra(Constant.FONTFILE, response.toString());
+    	        startActivity(it);
+    	        finish();
     		}
     		
     		@Override
@@ -200,57 +204,3 @@ class SendInfoAsyncTask extends AsyncTask<DeviceInfo, Void, Integer>{
     
 }
 
-
-/**
- * 
- * @author Kalus Yu
- * NO USE NOW  for reference
- */
-class ReadAsyncTask extends AsyncTask<Void, Void, Config>{
-	
-	Context mContext;
-	
-	public ReadAsyncTask(Context ctx) {
-		mContext = ctx;
-
-	}
-	
-	@Override
-	protected void onPreExecute() {
-		super.onPreExecute();
-
-	}
-	
-
-	@Override
-	protected Config doInBackground(Void... params) {
-		return readConfig();
-	}
-	
-	private Config readConfig() {
-		Config cfg = new Config();
-		String path = mContext.getFilesDir().getPath();
-		File file = new File(path + File.separatorChar + "config.txt");
-		InputStream fis = null;
-		try {
-			fis = new FileInputStream(file);
-			XmlUtils.readConfig(cfg,fis);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return cfg;
-		
-	}
-
-	@Override
-	protected void onPostExecute(Config result) {
-		super.onPostExecute(result);
-		Intent it = new Intent(mContext, MainActivity.class);
-		it.putExtra("config", result);
-		mContext.startActivity(it);
-		if (mContext instanceof SplashActivity){
-			((SplashActivity)mContext).finish();
-		}
-	}
-	
-}

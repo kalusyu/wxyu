@@ -5,6 +5,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONStringer;
+
 import net.youmi.android.AdManager;
 import net.youmi.android.dev.OnlineConfigCallBack;
 import net.youmi.android.offers.OffersManager;
@@ -73,8 +78,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     public static final String AWARD_FIRST_TIME_KEY = "mAwardFirstTime";  // key
     public static String AWARD_POINTS = "300";
     public static FontHandler mHandler;
-    private ArrayList<FontFile> mFontFiles;
-    
+    private JSONArray mJsonArray;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -84,7 +88,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
         sp = getSharedPreferences(SplashActivity.SHARE_PREFER_KEYS, Context.MODE_PRIVATE);
         mHandler = new FontHandler(getApplicationContext());
-        mFontFiles = (ArrayList<FontFile>)getIntent().getExtras().get(Constant.FONTFILE);
+        String json = getIntent().getStringExtra(Constant.FONTFILE);
+        try {
+            mJsonArray = new JSONArray(json);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         checkAndInitUI();
         
@@ -333,7 +342,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
 
     @Override
-    public ArrayList<FontFile> getFontFileList() {
-        return mFontFiles;
+    public JSONArray getFontJson() {
+        return mJsonArray;
     }
 }

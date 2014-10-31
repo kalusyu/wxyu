@@ -20,7 +20,7 @@ public class Constant {
 	
 	public static final String HOMEIP = "http://169.254.2.164/";
 	public static final String COMPANYIP = "http://192.168.43.189/";
-	public static String sUrl = HOMEIP;
+	public static String sUrl = COMPANYIP;
 	
 	                             
 	public static String methodSaveDeviceInfoPath = "admin/save";

@@ -3,14 +3,18 @@ package com.sg.mtfont.fontquality;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -51,9 +55,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	private LayoutInflater mInflater;
 	private List<Integer> listDrawable = new ArrayList<Integer>();
 	private GridViewAdapter adapter;
-	private List<FontFile> mFontFiles;
-	private ArrayList<String> mPictureUris = new ArrayList<String>();
-	private ArrayList<String> mFontApkUris = new ArrayList<String>();
+//	private ArrayList<String> mPictureUris = new ArrayList<String>();
+//	private ArrayList<String> mFontApkUris = new ArrayList<String>();
 	
 	private OnClickListener mGridItemOnclickListener = new OnClickListener() {
 		
@@ -65,8 +68,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 			case R.id.txt_font_name:
 				Intent it = new Intent(getActivity(),FontDetailActivity.class);
 				it.putExtra(EXTRA_SELECTED_URL, (String)view.getTag());
-				it.putExtra(EXTRA_PICTURE_URLS, mPictureUris);
-				it.putExtra(EXTRA_FONT_URLS, mFontApkUris);
+//				it.putExtra(EXTRA_PICTURE_URLS, mPictureUris);
+//				it.putExtra(EXTRA_FONT_URLS, mFontApkUris);
 				startActivity(it);
 				break;
 			//TODO 数据变化，刷新数据，与服务器交互
@@ -108,15 +111,18 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		
 		mPullToRefreshView = (PullToRefreshView) view.findViewById(R.id.main_pull_refresh_view);
 		mGridView = (GridView) view.findViewById(R.id.gridview);
-		mFontFiles = mListener.getFontFileList();
-		initUris(mFontFiles);
-		adapter = new GridViewAdapter();
+		JSONArray json = mListener.getFontJson();
+		
+		adapter = new GridViewAdapter(getActivity(),json);
 		mGridView.setAdapter(adapter);
+		
 		mPullToRefreshView.setOnHeaderRefreshListener(this);
 		mPullToRefreshView.setOnFooterRefreshListener(this);
 
 		Button btn = (Button) view.findViewById(R.id.btn_recover_system_font);
 		btn.setOnClickListener(mRecoverSystemFontClickListener);
+		
+		
 		return view;
 	}
 
@@ -130,8 +136,8 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	    new Thread(){
 	        public void run() {
 	            for (FontFile f : mFontFiles){
-	                mPictureUris.add(f.getFontNamePicUri() + f.getFontNamePic());
-	                mFontApkUris.add(f.getFontUri() + f.getFontDisplayName());
+//	                mPictureUris.add(f.getFontNamePicUri() + f.getFontNamePic());
+//	                mFontApkUris.add(f.getFontUri() + f.getFontDisplayName());
 	            }
 	        };
 	    }.start();
@@ -237,20 +243,39 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	}
 	
     public interface BoutiqueFragmentListener{
-        ArrayList<FontFile> getFontFileList();
+        JSONArray getFontJson();
     }
 	
-	private class GridViewAdapter extends BaseAdapter{
+	class GridViewAdapter extends BaseAdapter{
 		
+	    JSONArray mJson;
+	    Context mContext;
+	    int mCount;
 
-		@Override
+	    /**
+	     * 
+	     * @param context
+	     * @param json
+	     */
+		public GridViewAdapter(Context context,JSONArray json) {
+		    mContext = context;
+		    mJson = json;
+		    mCount = json.length();
+        }
+
+        @Override
 		public int getCount() {
-			return mFontFiles.size();
+			return mCount;
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return mFontFiles.get(position);
+			try {
+                return mJson.get(position);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+			return null;
 		}
 
 		@Override
@@ -276,13 +301,20 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
             }
 			// TODO function
 			// set data
-			FontFile fontFile = mFontFiles.get(position);
-			holder.mThumnailImage.setTag(fontFile.getFontNamePicUri() + fontFile.getFontNamePic());
-			loadThumbnailImage(holder,fontFile.getFontThumnailPicUri()+fontFile.getFontThumnailPic());
-			holder.mFontNameCh.setText(fontFile.getFontDisplayName());
-			holder.mLoveNumbers.setText(fontFile.getLoveNumbers());
-			holder.mDownloadNumbers.setText(fontFile.getDownloadNumbers());
-			
+			try {
+			JSONObject jo = mJson.getJSONObject(position);
+			if (jo.getString("type").contains("image")){
+			    String url = jo.getString("downloadUrl");
+			    holder.mThumnailImage.setTag(url);
+			    loadThumbnailImage(holder,url);//uri should be http:// format
+			}
+			//TODO
+//			holder.mFontNameCh.setText(fontFile.getFontDisplayName());
+//			holder.mLoveNumbers.setText(fontFile.getLoveNumbers());
+//			holder.mDownloadNumbers.setText(fontFile.getDownloadNumbers());
+			} catch (JSONException e){
+			    e.printStackTrace();
+			}
 			// set click listener
 			holder.mThumnailImage.setOnClickListener(mGridItemOnclickListener);
 			holder.mFontNameCh.setOnClickListener(mGridItemOnclickListener);
