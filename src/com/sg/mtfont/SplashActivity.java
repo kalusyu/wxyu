@@ -13,19 +13,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.sg.mtfont.bean.DeviceInfo;
 import com.sg.mtfont.bean.FontFile;
 import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.Constant;
+import com.sg.mtfont.utils.FontRestClient;
 import com.sg.mtfont.utils.HttpUtils;
 import com.sg.mtfont.xml.Config;
 import com.sg.mtfont.xml.XmlUtils;
 
+import org.apache.http.Header;
+import org.json.JSONArray;
 
 
 public class SplashActivity extends Activity implements IAsyncTaskHandler{
+	
+	public static final String TAG = SplashActivity.class.getSimpleName();
 	
 	public static final String SHARE_PREFER_KEYS = "share_prefer_keys";
 	public static final String LAUNCH_APP_FIRST = "launch_app_first";
@@ -40,8 +47,23 @@ public class SplashActivity extends Activity implements IAsyncTaskHandler{
 		
 		checkIfFirstTimeLaunchApp();
 		//TODO request need data
-		GetFontFileAsyncTask fontTask = new GetFontFileAsyncTask(this);
-		fontTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//		GetFontFileAsyncTask fontTask = new GetFontFileAsyncTask(this);
+//		fontTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		
+		FontRestClient.post(Constant.getFontInfo + "0-4", null, new JsonHttpResponseHandler(){
+    		@Override
+    		public void onSuccess(int statusCode, Header[] headers,
+    				JSONArray response) {
+    			Log.d(TAG, "ybw:"+response.toString());
+    		}
+    		
+    		@Override
+    		public void onFailure(int statusCode, Header[] headers,
+    				String responseString, Throwable throwable) {
+    			// TODO Auto-generated method stub
+    			super.onFailure(statusCode, headers, responseString, throwable);
+    		}
+    	});
 		//TODO progress tips
 	}
 	

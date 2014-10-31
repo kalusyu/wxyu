@@ -10,12 +10,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -26,8 +26,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpRequest;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.sg.mtfont.bean.DeviceInfo;
 import com.sg.mtfont.bean.FontFile;
 
@@ -35,7 +34,7 @@ import com.sg.mtfont.bean.FontFile;
  * @author Kalus Yu
  */
 public class HttpUtils {
-    static final String TAG = "HttpRequestUtils";
+    static final String TAG = HttpUtils.class.getSimpleName();
 
     static final int ERROR = -101;
 
@@ -108,7 +107,23 @@ public class HttpUtils {
     public static ArrayList<FontFile> getFontFileLists(){
 //        String urlStr = Constant.sUrl + Constant.methodgetAllDownload;
 //        return handleResponse(commonReuest(urlStr));
-        AsyncHttpRequest
+    	
+    	/*FontRestClient.get(Constant.getFontInfo, null, new JsonHttpResponseHandler(){
+    		@Override
+    		public void onSuccess(int statusCode, Header[] headers,
+    				JSONArray response) {
+    			Log.d(TAG, "ybw:"+response.toString());
+    		}
+    		
+    		@Override
+    		public void onFailure(int statusCode, Header[] headers,
+    				String responseString, Throwable throwable) {
+    			// TODO Auto-generated method stub
+    			super.onFailure(statusCode, headers, responseString, throwable);
+    		}
+    	});*/
+    	
+    	return null; // TODO
     }
 
     /**

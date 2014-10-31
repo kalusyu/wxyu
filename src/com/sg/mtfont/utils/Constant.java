@@ -18,13 +18,18 @@ public class Constant {
 	// private ImageView ivFontDetal;
 	public static final int NEED_POINTS = 200;
 	
-	public static String sUrl = "http://192.168.43.189/";
+	public static final String HOMEIP = "http://169.254.2.164/";
+	public static final String COMPANYIP = "http://192.168.43.189/";
+	public static String sUrl = HOMEIP;
+	
 	                             
 	public static String methodSaveDeviceInfoPath = "admin/save";
 	
 	public static String methodgetAllDownload = "admin/getAllDownload";
 	
 	public static String methodgetisFreeUser = "admin/isFreeUser";
+	
+	public static String getFontInfo = "mobile/getFontInfo/";
 	
 	
 	public static final String FONTFILE = "fontfile";
