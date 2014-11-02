@@ -1,9 +1,5 @@
 package com.sg.mtfont;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 
@@ -23,8 +19,6 @@ import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.Constant;
 import com.sg.mtfont.utils.FontRestClient;
 import com.sg.mtfont.utils.HttpUtils;
-import com.sg.mtfont.xml.Config;
-import com.sg.mtfont.xml.XmlUtils;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -50,7 +44,7 @@ public class SplashActivity extends Activity implements IAsyncTaskHandler{
 //		GetFontFileAsyncTask fontTask = new GetFontFileAsyncTask(this);
 //		fontTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		
-		FontRestClient.post(Constant.getFontInfo + "0-4", null, new JsonHttpResponseHandler(){
+		FontRestClient.post(Constant.getFontInfo + "0-"+Constant.PAGESIZE, null, new JsonHttpResponseHandler(){
     		@Override
     		public void onSuccess(int statusCode, Header[] headers,
     				JSONArray response) {

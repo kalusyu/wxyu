@@ -175,14 +175,14 @@ public class PullToRefreshView extends LinearLayout {
 		mHeaderUpdateTextView = (TextView) mHeaderView.findViewById(R.id.pull_to_refresh_updated_at);
 		mHeaderProgressBar = (ProgressBar) mHeaderView.findViewById(R.id.pull_to_refresh_progress);
 		// header layout
-		measureView(mHeaderView);
+		measureView(mHeaderView); 
 		mHeaderViewHeight = mHeaderView.getMeasuredHeight();
 		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, mHeaderViewHeight);
 		// 设置topMargin的值为负的header View高度,即将其隐藏在最上方
 		params.topMargin = -(mHeaderViewHeight);
 		// mHeaderView.setLayoutParams(params1);
 		addView(mHeaderView, params);
-
+		mHeaderView.setVisibility(View.GONE);
 	}
 
 	private void addFooterView() {
@@ -240,7 +240,7 @@ public class PullToRefreshView extends LinearLayout {
 	private void measureView(View child) {
 		ViewGroup.LayoutParams p = child.getLayoutParams();
 		if (p == null) {
-			p = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			p = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		}
 
 		int childWidthSpec = ViewGroup.getChildMeasureSpec(0, 0 + 0, p.width);

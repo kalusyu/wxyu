@@ -22,37 +22,36 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center|bottom"
             android:gravity="center_horizontal"
-            android:text="Hello Font"
             android:layout_marginBottom="15dip" />
     </FrameLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:layout_marginTop="15dip"
         android:layout_marginBottom="10dip" >
 
         <TextView
             android:id="@+id/txt_love_font_numbers"
-            android:layout_width="75dip"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/download_flag"
-            android:drawablePadding="3dip"
-            android:paddingLeft="10dip"
-            android:background="@drawable/gridview_item_btn_background"
-            android:text="2390" />
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
+            android:background="@drawable/gridview_item_btn_background" />
 
         <TextView
             android:id="@+id/txt_download_font_numbers"
-            android:layout_width="75dip"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/love_flag"
-            android:drawablePadding="3dip"
-            android:paddingLeft="10dip"
-            android:background="@drawable/gridview_item_btn_background"
-            android:text="3458" />
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
+            android:background="@drawable/gridview_item_btn_background" />
     </LinearLayout>
 
 </LinearLayout>

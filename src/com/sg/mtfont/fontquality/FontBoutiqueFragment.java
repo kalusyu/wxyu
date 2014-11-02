@@ -1,20 +1,31 @@
 package com.sg.mtfont.fontquality;
 
-import java.util.ArrayList;
-import java.util.List;
 
+import java.io.File;
+import java.util.concurrent.Executors;
+
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.app.DownloadManager.Request;
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,60 +35,102 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.sg.mtfont.R;
-import com.sg.mtfont.bean.FontFile;
 import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
+import com.sg.mtfont.task.FontApplyAsyncTask;
+import com.sg.mtfont.utils.Constant;
+import com.sg.mtfont.utils.FileUtils;
+import com.sg.mtfont.utils.FontDateUtils;
+import com.sg.mtfont.utils.FontRestClient;
+import com.sg.mtfont.utils.PointsHelper;
+import com.sg.mtfont.utils.SharedPreferencesHelper;
 import com.sg.mtfont.view.PullToRefreshView;
 import com.sg.mtfont.view.PullToRefreshView.OnFooterRefreshListener;
 import com.sg.mtfont.view.PullToRefreshView.OnHeaderRefreshListener;
+/**
+ * 
+ * @author Kalus Yu
+ *
+ */
+public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshListener, OnFooterRefreshListener {
 
-public class FontBoutiqueFragment extends Fragment implements OnClickListener,OnHeaderRefreshListener, OnFooterRefreshListener {
-
-	public static final String FONT_DETAIL_RESOURCE = "fontDetailResource";
-	public static final String FONT_FILE_PATCH_RESOURCE = "fontFilePatchResource";
-	public static final String FONT_FILENAME = "fontFileName";
-	
+    public static final String TAG = FontBoutiqueFragment.class.getSimpleName();
 	public static final String EXTRA_SELECTED_URL = "selected_url";
 	public static final String EXTRA_PICTURE_URLS = "all_urls";
 	public static final String EXTRA_FONT_URLS = "font_apk_urls";
 	
-	BoutiqueFragmentListener mListener;
+	private BoutiqueFragmentListener mListener;
 	
-	PullToRefreshView mPullToRefreshView;
-	GridView mGridView;
+	private PullToRefreshView mPullToRefreshView;
+	private GridView mGridView;
 	private LayoutInflater mInflater;
-	private List<Integer> listDrawable = new ArrayList<Integer>();
-	private GridViewAdapter adapter;
-//	private ArrayList<String> mPictureUris = new ArrayList<String>();
-//	private ArrayList<String> mFontApkUris = new ArrayList<String>();
+	private GridViewAdapter mGridAdapter;
+	
+	private int mCurrentPage = 1;
+	private int mTotalPage;
 	
 	private OnClickListener mGridItemOnclickListener = new OnClickListener() {
 		
 		@Override
-		public void onClick(View view) {
+		public void onClick(final View view) {
 			switch(view.getId()){
 			//TODO goto detail page
 			case R.id.img_thumbnail:
 			case R.id.txt_font_name:
-				Intent it = new Intent(getActivity(),FontDetailActivity.class);
-				it.putExtra(EXTRA_SELECTED_URL, (String)view.getTag());
-//				it.putExtra(EXTRA_PICTURE_URLS, mPictureUris);
-//				it.putExtra(EXTRA_FONT_URLS, mFontApkUris);
-				startActivity(it);
 				break;
 			//TODO 数据变化，刷新数据，与服务器交互
 			case R.id.txt_love_font_numbers:
+			    JSONObject tag = (JSONObject)view.getTag();
+			    try{
+    			    int fileId = tag.getInt("fileId");
+    			    FontRestClient.post(Constant.updateLoveNumber + "2-"+fileId, null, new JsonHttpResponseHandler(){
+    			        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+        			            try {
+                                    ((TextView)view).setText(response.getLong("loveNum")+"");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+        			            view.postInvalidate();
+    			        }
+    			    });
+			    } catch (JSONException e){
+			        Log.e(TAG, "mGridItemOnclickListener txt_love_font_numbers JSONException e.getMessage()="+e.getMessage());
+			    }
 				break;
 			//TODO
 			case R.id.txt_download_font_numbers:
+			    tag = (JSONObject)view.getTag();
+			    try{
+                    int fileId = tag.getInt("fileId");
+                    FontRestClient.post(Constant.updateDownloadNumber + "2-"+fileId, null, new JsonHttpResponseHandler(){
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                try {
+                                    ((TextView)view).setText(response.getLong("downloadNum")+"");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                view.postInvalidate();
+                        }
+                    });
+			    } catch (JSONException e){
+			        Log.e(TAG, "mGridItemOnclickListener txt_love_font_numbers JSONException e.getMessage()="+e.getMessage());
+			    }
+                try {
+                    downloadFile(mApkSparse.get(tag.getInt("groupId")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 				break;
+				
 				default:
 					;
 			}
@@ -92,7 +145,7 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		options = new DisplayImageOptions.Builder()
-        .showImageOnLoading(R.drawable.test_image)
+        .showImageOnLoading(R.drawable.default_image)
         .showImageForEmptyUri(R.drawable.feed_back)
         .showImageOnFail(R.drawable.ic_launcher)
         .cacheInMemory(true)
@@ -110,13 +163,14 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		mInflater = inflater;
 		
 		mPullToRefreshView = (PullToRefreshView) view.findViewById(R.id.main_pull_refresh_view);
+		clearSparseArray();
 		mGridView = (GridView) view.findViewById(R.id.gridview);
 		JSONArray json = mListener.getFontJson();
+		handleJson(json);
+		mGridAdapter = new GridViewAdapter(getActivity(),mImageSparse);
+		mGridView.setAdapter(mGridAdapter);
 		
-		adapter = new GridViewAdapter(getActivity(),json);
-		mGridView.setAdapter(adapter);
-		
-		mPullToRefreshView.setOnHeaderRefreshListener(this);
+//		mPullToRefreshView.setOnHeaderRefreshListener(this);
 		mPullToRefreshView.setOnFooterRefreshListener(this);
 
 		Button btn = (Button) view.findViewById(R.id.btn_recover_system_font);
@@ -125,23 +179,110 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		
 		return view;
 	}
-
-	/**
-	 * launch thread to init uris
-	 * @author Kalus Yu
-	 * @param mFontFiles2
-	 * 2014年10月7日 下午4:25:54
-	 */
-	private void initUris(final List<FontFile> mFontFiles) {
-	    new Thread(){
-	        public void run() {
-	            for (FontFile f : mFontFiles){
-//	                mPictureUris.add(f.getFontNamePicUri() + f.getFontNamePic());
-//	                mFontApkUris.add(f.getFontUri() + f.getFontDisplayName());
-	            }
-	        };
-	    }.start();
+	
+	private void clearSparseArray() {
+	    mImageSparse.clear();
+	    mApkSparse.clear();
     }
+	
+	private void downloadFile(JSONObject json) throws JSONException{
+	    String fileName = json.getString("name");
+	    String file = FileUtils.getSDCardPath()
+                + File.separatorChar + "download"
+                + File.separatorChar + fileName;
+        File fontApk = new File(file);
+        if(!fontApk.exists()){
+            DownloadManager dm = (DownloadManager)getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+            Uri uri = Uri.parse(Constant.sUrl + json.getString("relativeUrl").replace("\\", "/"));
+            Request request = new Request(uri);
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE|DownloadManager.Request.NETWORK_WIFI);
+            request.setDestinationInExternalFilesDir(getActivity(), null, file);//TODO 考虑sd卡问题，可以考虑先下载安装完再删除存到应用files下面
+            request.setDestinationInExternalPublicDir("fontxiuxiu/download", fileName);
+            long id = dm.enqueue(request);
+            SharedPreferences sp = SharedPreferencesHelper.getSharepreferences(getActivity());
+            sp.edit().putBoolean(String.valueOf(id), true).commit();
+            request.setTitle("字体下载");
+            request.setDescription(fileName+"下载中");
+            
+            Toast.makeText(getActivity(), "后台正在下载...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        PackageManager pm = getActivity().getPackageManager();
+        PackageInfo info = pm.getPackageArchiveInfo(file,
+                PackageManager.GET_ACTIVITIES);
+        String packageName = info.applicationInfo.packageName;
+        int currentPoints = PointsHelper.getCurrentPoints(getActivity());
+        //TODO 
+        if (/*!MainActivity.mConfig.isFree() &&*/ currentPoints < Constant.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("提示")
+                    .setMessage(
+                            "应用此字体需要200积分\n您当前的积分为" + currentPoints + "，是否获取积分")
+                    .setPositiveButton("获取积分",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface arg0,
+                                        int arg1) {
+                                    //TODO
+                                    /*ViewPager viewPager = MainActivity
+                                            .getViewPager();
+                                    if (viewPager != null) {
+                                        viewPager.setCurrentItem(2);
+                                    }*/
+                                }
+                            })
+                    .setNegativeButton("取消",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface arg0,
+                                        int arg1) {
+
+                                }
+                            }).show();
+        } else {
+            FontApplyAsyncTask applyFontTask = new FontApplyAsyncTask();
+            applyFontTask.executeOnExecutor(Executors.newSingleThreadExecutor(),json);
+        }
+	}
+
+    public void onStart() {
+	    super.onStart();
+	    FontRestClient.post(Constant.getPageInfo, null, new JsonHttpResponseHandler(){
+	        @Override
+	        public void onSuccess(int statusCode, Header[] headers,
+	                JSONArray response) {
+	            //{"pageSize":6,"pageNumber":1,"list":[{"id":7},{"id":8},{"id":9},{"id":10},{"id":11},{"id":12}],"totalRow":24,"totalPage":4}
+	            try {
+                    mTotalPage = response.getJSONObject(0).getInt("totalPage");
+                } catch (JSONException e) {
+                    Log.e(TAG, "onStart JSONException e.getMessage()="+e.getMessage());
+                }
+	        }
+	    });
+	};
+
+	SparseArray<JSONObject> mImageSparse = new SparseArray<JSONObject>();
+	SparseArray<JSONObject> mApkSparse = new SparseArray<JSONObject>();
+	private void handleJson(JSONArray json) {
+	    try {
+	        int k = mImageSparse.size();
+    	    for (int i = 0; i < json.length(); i++){
+    	        JSONObject o = json.getJSONObject(i);
+    	        int groupId = o.getInt("groupId");
+    	        String type = o.getString("type");
+    	        if (type.contains("image")){
+    	            mImageSparse.put(k++, o);
+    	        } else {
+    	            mApkSparse.put(groupId, o);
+    	        }
+    	    }
+	    } catch (JSONException e){
+	        e.printStackTrace();
+	    }
+    }
+
 
     OnClickListener mRecoverSystemFontClickListener = new OnClickListener() {
 
@@ -187,58 +328,72 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
     };
 
 	@Override
-	public void onClick(View arg0) {
-		Intent intent = new Intent(getActivity(), FontDetailActivity.class);
-		int resoureceId = -1;
-		String fontFilePath = null;
-		String fontFileName = null;
-
-		String[] str = new String[] {
-				"com.monotype.android.font.xiaonaipaozhongwen",
-				"com.monotype.android.font.cuojuehuiyi",
-				"com.monotype.android.font.wuyunkuaizoukai",
-				"com.monotype.android.font.jiangnandiao",
-				"com.monotype.android.font.zhihualuo"
-
-		};
-		String[] fileName = new String[] { "wuyunkuaizoukai.apk",
-				"xiaonaipaozhongwen.apk", "zhihualuo.apk", "cuojuehuiyi.apk",
-				"jiangnandiao.apk" };
-
-		intent.putExtra(FONT_DETAIL_RESOURCE, resoureceId);
-		intent.putExtra(FONT_FILE_PATCH_RESOURCE, fontFilePath);
-		intent.putExtra(FONT_FILENAME, fontFileName);
-		startActivity(intent);
-	}
-
-	@Override
 	public void onFooterRefresh(PullToRefreshView view) {
-		mPullToRefreshView.postDelayed(new Runnable() {
+        mPullToRefreshView.postDelayed(new Runnable() {
 
-			@Override
-			public void run() {
-				System.out.println("上拉加载");
-				listDrawable.add(R.drawable.test_image);
-				adapter.notifyDataSetChanged();
-				mPullToRefreshView.onFooterRefreshComplete();
-			}
-		}, 1000);		
+            @Override
+            public void run() {
+                // 设置更新时间
+                mPullToRefreshView.onHeaderRefreshComplete("最近更新:"+ FontDateUtils.getDateString());
+                
+                if (mCurrentPage <= mTotalPage){
+                    int start = mCurrentPage * Constant.PAGESIZE;
+                    // TODO total num page
+                    mCurrentPage += 1;
+                    FontRestClient.post(Constant.getFontInfo+ start+"-"+Constant.PAGESIZE, null, new JsonHttpResponseHandler(){
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers,
+                                JSONArray response) {
+                            handleJson(response);
+                            mGridAdapter.notifyDataSetChanged();
+                            mPullToRefreshView.onFooterRefreshComplete();
+                        }
+                        
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers,
+                                String responseString, Throwable throwable) {
+                            super.onFailure(statusCode, headers, responseString, throwable);
+                            mCurrentPage -= 1;
+                        }
+                    });
+                } else {
+                    mPullToRefreshView.onFooterRefreshComplete();
+                }
+            }
+        }, 1000);	
+        
 	}
 
 	@Override
 	public void onHeaderRefresh(PullToRefreshView view) {
-		mPullToRefreshView.postDelayed(new Runnable() {
-
-			@Override
-			public void run() {
-				// 设置更新时间
-				// mPullToRefreshView.onHeaderRefreshComplete("最近更新:01-23 12:01");
-				System.out.println("下拉更新");
-				listDrawable.add(R.drawable.test_image);
-				adapter.notifyDataSetChanged();
-				mPullToRefreshView.onHeaderRefreshComplete();
-			}
-		}, 1000);
+//		mPullToRefreshView.postDelayed(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				// 设置更新时间
+//				mPullToRefreshView.onHeaderRefreshComplete("最近更新:"+ FontDateUtils.getDateString());
+//				
+//				int start = mCurrentPage * 6 + 1;
+//				int end = (mCurrentPage + 1) * 6 + 1;
+//				mCurrentPage += 1;
+//				FontRestClient.post(Constant.getFontInfo+ start+"-"+end, null, new JsonHttpResponseHandler(){
+//				    @Override
+//				    public void onSuccess(int statusCode, Header[] headers,
+//				            JSONArray response) {
+//				        handleJson(response);
+//				        mGridAdapter.notifyDataSetChanged();
+//				        mPullToRefreshView.onHeaderRefreshComplete();
+//				    }
+//				    
+//				    @Override
+//				    public void onFailure(int statusCode, Header[] headers,
+//				            String responseString, Throwable throwable) {
+//				        super.onFailure(statusCode, headers, responseString, throwable);
+//				        mCurrentPage -= 1;
+//				    }
+//				});
+//			}
+//		}, 1000);
 		
 	}
 	
@@ -248,34 +403,25 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 	
 	class GridViewAdapter extends BaseAdapter{
 		
-	    JSONArray mJson;
 	    Context mContext;
-	    int mCount;
 
 	    /**
 	     * 
 	     * @param context
 	     * @param json
 	     */
-		public GridViewAdapter(Context context,JSONArray json) {
+		public GridViewAdapter(Context context,SparseArray<JSONObject> image) {
 		    mContext = context;
-		    mJson = json;
-		    mCount = json.length();
         }
 
         @Override
 		public int getCount() {
-			return mCount;
+			return mImageSparse.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			try {
-                return mJson.get(position);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-			return null;
+             return mImageSparse.get(position);
 		}
 
 		@Override
@@ -302,24 +448,32 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 			// TODO function
 			// set data
 			try {
-			JSONObject jo = mJson.getJSONObject(position);
-			if (jo.getString("type").contains("image")){
-			    String url = jo.getString("downloadUrl");
-			    holder.mThumnailImage.setTag(url);
-			    loadThumbnailImage(holder,url);//uri should be http:// format
-			}
-			//TODO
-//			holder.mFontNameCh.setText(fontFile.getFontDisplayName());
-//			holder.mLoveNumbers.setText(fontFile.getLoveNumbers());
-//			holder.mDownloadNumbers.setText(fontFile.getDownloadNumbers());
+    			JSONObject jo = mImageSparse.get(position);
+    			if (jo.getString("type").contains("image")){ // TODO more
+    			    String url = jo.getString("relativeUrl");
+    			    url = url.replace("\\", "/");
+    			    holder.mThumnailImage.setTag(Constant.sUrl + url);
+    			    loadThumbnailImage(holder,Constant.sUrl +url);//uri should be http:// format
+    			}
+    			//TODO
+    //			holder.mFontNameCh.setText(fontFile.getFontDisplayName());
+    			holder.mLoveNumbers.setText(jo.getLong("loveNum")+"");
+    			holder.mDownloadNumbers.setText(jo.getLong("downloadNum")+"");
+    			
+    			int fileId = jo.getInt("id");
+    			holder.mLoveNumbers.setTag(jo);
+    			holder.mDownloadNumbers.setTag(jo);
+    			
+    			// set click listener
+    			holder.mThumnailImage.setOnClickListener(mGridItemOnclickListener);
+    			holder.mFontNameCh.setOnClickListener(mGridItemOnclickListener);
+    			holder.mLoveNumbers.setOnClickListener(mGridItemOnclickListener);
+    			holder.mDownloadNumbers.setOnClickListener(mGridItemOnclickListener);
+    			
 			} catch (JSONException e){
-			    e.printStackTrace();
-			}
-			// set click listener
-			holder.mThumnailImage.setOnClickListener(mGridItemOnclickListener);
-			holder.mFontNameCh.setOnClickListener(mGridItemOnclickListener);
-			holder.mLoveNumbers.setOnClickListener(mGridItemOnclickListener);
-			holder.mDownloadNumbers.setOnClickListener(mGridItemOnclickListener);
+                e.printStackTrace();
+            }
+            
 			
 			return view;
 		}
@@ -358,4 +512,5 @@ public class FontBoutiqueFragment extends Fragment implements OnClickListener,On
 		TextView mLoveNumbers;
 		TextView mDownloadNumbers;
 	}
+	
 }
