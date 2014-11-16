@@ -17,6 +17,11 @@ public class FontDateUtils {
         return getDateString(DEFAULT_FORMAT);
     }
     
+    /**
+     * 获取 给定格式的日期
+     * @param format
+     * @return String
+     */
     public static String getDateString(String format){
         df = new SimpleDateFormat(format);
         return df.format(new Date());

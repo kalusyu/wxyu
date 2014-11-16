@@ -16,6 +16,8 @@ import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -43,6 +45,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.sg.mtfont.FontDownloadReceiver;
 import com.sg.mtfont.R;
 import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
@@ -78,6 +81,8 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 	private int mCurrentPage = 1;
 	private int mTotalPage;
 	
+	private FontDownloadReceiver mDownloadReceiver;
+	
 	private OnClickListener mGridItemOnclickListener = new OnClickListener() {
 		
 		@Override
@@ -91,7 +96,7 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 			case R.id.txt_love_font_numbers:
 			    JSONObject tag = (JSONObject)view.getTag();
 			    try{
-    			    int fileId = tag.getInt("fileId");
+    			    int fileId = tag.getInt("id");//获取文件id，根据文件ID增加相应的喜欢数
     			    FontRestClient.post(Constant.updateLoveNumber + "2-"+fileId, null, new JsonHttpResponseHandler(){
     			        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
         			            try {
@@ -110,7 +115,7 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 			case R.id.txt_download_font_numbers:
 			    tag = (JSONObject)view.getTag();
 			    try{
-                    int fileId = tag.getInt("fileId");
+                    int fileId = tag.getInt("id");
                     FontRestClient.post(Constant.updateDownloadNumber + "2-"+fileId, null, new JsonHttpResponseHandler(){
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 try {
@@ -125,7 +130,7 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 			        Log.e(TAG, "mGridItemOnclickListener txt_love_font_numbers JSONException e.getMessage()="+e.getMessage());
 			    }
                 try {
-                    downloadFile(mApkSparse.get(tag.getInt("groupId")));
+                    downloadFile(mApkSparse.get(tag.getInt("groupId")));//根据之前的groupId获取apk文件json
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -153,6 +158,23 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
         .considerExifParams(true)
         .bitmapConfig(Bitmap.Config.RGB_565)
         .build();
+		
+		mDownloadReceiver = new FontDownloadReceiver();
+		mDownloadReceiver.setup(this);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+		getActivity().registerReceiver(mDownloadReceiver, filter);
+		
+		filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+		filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
+		filter.addDataScheme("package");
+		getActivity().registerReceiver(mDownloadReceiver, filter);
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		getActivity().unregisterReceiver(mDownloadReceiver);
 	}
 
 	@Override
@@ -460,7 +482,6 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
     			holder.mLoveNumbers.setText(jo.getLong("loveNum")+"");
     			holder.mDownloadNumbers.setText(jo.getLong("downloadNum")+"");
     			
-    			int fileId = jo.getInt("id");
     			holder.mLoveNumbers.setTag(jo);
     			holder.mDownloadNumbers.setTag(jo);
     			

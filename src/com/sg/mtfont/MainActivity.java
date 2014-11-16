@@ -127,11 +127,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         Tab points = bar.newTab().setText(R.string.get_points)/*.setIcon(R.drawable.ic_launcher)*/;
         
         boutique.setTabListener(new FontTabListener(new FontBoutiqueFragment()));
-        all.setTabListener(new FontTabListener(new FontAllFragment()));
+//        all.setTabListener(new FontTabListener(new FontAllFragment()));
         points.setTabListener(new FontTabListener(new EarnPointsFragment()));
         
         bar.addTab(boutique);
-        bar.addTab(all);
+//        bar.addTab(all);
         bar.addTab(points);
     }
 
