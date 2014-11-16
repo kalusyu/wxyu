@@ -22,6 +22,7 @@ import com.sg.mtfont.utils.HttpUtils;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 public class SplashActivity extends Activity implements IAsyncTaskHandler{
@@ -58,8 +59,13 @@ public class SplashActivity extends Activity implements IAsyncTaskHandler{
     		@Override
     		public void onFailure(int statusCode, Header[] headers,
     				String responseString, Throwable throwable) {
-    			// TODO Auto-generated method stub
     			super.onFailure(statusCode, headers, responseString, throwable);
+    		}
+    		
+    		@Override
+    		public void onFailure(int statusCode, Header[] headers,
+    				Throwable throwable, JSONObject errorResponse) {
+    			super.onFailure(statusCode, headers, throwable, errorResponse);
     		}
     	});
 		//TODO progress tips

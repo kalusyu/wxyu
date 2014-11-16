@@ -5,10 +5,11 @@ public class Constant {
 	// private ImageView ivFontDetal;
 	public static final int NEED_POINTS = 200;
 	
-	public static final String HOMEIP = "http://169.254.2.164/";
+	public static final String HOMEIP = "http://169.254.2.164";
 	public static final String COMPANYIP = "http://192.168.43.189";
-	public static final String DOMAIN_NAME = "http://kalusyu.oicp.net/";
-	public static String sUrl = COMPANYIP;
+	public static final String DOMAIN_NAME = "http://kalusyu.oicp.net";
+	public static final String WANGXI_JIA = "http://192.168.1.102";
+	public static String sUrl = WANGXI_JIA;
 	                             
 	public static String methodSaveDeviceInfoPath = "admin/save";
 	

@@ -223,50 +223,15 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
             long id = dm.enqueue(request);
             SharedPreferences sp = SharedPreferencesHelper.getSharepreferences(getActivity());
             sp.edit().putBoolean(String.valueOf(id), true).commit();
+            request.setVisibleInDownloadsUi(true);
+            request.setNotificationVisibility(View.VISIBLE);
             request.setTitle("字体下载");
             request.setDescription(fileName+"下载中");
             
             Toast.makeText(getActivity(), "后台正在下载...", Toast.LENGTH_SHORT).show();
             return;
         }
-        PackageManager pm = getActivity().getPackageManager();
-        PackageInfo info = pm.getPackageArchiveInfo(file,
-                PackageManager.GET_ACTIVITIES);
-        String packageName = info.applicationInfo.packageName;
-        int currentPoints = PointsHelper.getCurrentPoints(getActivity());
-        //TODO 
-        if (/*!MainActivity.mConfig.isFree() &&*/ currentPoints < Constant.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
-            new AlertDialog.Builder(getActivity())
-                    .setTitle("提示")
-                    .setMessage(
-                            "应用此字体需要200积分\n您当前的积分为" + currentPoints + "，是否获取积分")
-                    .setPositiveButton("获取积分",
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface arg0,
-                                        int arg1) {
-                                    //TODO
-                                    /*ViewPager viewPager = MainActivity
-                                            .getViewPager();
-                                    if (viewPager != null) {
-                                        viewPager.setCurrentItem(2);
-                                    }*/
-                                }
-                            })
-                    .setNegativeButton("取消",
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface arg0,
-                                        int arg1) {
-
-                                }
-                            }).show();
-        } else {
-            FontApplyAsyncTask applyFontTask = new FontApplyAsyncTask();
-            applyFontTask.executeOnExecutor(Executors.newSingleThreadExecutor(),json);
-        }
+        
 	}
 
     public void onStart() {
@@ -304,6 +269,47 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 	        e.printStackTrace();
 	    }
     }
+	
+	public void checkPointsOrApplyFont(String path){
+		PackageManager pm = getActivity().getPackageManager();
+        PackageInfo info = pm.getPackageArchiveInfo(path,
+                PackageManager.GET_ACTIVITIES);
+        String packageName = info.applicationInfo.packageName;
+        int currentPoints = PointsHelper.getCurrentPoints(getActivity());
+        //TODO 
+        if (/*!MainActivity.mConfig.isFree() &&*/ currentPoints < Constant.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("提示")
+                    .setMessage(
+                            "应用此字体需要200积分\n您当前的积分为" + currentPoints + "，是否获取积分")
+                    .setPositiveButton("获取积分",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface arg0,
+                                        int arg1) {
+                                    //TODO
+                                    /*ViewPager viewPager = MainActivity
+                                            .getViewPager();
+                                    if (viewPager != null) {
+                                        viewPager.setCurrentItem(2);
+                                    }*/
+                                }
+                            })
+                    .setNegativeButton("取消",
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface arg0,
+                                        int arg1) {
+
+                                }
+                            }).show();
+        } else {
+            FontApplyAsyncTask applyFontTask = new FontApplyAsyncTask(getActivity());
+            applyFontTask.executeOnExecutor(Executors.newSingleThreadExecutor(),path);
+        }
+	}
 
 
     OnClickListener mRecoverSystemFontClickListener = new OnClickListener() {
