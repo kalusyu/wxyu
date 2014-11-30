@@ -60,12 +60,20 @@ public class SplashActivity extends Activity implements IAsyncTaskHandler{
     		public void onFailure(int statusCode, Header[] headers,
     				String responseString, Throwable throwable) {
     			super.onFailure(statusCode, headers, responseString, throwable);
+    			failRequest();
     		}
     		
     		@Override
     		public void onFailure(int statusCode, Header[] headers,
     				Throwable throwable, JSONObject errorResponse) {
     			super.onFailure(statusCode, headers, throwable, errorResponse);
+    			failRequest();
+    		}
+    		
+    		public void failRequest(){
+    			Intent it = new Intent(SplashActivity.this, MainActivity.class);
+    	        startActivity(it);
+    	        finish();
     		}
     	});
 		//TODO progress tips

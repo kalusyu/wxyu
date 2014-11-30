@@ -209,6 +209,7 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 	
 	private void downloadFile(JSONObject json) throws JSONException{
 	    String fileName = json.getString("name");
+	    FileUtils.createSDDir("download");
 	    String file = FileUtils.getSDCardPath()
                 + File.separatorChar + "download"
                 + File.separatorChar + fileName;
@@ -253,6 +254,9 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 	SparseArray<JSONObject> mImageSparse = new SparseArray<JSONObject>();
 	SparseArray<JSONObject> mApkSparse = new SparseArray<JSONObject>();
 	private void handleJson(JSONArray json) {
+		if (json == null || json.length() == 0){
+			return;
+		}
 	    try {
 	        int k = mImageSparse.size();
     	    for (int i = 0; i < json.length(); i++){

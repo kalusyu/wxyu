@@ -90,7 +90,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         mHandler = new FontHandler(getApplicationContext());
         String json = getIntent().getStringExtra(Constant.FONTFILE);
         try {
-            mJsonArray = new JSONArray(json);
+        	if (json != null){
+        		mJsonArray = new JSONArray(json);
+        	}
         } catch (JSONException e) {
             e.printStackTrace();
         }

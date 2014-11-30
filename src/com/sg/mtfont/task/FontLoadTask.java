@@ -77,7 +77,6 @@ public class FontLoadTask extends AsyncTask<String, Void, FontResource> {
                                 R.string.font_apply_success),
                         Toast.LENGTH_SHORT).show();
             }
-            Toast.makeText(mContext, "变身成功！", Toast.LENGTH_SHORT).show();
         } catch (NoSuchFieldError error) {
             Toast.makeText(mContext, R.string.font_apply_only_in_meitu2,
                     Toast.LENGTH_LONG).show();
