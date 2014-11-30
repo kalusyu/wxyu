@@ -84,6 +84,8 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 	private int mCurrentPage = 1;
 	private int mTotalPage;
 	
+	static boolean isFreeUser = false;
+	
 	private FontDownloadReceiver mDownloadReceiver;
 	
 	private OnClickListener mGridItemOnclickListener = new OnClickListener() {
@@ -153,7 +155,7 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		options = new DisplayImageOptions.Builder()
-        .showImageOnLoading(R.drawable.ic_launcher)
+        .showImageOnLoading(R.drawable.default_image)
         .showImageForEmptyUri(R.drawable.feed_back)
         .showImageOnFail(R.drawable.ic_launcher)
         .cacheInMemory(true)
@@ -256,6 +258,19 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
                 }
 	        }
 	    });
+	    FontRestClient.post(Constant.isFreeUser + CommonUtils.getImei(getActivity()), null, new JsonHttpResponseHandler(){
+	    	@Override
+	    	public void onSuccess(int statusCode, Header[] headers,
+	    			JSONArray response) {
+	    		try {
+					isFreeUser = response.getJSONObject(0).getBoolean("freeUser");
+				} catch (JSONException e) {
+					e.printStackTrace();
+					Log.e(TAG, "onStart Constant.isFreeUser e.getMessage="+e.getMessage());
+				}
+	    	}
+	    	
+	    });
 	};
 
 	SparseArray<JSONObject> mImageSparse = new SparseArray<JSONObject>();
@@ -288,11 +303,11 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
         String packageName = info.applicationInfo.packageName;
         int currentPoints = PointsHelper.getCurrentPoints(getActivity());
         //TODO 
-        if (/*!MainActivity.mConfig.isFree() &&*/ currentPoints < Constant.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
+        if (!isFreeUser && currentPoints < Constant.NEED_POINTS && !SharedPreferencesHelper.isFontApplied(getActivity(), packageName)) {
             new AlertDialog.Builder(getActivity())
                     .setTitle("提示")
                     .setMessage(
-                            "应用此字体需要200积分\n您当前的积分为" + currentPoints + "，是否获取积分")
+                            "应用此字体需要200积分\n您当前的积分为" + currentPoints + "，或者积满1000分购买免费版，永久免费！")
                     .setPositiveButton("获取积分",
                             new DialogInterface.OnClickListener() {
 
@@ -300,11 +315,6 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
                                 public void onClick(DialogInterface arg0,
                                         int arg1) {
                                     //TODO
-                                    /*ViewPager viewPager = MainActivity
-                                            .getViewPager();
-                                    if (viewPager != null) {
-                                        viewPager.setCurrentItem(2);
-                                    }*/
                                 }
                             })
                     .setNegativeButton("取消",

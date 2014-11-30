@@ -39,6 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:textColor="#ffffffff"
             android:layout_weight="1"
             android:background="@drawable/gridview_item_btn_background"
             android:drawableLeft="@drawable/download_flag"
@@ -50,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:textColor="#ffffffff"
             android:background="@drawable/gridview_item_btn_background"
             android:drawableLeft="@drawable/love_flag"
             android:gravity="center_horizontal" />

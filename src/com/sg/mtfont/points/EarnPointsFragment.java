@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.http.Header;
+import org.json.JSONArray;
+
 import net.youmi.android.offers.OffersManager;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -24,9 +27,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.sg.mtfont.MainActivity;
 import com.sg.mtfont.R;
 import com.sg.mtfont.utils.CommonUtils;
+import com.sg.mtfont.utils.Constant;
+import com.sg.mtfont.utils.FontRestClient;
 import com.sg.mtfont.utils.PointsHelper;
 import com.sg.mtfont.xml.Config;
 import com.sg.mtfont.xml.XmlUtils;
@@ -60,26 +67,15 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 			Toast.makeText(getActivity(), R.string.no_much_points, Toast.LENGTH_SHORT).show();
 		} else {
 			PointsHelper.spendPoints(getActivity(), 1000);//消耗1000
-			Config cfg =new Config();
-			cfg.setFree(true);
-			String path = getActivity().getFilesDir().getPath();
-			Environment.getUserSystemDirectory(0);
-			File file = new File(path + File.separatorChar + "config.txt");
-			if(!file.exists()){
-				try {
-					file.createNewFile();
-				} catch (IOException e) {
-					e.printStackTrace();
+			FontRestClient.post(Constant.buySoft + CommonUtils.getImei(getActivity()), null, new JsonHttpResponseHandler() {
+				@Override
+				public void onSuccess(int statusCode, Header[] headers,
+						JSONArray response) {
+					Toast.makeText(getActivity(), R.string.buy_success_tips, Toast.LENGTH_SHORT).show();
+					super.onSuccess(statusCode, headers, response);
 				}
-			}
-			OutputStream out = null;
-			try {
-				out = new FileOutputStream(file);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			XmlUtils.saveConfig(cfg, out);
-			Toast.makeText(getActivity(), R.string.buy_success_tips, Toast.LENGTH_SHORT).show();
+			});
+			
 			new Thread(new Runnable() {
 				
 				@Override

@@ -17,6 +17,10 @@
     <TextView 
         android:id="@+id/txt_error_tips"
         android:visibility="gone"
+        android:textSize="36sp"
+        android:textColor="#FFFFFFFF"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="服务器在开小差或者您的网络出现问题"/>

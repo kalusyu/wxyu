@@ -88,6 +88,7 @@ public class SplashActivity extends Activity implements IAsyncTaskHandler{
 	private void checkIfFirstTimeLaunchApp() {
 		SharedPreferences sp = getSharedPreferences(SHARE_PREFER_KEYS, Context.MODE_PRIVATE);
 		boolean launchFirstTime = sp.getBoolean(LAUNCH_APP_FIRST, true);
+		Log.d(TAG, "launchFirstTime=" + launchFirstTime);
 		// first launch application
 		if (launchFirstTime){
 			SendInfoAsyncTask t = new SendInfoAsyncTask(this);

@@ -9,9 +9,9 @@ public class Constant {
 	public static final String COMPANYIP = "http://192.168.43.189";
 	public static final String DOMAIN_NAME = "http://kalusyu.oicp.net";
 	public static final String WANGXI_JIA = "http://192.168.1.102";
-	public static String sUrl = COMPANYIP;
+	public static String sUrl = DOMAIN_NAME;
 	                             
-	public static String methodSaveDeviceInfoPath = "admin/save";
+	public static String methodSaveDeviceInfoPath = "/mobileDevice/save/";
 	
 	public static String methodgetAllDownload = "admin/getAllDownload";
 	
@@ -26,6 +26,10 @@ public class Constant {
 	public static String updateDownloadNumber = "/mobile/updateDownloadNumber/";
 	
 	public static String downloadFontFile = "/mobile/downloadFontFile/";
+	
+	public static String isFreeUser = "/mobile/isFreeUser/";
+	
+	public static String buySoft = "/mobile/buySoft/";
 	
 	
 	public static final String FONTFILE = "fontfile";
@@ -45,6 +49,7 @@ public class Constant {
         public static final String TYPE = "type";
         public static final String DOWNLOADURL = "downloadUrl";
         public static final String RELATIVEURL = "relativeUrl";
+        public static final String PACKAGENAME = "packageName";
 	}
 	
 	static final class Count implements BaseColumn {
