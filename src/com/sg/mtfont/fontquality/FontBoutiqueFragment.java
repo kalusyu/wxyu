@@ -2,6 +2,8 @@ package com.sg.mtfont.fontquality;
 
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 
 import org.apache.http.Header;
@@ -50,6 +52,7 @@ import com.sg.mtfont.R;
 import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
 import com.sg.mtfont.task.FontApplyAsyncTask;
+import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.Constant;
 import com.sg.mtfont.utils.FileUtils;
 import com.sg.mtfont.utils.FontDateUtils;
@@ -150,7 +153,7 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		options = new DisplayImageOptions.Builder()
-        .showImageOnLoading(R.drawable.default_image)
+        .showImageOnLoading(R.drawable.ic_launcher)
         .showImageForEmptyUri(R.drawable.feed_back)
         .showImageOnFail(R.drawable.ic_launcher)
         .cacheInMemory(true)
@@ -189,7 +192,11 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 		mGridView = (GridView) view.findViewById(R.id.gridview);
 		JSONArray json = mListener.getFontJson();
 		handleJson(json);
-		mGridAdapter = new GridViewAdapter(getActivity(),mImageSparse);
+		if (json == null || json.length() == 0 || !CommonUtils.isConnected(getActivity())){
+			view.findViewById(R.id.txt_error_tips).setVisibility(View.VISIBLE);
+		}
+		List<PackageInfo> packageInfo = FontResUtil.getFontPackegeInfoList(getActivity().getPackageManager());
+		mGridAdapter = new GridViewAdapter(getActivity(),mImageSparse,packageInfo);
 		mGridView.setAdapter(mGridAdapter);
 		
 //		mPullToRefreshView.setOnHeaderRefreshListener(this);
@@ -369,6 +376,7 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
                 mPullToRefreshView.onHeaderRefreshComplete("最近更新:"+ FontDateUtils.getDateString());
                 
                 if (mCurrentPage <= mTotalPage){
+                	mPullToRefreshView.setEnabled(true);
                     int start = mCurrentPage * Constant.PAGESIZE;
                     // TODO total num page
                     mCurrentPage += 1;
@@ -390,6 +398,8 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
                     });
                 } else {
                     mPullToRefreshView.onFooterRefreshComplete();
+                    mPullToRefreshView.getFooterTextView().setText("更多待续！");
+                    mPullToRefreshView.setEnabled(false);
                 }
             }
         }, 1000);	
@@ -436,24 +446,34 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 	class GridViewAdapter extends BaseAdapter{
 		
 	    Context mContext;
+	    SparseArray<JSONObject> mAdapterImageSparse;
+	    List<PackageInfo> mPackageInfo;
+	    List<String> mPackageNames;
+	    
 
 	    /**
 	     * 
 	     * @param context
 	     * @param json
 	     */
-		public GridViewAdapter(Context context,SparseArray<JSONObject> image) {
+		public GridViewAdapter(Context context,SparseArray<JSONObject> image, List<PackageInfo> packageInfo) {
+			mPackageNames = new ArrayList<String>();
 		    mContext = context;
+		    mAdapterImageSparse = image;
+		    mPackageInfo = packageInfo;
+		    for (PackageInfo p : packageInfo){
+		    	mPackageNames.add(p.packageName);
+		    }
         }
 
         @Override
 		public int getCount() {
-			return mImageSparse.size();
+			return mAdapterImageSparse.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-             return mImageSparse.get(position);
+             return mAdapterImageSparse.get(position);
 		}
 
 		@Override
@@ -480,7 +500,7 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 			// TODO function
 			// set data
 			try {
-    			JSONObject jo = mImageSparse.get(position);
+    			JSONObject jo = mAdapterImageSparse.get(position);
     			if (jo.getString("type").contains("image")){ // TODO more
     			    String url = jo.getString("relativeUrl");
     			    url = url.replace("\\", "/");
@@ -490,10 +510,16 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
     			//TODO
     //			holder.mFontNameCh.setText(fontFile.getFontDisplayName());
     			holder.mLoveNumbers.setText(jo.getLong("loveNum")+"");
-    			holder.mDownloadNumbers.setText(jo.getLong("downloadNum")+"");
-    			
     			holder.mLoveNumbers.setTag(jo);
-    			holder.mDownloadNumbers.setTag(jo);
+    			
+    			
+    			if (mPackageNames.contains(mApkSparse.get(jo.getInt("groupId")).getString("packageName"))){
+    				holder.mDownloadNumbers.setVisibility(View.GONE);
+    				holder.mDownloadNumbers.setCompoundDrawables(null, null, null, null);
+    			} else {
+    				holder.mDownloadNumbers.setText(jo.getLong("downloadNum")+"");
+    				holder.mDownloadNumbers.setTag(jo);
+    			}
     			
     			// set click listener
     			holder.mThumnailImage.setOnClickListener(mGridItemOnclickListener);

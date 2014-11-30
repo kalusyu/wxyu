@@ -9,7 +9,7 @@ public class Constant {
 	public static final String COMPANYIP = "http://192.168.43.189";
 	public static final String DOMAIN_NAME = "http://kalusyu.oicp.net";
 	public static final String WANGXI_JIA = "http://192.168.1.102";
-	public static String sUrl = WANGXI_JIA;
+	public static String sUrl = COMPANYIP;
 	                             
 	public static String methodSaveDeviceInfoPath = "admin/save";
 	

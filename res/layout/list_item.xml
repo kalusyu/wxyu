@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="#ffffff"
     android:orientation="vertical"
-    android:paddingTop="2dip"
-    android:background="#ffffff" >
+    android:paddingTop="2dip" >
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -21,37 +21,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center|bottom"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="15dip" />
+            android:layout_marginBottom="15dip"
+            android:gravity="center_horizontal" />
     </FrameLayout>
 
     <LinearLayout
+        android:background="@color/puple"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:layout_marginBottom="10dip" >
+        android:padding="6dip"
+        android:gravity="center_horizontal|center_horizontal"
+        android:orientation="horizontal" >
 
-        <TextView
+        <com.sg.mtfont.view.DrawableCenterTextView
             android:id="@+id/txt_love_font_numbers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/download_flag"
-            android:layout_weight="1"
             android:layout_gravity="center"
-            android:gravity="center_horizontal"
-            android:background="@drawable/gridview_item_btn_background" />
+            android:layout_weight="1"
+            android:background="@drawable/gridview_item_btn_background"
+            android:drawableLeft="@drawable/download_flag"
+            android:gravity="center_horizontal" />
 
-        <TextView
+        <com.sg.mtfont.view.DrawableCenterTextView
             android:id="@+id/txt_download_font_numbers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/love_flag"
-            android:layout_weight="1"
             android:layout_gravity="center"
-            android:gravity="center_horizontal"
-            android:background="@drawable/gridview_item_btn_background" />
+            android:layout_weight="1"
+            android:background="@drawable/gridview_item_btn_background"
+            android:drawableLeft="@drawable/love_flag"
+            android:gravity="center_horizontal" />
     </LinearLayout>
 
 </LinearLayout>
