@@ -87,7 +87,8 @@ public class EarnPointsFragment extends Fragment implements OnClickListener{
 			Intent i = getActivity().getPackageManager()  
 			        .getLaunchIntentForPackage(getActivity().getPackageName());  
 			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  
-			startActivity(i); 
+			startActivity(i);
+			getActivity().finish();
 			
 		}
 	}
