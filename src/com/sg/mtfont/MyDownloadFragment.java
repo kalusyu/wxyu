@@ -38,6 +38,9 @@ public class MyDownloadFragment extends Fragment {
 	
 	
 	public MyDownloadFragment(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return;
+		} 
 		mServerPackages = new SparseArray<DisplayData>();
 		try {
 			int k = 0;
@@ -77,7 +80,14 @@ public class MyDownloadFragment extends Fragment {
 						}
 					}
 				}
-				adapter.notifyDataSetChanged();
+				getActivity().runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
 			}
 		}).start();
 		v.setAdapter(adapter);

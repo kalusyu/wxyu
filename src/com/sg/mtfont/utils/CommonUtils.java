@@ -295,7 +295,7 @@ public class CommonUtils {
 		ConnectivityManager cm = (ConnectivityManager)
 				ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo ni = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-		boolean isNetData = ni.isConnected();
+		boolean isNetData = ni.isAvailable();
 		return isWifi || isNetData ;
 	}
 }

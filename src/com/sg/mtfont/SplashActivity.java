@@ -44,12 +44,15 @@ public class SplashActivity extends Activity implements IAsyncTaskHandler{
 		//TODO request need data
 //		GetFontFileAsyncTask fontTask = new GetFontFileAsyncTask(this);
 //		fontTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		if (!CommonUtils.isConnected(this)){
+			startIntentDirectly();
+		}
 		
 		FontRestClient.post(Constant.getFontInfo + "0-"+Constant.PAGESIZE, null, new JsonHttpResponseHandler(){
     		@Override
     		public void onSuccess(int statusCode, Header[] headers,
     				JSONArray response) {
-    			Log.d(TAG, "ybw:"+response.toString());
+    			//Log.d(TAG, "ybw:"+response.toString());
     			Intent it = new Intent(SplashActivity.this, MainActivity.class);
     	        it.putExtra(Constant.FONTFILE, response.toString());
     	        startActivity(it);
@@ -60,23 +63,25 @@ public class SplashActivity extends Activity implements IAsyncTaskHandler{
     		public void onFailure(int statusCode, Header[] headers,
     				String responseString, Throwable throwable) {
     			super.onFailure(statusCode, headers, responseString, throwable);
-    			failRequest();
+    			startIntentDirectly();
     		}
     		
     		@Override
     		public void onFailure(int statusCode, Header[] headers,
     				Throwable throwable, JSONObject errorResponse) {
     			super.onFailure(statusCode, headers, throwable, errorResponse);
-    			failRequest();
+    			startIntentDirectly();
     		}
     		
-    		public void failRequest(){
-    			Intent it = new Intent(SplashActivity.this, MainActivity.class);
-    	        startActivity(it);
-    	        finish();
-    		}
+    		
     	});
 		//TODO progress tips
+	}
+	
+	public void startIntentDirectly(){
+		Intent it = new Intent(SplashActivity.this, MainActivity.class);
+        startActivity(it);
+        finish();
 	}
 	
 	/**
