@@ -15,33 +15,19 @@
     <!-- Application theme. -->
      <style name="AppTheme" parent="AppBaseTheme">
         <item name="android:actionBarStyle">@style/ActionBarTheme</item>
-        <item name="android:actionBarTabStyle">@style/FontActionBarTabStyle</item>
-        <item name="android:actionBarTabTextStyle">@style/FontTabText</item>
     </style>
-    
-     <style name="FontTabText" parent="@android:style/Widget.ActionBar.TabText">
-         <item name="android:textSize">20sp</item>
-      <!--    <item name="android:textColor">#FF0000</item>
-         <item name="android:background">#00FF00</item> -->
-     </style>
-    
-     <style name="FontActionBarTabStyle" parent="@android:style/Widget.ActionBar.TabView">
-         <item name="android:background">@drawable/minitab_lt</item>
-     </style>
         
-    <style name="ActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">
+    <style name="ActionBarTheme" parent="@android:style/Widget.DeviceDefault.Light.ActionBar">
         <item name="android:background">@drawable/action_bar_background</item>   标题栏颜色
         <item name="android:backgroundStacked">#BBBBBB</item>  导航栏颜色
         <item name="android:backgroundSplit">#000000</item>  底部操作栏颜色
         <item name="android:titleTextStyle">@style/ActionBarTitleText</item>
-        <item name="android:divider">#ff0000</item>
     </style>
     
     <!--ActionBar title style-->
     <style name="ActionBarTitleText" 
            parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"  >
         <item name="android:textColor">#ffffff</item>
-        <item name="android:textSize">26sp</item>
     </style>
 
 </resources>

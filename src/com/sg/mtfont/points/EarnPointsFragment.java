@@ -1,23 +1,16 @@
 package com.sg.mtfont.points;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.apache.http.Header;
 import org.json.JSONArray;
 
 import net.youmi.android.offers.OffersManager;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +20,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.sg.mtfont.MainActivity;
 import com.sg.mtfont.R;
@@ -35,8 +27,6 @@ import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.Constant;
 import com.sg.mtfont.utils.FontRestClient;
 import com.sg.mtfont.utils.PointsHelper;
-import com.sg.mtfont.xml.Config;
-import com.sg.mtfont.xml.XmlUtils;
 
 public class EarnPointsFragment extends Fragment implements OnClickListener{
 	

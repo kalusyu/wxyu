@@ -18,7 +18,9 @@ import net.youmi.android.offers.PointsManager;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
@@ -29,8 +31,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
@@ -59,7 +59,7 @@ import com.sg.mtfont.utils.PointsHelper;
  * @author Kalus Yu
  *
  */
-public class MainActivity extends FragmentActivity implements OnClickListener,
+public class MainActivity extends Activity implements OnClickListener,
         PointsChangeNotify ,BoutiqueFragmentListener{
 
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -85,6 +85,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         sp = getSharedPreferences(SplashActivity.SHARE_PREFER_KEYS, Context.MODE_PRIVATE);
         mHandler = new FontHandler(getApplicationContext());
@@ -129,11 +130,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
         Tab points = bar.newTab().setText(R.string.get_points)/*.setIcon(R.drawable.ic_launcher)*/;
         Tab myDownload = bar.newTab().setText(R.string.myDownload);
         
-        boutique.setTabListener(new FontTabListener(new FontBoutiqueFragment()));
+        boutique.setTabListener(new FontTabListener(this,"boutique", FontBoutiqueFragment.class));
 //        all.setTabListener(new FontTabListener(new FontAllFragment()));
-        myDownload.setTabListener(new FontTabListener(new MyDownloadFragment(mJsonArray)));
+        myDownload.setTabListener(new FontTabListener(this,"mydownload", MyDownloadFragment.class));
         
-        points.setTabListener(new FontTabListener(new EarnPointsFragment()));
+        points.setTabListener(new FontTabListener(this,"points", EarnPointsFragment.class));
         
         bar.addTab(boutique);
 //        bar.addTab(all);
@@ -264,6 +265,16 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
         return true;
     }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case android.R.id.home:
+    		finish();
+    		return true;
+    	}
+    	return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -322,12 +333,18 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
     }
     
     
-    class FontTabListener implements TabListener{
+    class FontTabListener<T extends Fragment> implements TabListener{
         
         private Fragment mFragment;
         
-        public FontTabListener(Fragment fragment) {
-            mFragment = fragment;
+        private final Activity mActivity; 
+        private final String mTag;
+        private final Class<T> mClass;
+        
+        public FontTabListener(Activity activity, String tag, Class<T> clz) {
+        	mActivity = activity;
+        	mTag = tag;         
+        	mClass = clz; 
         }
 
         @Override
@@ -336,16 +353,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
         @Override
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            android.support.v4.app.FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-            tr.add(R.id.tab_fragment_content, mFragment);
-            tr.commit();
+        	if (mFragment == null){
+        		mFragment = Fragment.instantiate(mActivity, mClass.getName());
+        		ft.add(R.id.tab_fragment_content, mFragment);
+        	} else {
+        		ft.attach(mFragment);
+        	}
         }
 
         @Override
         public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-            android.support.v4.app.FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-            tr.remove(mFragment);
-            tr.commit();
+            if (mFragment != null){
+            	ft.detach(mFragment);
+            }
         }
         
     }
