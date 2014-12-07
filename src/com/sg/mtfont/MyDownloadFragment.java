@@ -8,16 +8,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sg.mtfont.fontmanager.FontResUtil;
-import com.sg.mtfont.fontquality.FontBoutiqueFragment.BoutiqueFragmentListener;
 import com.sg.mtfont.task.FontLoadTask;
 import com.sg.mtfont.utils.ApkInstallHelper;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -34,8 +32,6 @@ public class MyDownloadFragment extends Fragment {
 	private SparseArray<DisplayData> mServerPackages;
 	
 	private SparseArray<DisplayData>  mSparse;
-	
-	BoutiqueFragmentListener mListener;
 	
 	public MyDownloadFragment() {
 	}
@@ -62,39 +58,7 @@ public class MyDownloadFragment extends Fragment {
 			e.printStackTrace();
 		}
 	}
-	
-	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (BoutiqueFragmentListener) activity;
-        } catch (ClassCastException e){
-            e.printStackTrace();
-        }
-    }
 
-	private void initData() {
-		JSONArray jsonArray = mListener.getFontJson();
-		if (jsonArray == null){
-			return;
-		}
-		mServerPackages = new SparseArray<DisplayData>();
-		try {
-			int k = 0;
-			for (int i = 0; i < jsonArray.length(); i++ ){
-				JSONObject jo = jsonArray.getJSONObject(i);
-				String type = jo.getString("type");
-				if (!type.contains("image")){
-					DisplayData data = new DisplayData();
-					data.fontName = jo.getString("name");
-					data.packageName = jo.getString("packageName");
-					mServerPackages.put(k++, data);
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -107,11 +71,7 @@ public class MyDownloadFragment extends Fragment {
 			
 			@Override
 			public void run() {
-				initData();
 				int k = 0;
-				if (mServerPackages == null){
-					return;
-				}
 				for (PackageInfo pinfo : infos){
 					for (int i = 0; i < mServerPackages.size(); i ++){
 						DisplayData data = mServerPackages.get(i);
@@ -127,8 +87,8 @@ public class MyDownloadFragment extends Fragment {
 						adapter.notifyDataSetChanged();
 					}
 				});
+				
 			}
-
 		}).start();
 		v.setAdapter(adapter);
 		return v;
