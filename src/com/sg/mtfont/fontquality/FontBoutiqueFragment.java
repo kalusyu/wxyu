@@ -48,7 +48,9 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.sg.mtfont.FontDownloadReceiver;
+import com.sg.mtfont.MainActivity;
 import com.sg.mtfont.R;
+import com.sg.mtfont.SplashActivity;
 import com.sg.mtfont.fontmanager.FontResUtil;
 import com.sg.mtfont.fontmanager.FontResource;
 import com.sg.mtfont.task.FontApplyAsyncTask;
@@ -157,7 +159,7 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 		options = new DisplayImageOptions.Builder()
         .showImageOnLoading(R.drawable.default_image)
         .showImageForEmptyUri(R.drawable.feed_back)
-        .showImageOnFail(R.drawable.ic_launcher)
+        .showImageOnFail(R.drawable.ic_launcher) //TODO
         .cacheInMemory(true)
         .cacheOnDisk(true)
         .considerExifParams(true)
@@ -192,10 +194,35 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 		mPullToRefreshView = (PullToRefreshView) view.findViewById(R.id.main_pull_refresh_view);
 		clearSparseArray();
 		mGridView = (GridView) view.findViewById(R.id.gridview);
-		JSONArray json = mListener.getFontJson();
+		final JSONArray json = mListener.getFontJson();
 		handleJson(json);
 		if (json == null || json.length() == 0 || !CommonUtils.isConnected(getActivity())){
-			view.findViewById(R.id.txt_error_tips).setVisibility(View.VISIBLE);
+			final View tv = view.findViewById(R.id.txt_error_tips);
+			tv.setVisibility(View.VISIBLE);
+			tv.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					FontRestClient.post(Constant.getFontInfo + "0-"+Constant.PAGESIZE, null, new JsonHttpResponseHandler(){
+			    		@Override
+			    		public void onSuccess(int statusCode, Header[] headers,
+			    				JSONArray response) {
+			    			mListener.clearJsonArray();
+			    			mListener.setJsonArray(response);
+			    			clearSparseArray();
+			    			handleJson(response);
+			    			tv.setVisibility(View.GONE);
+			    		}
+			    		
+			    		@Override
+			    		public void onFailure(int statusCode, Header[] headers,
+			    				String responseString, Throwable throwable) {
+			    			super.onFailure(statusCode, headers, responseString, throwable);
+			    			tv.setVisibility(View.VISIBLE);
+			    		}
+					});
+				}
+			});
 		}
 		List<PackageInfo> packageInfo = FontResUtil.getFontPackegeInfoList(getActivity().getPackageManager());
 		mGridAdapter = new GridViewAdapter(getActivity(),mImageSparse,packageInfo);
@@ -451,6 +478,8 @@ public class FontBoutiqueFragment extends Fragment implements OnHeaderRefreshLis
 	
     public interface BoutiqueFragmentListener{
         JSONArray getFontJson();
+        void setJsonArray(JSONArray response);
+        void clearJsonArray();
     }
 	
 	class GridViewAdapter extends BaseAdapter{

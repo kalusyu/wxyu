@@ -14,16 +14,17 @@
         android:layout_height="wrap_content"
         android:background="@drawable/recovery_background"
         android:text="@string/recover_system_font_txt"/>
-    <TextView 
+    <com.sg.mtfont.view.DrawablePaddingTextView
         android:id="@+id/txt_error_tips"
+        android:drawableTop="@drawable/reload"
         android:visibility="gone"
-        android:textSize="36sp"
+        android:textSize="26sp"
         android:textColor="#FFFFFFFF"
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="服务器在开小差或者您的网络出现问题"/>
+        android:text="点击重新加载"/>
 
     <com.sg.mtfont.view.PullToRefreshView
         android:id="@+id/main_pull_refresh_view"

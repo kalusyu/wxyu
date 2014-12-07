@@ -2,13 +2,9 @@
 package com.sg.mtfont;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONStringer;
 
 import net.youmi.android.AdManager;
 import net.youmi.android.dev.OnlineConfigCallBack;
@@ -26,22 +22,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
 
-import com.sg.mtfont.bean.FontFile;
 import com.sg.mtfont.feedback.FeedBackActivity;
-import com.sg.mtfont.fontall.FontAllFragment;
 import com.sg.mtfont.fontquality.FontBoutiqueFragment;
 import com.sg.mtfont.fontquality.FontBoutiqueFragment.BoutiqueFragmentListener;
 import com.sg.mtfont.points.EarnPointsFragment;
@@ -49,7 +38,6 @@ import com.sg.mtfont.setting.AboutActivity;
 import com.sg.mtfont.setting.UpdateHelper;
 import com.sg.mtfont.utils.CommonUtils;
 import com.sg.mtfont.utils.Constant;
-import com.sg.mtfont.utils.FileUtils;
 import com.sg.mtfont.utils.HttpUtils;
 import com.sg.mtfont.utils.PointsHelper;
 
@@ -374,5 +362,15 @@ public class MainActivity extends Activity implements OnClickListener,
     @Override
     public JSONArray getFontJson() {
         return mJsonArray;
+    }
+    
+    @Override
+    public void setJsonArray(JSONArray response) {
+    	mJsonArray = response;
+    }
+    
+    @Override
+    public void clearJsonArray() {
+    	mJsonArray = null;
     }
 }

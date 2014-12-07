@@ -30,9 +30,9 @@
      </style>
         
     <style name="ActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">@drawable/action_bar_background</item>   标题栏颜色
-        <item name="android:backgroundStacked">#BBBBBB</item>  导航栏颜色
-        <item name="android:backgroundSplit">#000000</item>  底部操作栏颜色
+        <item name="android:background">@drawable/action_bar_background</item>   <!-- 标题栏颜色 -->
+        <item name="android:backgroundStacked">#f38922</item> <!-- 导航栏颜色 actiontab 的背景色-->
+        <item name="android:backgroundSplit">#f32236</item>  <!--底部操作栏颜色-->
         <item name="android:titleTextStyle">@style/ActionBarTitleText</item>
         <item name="android:divider">#ff0000</item>
     </style>
@@ -41,7 +41,7 @@
     <style name="ActionBarTitleText" 
            parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"  >
         <item name="android:textColor">#ffffff</item>
-        <item name="android:textSize">26sp</item>
+        <item name="android:textSize">22sp</item>
     </style>
 
 </resources>
